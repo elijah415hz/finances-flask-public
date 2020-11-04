@@ -1,11 +1,6 @@
 from flask import Flask, request, render_template
-# import pymysql
 from sqlalchemy import create_engine
-from dotenv import load_dotenv
-load_dotenv()
-
 import pandas as pd
-# import numpy as np
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 

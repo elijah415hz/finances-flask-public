@@ -1,1 +1,1 @@
-web: bin/run_cloud_sql_proxy &>null && gunicorn hello:app
+web: bin/run_cloud_sql_proxy &>null && gunicorn hello:create_app

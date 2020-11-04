@@ -59,7 +59,7 @@ def income():
 
 @app.route("/expenses")
 def expenses():
-    engine = create_engine(connectionString)    
+    engine = create_engine(FLASK_DB_URI)    
     year = request.args.get("year")
     month = request.args.get("month")
     year_month = year + "-" + month    

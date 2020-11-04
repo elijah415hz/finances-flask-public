@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 import os
-connectionString = os.environ.get("connectionString")
+FLASK_DB_URI = os.environ.get("connectionString")
 
 
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def index():
 
 @app.route("/income")
 def income():
-    engine = create_engine(connectionString)    
+    engine = create_engine(FLASK_DB_URI)    
     
     year = request.args.get("year")
     month = request.args.get("month")

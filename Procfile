@@ -1,1 +1,1 @@
-web: bin/run_cloud_sql_proxy
+web: bin/run_cloud_sql_proxy &>null && flask run

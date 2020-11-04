@@ -1,0 +1,6 @@
+flask
+flask-heroku
+pymysql
+sqlalchemy
+dotenv 
+pandas

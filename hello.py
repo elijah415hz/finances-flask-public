@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 import os
-FLASK_DB_URI = os.environ.get("connectionString")
+FLASK_DB_URI = os.environ.get("FLASK_DB_URI")
 
 app = Flask(__name__)
 

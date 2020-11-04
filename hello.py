@@ -1,11 +1,11 @@
 from flask import Flask, request
-import pymysql
+# import pymysql
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 load_dotenv()
 
 import pandas as pd
-import numpy as np
+# import numpy as np
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -55,7 +55,12 @@ def income():
     INC_report = pd.read_sql(sql, con=engine, parse_dates=['Date'])
     INC_report.set_index('Date', inplace=True)
     INC_total = INC_report['Amount'].sum()
-    return INC_report.to_html()
+    month_str = datetime.strftime(month, '%B %Y')
+    return '''
+    <h1>Income for {}</h1>
+    {}
+    <span>Total: {}</span>
+    '''.format(month_str, INC_report.to_html(), INC_total)
 
 @app.route("/expenses")
 def expenses():
@@ -81,7 +86,12 @@ def expenses():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
     pd.set_option('display.max_rows', None)
-    return EXP_report.to_html()
+    month_str = datetime.strftime(month, '%B %Y')
+    return '''
+    <h1>Expenses for {}</h1>
+    {}
+    '''.format(month_str, EXP_report.to_html())
 
-    if __name__ == "__main__":
-        app.run(host='0.0.0.0')
+
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0')

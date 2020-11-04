@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 # import pymysql
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
@@ -56,11 +56,8 @@ def income():
     INC_report.set_index('Date', inplace=True)
     INC_total = INC_report['Amount'].sum()
     month_str = datetime.strftime(month, '%B %Y')
-    return '''
-    <h1>Income for {}</h1>
-    {}
-    <span>Total: {}</span>
-    '''.format(month_str, INC_report.to_html(), INC_total)
+    header = "Income for {}".format(month_str)
+    return render_template('table.html', header=header, table=INC_report.to_html(), total=INC_total)
 
 @app.route("/expenses")
 def expenses():
@@ -87,11 +84,9 @@ def expenses():
     pd.set_option('display.width', None)
     pd.set_option('display.max_rows', None)
     month_str = datetime.strftime(month, '%B %Y')
-    return '''
-    <h1>Expenses for {}</h1>
-    {}
-    '''.format(month_str, EXP_report.to_html())
-
+    header = "Expenses for {}".format(month_str)
+    return render_template('table.html', header=header, table=EXP_report.to_html())
+   
 
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0')

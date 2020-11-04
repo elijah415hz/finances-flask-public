@@ -12,8 +12,6 @@ from dateutil.relativedelta import relativedelta
 import os
 FLASK_DB_URI = os.environ.get("connectionString")
 
-
-def create_app():
 app = Flask(__name__)
 
 @app.route("/")

@@ -13,21 +13,21 @@ app = Flask(__name__)
 def index():
     return '''
     <h1>View Income</h1>
-    <form action="/income" method="get">
+    <form class="form-inline" action="/income" method="get">
     <label for="year">Year</label>
-    <input type="text" name="year" placeholder="YYYY">
+    <input type="text" id="year" class="form-control" name="year" placeholder="YYYY">
     <label for="month">Month</label>
-    <input type="text" name="month" placeholder="MM">
-    <button type="submit">Submit</button>
+    <input type="text" id="month" class="form-control" name="month" placeholder="MM">
+    <button class="btn btn-success">Submit</button>
     </form>
 
     <h1>View Expenses</h1>
-    <form action="/expenses" method="get">
-    <label for="year">Year</label>
-    <input type="text" name="year" placeholder="YYYY">
-    <label for="month">Month</label>
-    <input type="text" name="month" placeholder="MM">
-    <button type="submit">Submit</button>
+    <form class="form-inline" action="/expenses" method="get">
+    <label for="year2">Year</label>
+    <input type="text" id="year2" class="form-control" name="year" placeholder="YYYY">
+    <label for="month2">Month</label>
+    <input type="text" id="month2" class="form-control" name="month" placeholder="MM">
+    <button class="btn btn-success">Submit</button>
     </form>
     '''
 

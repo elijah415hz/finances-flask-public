@@ -1,13 +1,23 @@
 {% extends 'base.html' %}
 
 {% block table %}
-<div class="flex">
-    <h1>
-        {{header}}
-    </h1>
-    {{table|safe}}
-    {% if total %}
-        <strong>Total: {{total}}</strong>
-    {% endif %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>
+                {{header}}
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{table|safe}}
+            {% if total %}
+            <br>    
+            <strong>Total: {{total}}</strong>
+            {% endif %}
+        </div>
+    </div>
+    
 </div>
 {% endblock %}

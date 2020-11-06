@@ -11,25 +11,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return '''
-    <h1>View Income</h1>
-    <form class="form-inline" action="/income" method="get">
-    <label for="year">Year</label>
-    <input type="text" id="year" class="form-control" name="year" placeholder="YYYY">
-    <label for="month">Month</label>
-    <input type="text" id="month" class="form-control" name="month" placeholder="MM">
-    <button class="btn btn-success">Submit</button>
-    </form>
-
-    <h1>View Expenses</h1>
-    <form class="form-inline" action="/expenses" method="get">
-    <label for="year2">Year</label>
-    <input type="text" id="year2" class="form-control" name="year" placeholder="YYYY">
-    <label for="month2">Month</label>
-    <input type="text" id="month2" class="form-control" name="month" placeholder="MM">
-    <button class="btn btn-success">Submit</button>
-    </form>
-    '''
+    return render_template('form.html')
 
 @app.route("/income")
 def income():

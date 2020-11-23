@@ -13,6 +13,10 @@ app = Flask(__name__)
 def index():
     return render_template('form.html')
 
+@app.route("/react")
+def react():
+    return render_template('react_client/build/index.html')
+
 @app.route("/income")
 def income():
     engine = create_engine(FLASK_DB_URI)    
@@ -35,6 +39,28 @@ def income():
     month_str = datetime.strftime(month, '%B %Y')
     header = "Income for {}".format(month_str)
     return render_template('table.html', header=header, table=INC_report.to_html(), total=INC_total)
+
+@app.route("/api/income")
+def api_income():
+    engine = create_engine(FLASK_DB_URI)    
+    
+    year = request.args.get("year")
+    month = request.args.get("month")
+    year_month = year + "-" + month
+    month = datetime.strptime(year_month, '%Y-%m')
+    start_date = (month - timedelta(days=1)).date()
+    end_date = (month + relativedelta(months=+1)).date()
+    sql = "SELECT Date, Amount, s.name AS Source, p.name AS Person\
+                FROM income i\
+                LEFT JOIN source s ON s.id=i.source_id\
+                LEFT JOIN person_earner p ON p.id=i.earner_id\
+		        WHERE date > '{}' AND date < '{}'\
+                ORDER BY date;".format(start_date, end_date)
+    INC_report = pd.read_sql(sql, con=engine, parse_dates=['Date'])
+    INC_report.set_index('Date', inplace=True)
+    INC_total = INC_report['Amount'].sum()
+    month_str = datetime.strftime(month, '%B %Y')
+    return INC_report.to_json(orient="table")
 
 @app.route("/expenses")
 def expenses():

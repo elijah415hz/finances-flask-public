@@ -31,6 +31,12 @@ function App() {
     id: number
   }
 
+  interface pivotDataEntry {
+    Broad_category: string,
+    Narrow_category: string,
+    Amount: string
+  }
+
   const [incomeTableState, setIncomeTableState] = useState<incomeDataEntry[]>(
     [{
       Amount: "",
@@ -54,8 +60,7 @@ function App() {
       entry_id: NaN
     }]
   )
-  const [pivotTableState, setPivotTableState] = useState<{ schema: { fields: { name: string }[] }, data: [] }>()
-
+  const [pivotTableState, setPivotTableState] = useState<pivotDataEntry[]>()
 
   function formatDates(entry:
     {
@@ -83,18 +88,19 @@ function App() {
     try {
       event.preventDefault()
       let route = formState.form
-      let tableData = await (await API[route](formState)).json()
+      let {data} = await (await API[route](formState)).json()
       // Formatting the dates the hard way because javascript doesn't support strftime...
-      tableData.data = tableData.data.map(formatDates)
+      // tableData.data = tableData.data.map(formatDates)
       switch (route) {
         case "expenses":
-          console.log(tableData)
-          setExpensesTableState(tableData.data)
+          setExpensesTableState(data)
           break;
         case "income":
-          setIncomeTableState(tableData.data)
+          setIncomeTableState(data)
           break;
         case "pivot":
+          console.log(data)
+          setPivotTableState(data)
           break;
       }
     } catch (err) {
@@ -289,6 +295,47 @@ function App() {
                 </td>
               </tr>
 
+            </tbody>
+          ))}
+        </table>
+      ) : null}
+      {formState.form === "pivot" && pivotTableState ? (
+        <table>
+          <thead>
+            <tr>
+              <th>
+                Broad Category
+              </th>
+              <th>
+                Narrow Category
+              </th>
+              <th>
+                Amount
+              </th>
+             </tr>
+          </thead>
+          {pivotTableState.map((entry: pivotDataEntry, i: number) => (
+            <tbody key={i}>
+              <tr>
+                <td><input
+                  name="Broad_category"
+                  className="tableInput"
+                  value={entry.Broad_category}
+                />
+                </td>
+                <td><input
+                  name="Narrow_category"
+                  className="tableInput"
+                  value={entry.Narrow_category}
+                />
+                </td>
+                <td><input
+                  name="Amount"
+                  className="tableInput"
+                  value={entry.Amount}
+                />
+                </td>
+               </tr>
             </tbody>
           ))}
         </table>

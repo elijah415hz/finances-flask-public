@@ -1,5 +1,5 @@
 
-const API: { expenses: Function, income: Function, pivot: Function } = {
+const API: { expenses: Function, income: Function, pivot: Function, wallchart: Function } = {
     expenses: function (yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
         return fetch(`/api/expenses?year=${yearMonthObj.year}&month=${yearMonthObj.month}`)
     },
@@ -8,6 +8,9 @@ const API: { expenses: Function, income: Function, pivot: Function } = {
     },
     pivot: function (yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
         return fetch(`/api/pivot?year=${yearMonthObj.year}&month=${yearMonthObj.month}`)
+    },
+    wallchart: function (): Promise<Response> {
+        return fetch('/api/wallchart')
     }
 }
 

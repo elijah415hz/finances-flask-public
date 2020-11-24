@@ -1,9 +1,12 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_file
 from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
+from matplotlib.figure import Figure
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+import base64
+from io import BytesIO
 
 import os
 FLASK_DB_URI = os.environ.get("FLASK_DB_URI")
@@ -91,8 +94,9 @@ def api_pivot():
     return PT_report.to_json(orient="table")
 
 # Figure out how to send matplotlib...
-def wallchart(engine):
-    # Pull selected month from expenses and income    
+@app.route("/api/wallchart")
+def wallchart():
+    engine = create_engine(FLASK_DB_URI)    
     EXP_sql = "SELECT Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
                     LEFT JOIN vendor v ON v.id=e.vendor_id \
                     LEFT JOIN broad_category b ON b.id=e.broad_category_id \
@@ -115,9 +119,15 @@ def wallchart(engine):
     # Generate Plot
     df_wallchart = pd.merge(INC_wallchart, EXP_wallchart, on='Date')
     df_wallchart.rename(columns={'Amount_x': 'Income', 'Amount_y': 'Expenses'}, inplace=True)
-    df_wallchart.plot.line(figsize=(13, 4), color=['blue', 'red'], grid=True)
-    plt.show()
-    exit()
+    fig = Figure()
+    ax = fig.subplots()
+    df_wallchart.plot.line(figsize=(13, 4), color=['blue', 'red'], grid=True, ax=ax)
+    buffer = BytesIO()
+    fig.savefig(buffer, format="png")
+    # Embed the result in the html output.
+    buffer.seek(0)
+    return send_file(buffer,  attachment_filename='plot.png',
+                     mimetype='image/png')
 
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0')

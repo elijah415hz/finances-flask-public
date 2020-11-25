@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Table from './components/Table';
 import API from './utils/API'
 
 function App() {
@@ -50,30 +51,37 @@ function App() {
     }
   )
 
-  const [incomeTableState, setIncomeTableState] = useState<incomeDataEntry[]>(
-    [{
-      Amount: "",
-      Date: "",
-      Source: "",
-      Person: "",
-      id: NaN,
-      source_id: NaN,
-      earner_id: NaN
-    }]
+  const [incomeTableState, setIncomeTableState] = useState<{ schema: { fields: [] }, data: incomeDataEntry[] }>(
+    {
+      schema: { fields: [] },
+      data: [{
+        Amount: "",
+        Date: "",
+        Source: "",
+        Person: "",
+        id: NaN,
+        source_id: NaN,
+        earner_id: NaN
+      }]
+    }
   )
 
-  const [expensesTableState, setExpensesTableState] = useState<expensesDataEntry[]>(
-    [{
-      Amount: "",
-      Date: "",
-      Source: "",
-      Vendor: "",
-      Broad_category: "",
-      Narrow_category: "",
-      Person: "",
-      Notes: "",
-      entry_id: NaN
-    }]
+  const [expensesTableState, setExpensesTableState] = useState<{ schema: { fields: [] }, data: expensesDataEntry[] }>(
+    {
+      schema: { fields: [] },
+      data: [{
+        Amount: "",
+        Date: "",
+        Source: "",
+        Vendor: "",
+        Broad_category: "",
+        Narrow_category: "",
+        Person: "",
+        Notes: "",
+        entry_id: NaN
+      }]
+    }
+
   )
   const [pivotTableState, setPivotTableState] = useState<pivotDataEntry[]>()
 
@@ -106,19 +114,18 @@ function App() {
     try {
       event.preventDefault()
       let route = formState.form
-      let { data } = await (await API[route](formState)).json()
+      let response = await (await API[route](formState)).json()
       // Formatting the dates the hard way because javascript doesn't support strftime...
-      data = data.map(formatDates)
-      console.log(data)
+      response.data = response.data.map(formatDates)
       switch (route) {
         case "expenses":
-          setExpensesTableState(data)
+          setExpensesTableState(response)
           break;
         case "income":
-          setIncomeTableState(data)
+          setIncomeTableState(response)
           break;
         case "pivot":
-          setPivotTableState(data)
+          setPivotTableState(response)
           break;
       }
     } catch (err) {
@@ -129,20 +136,20 @@ function App() {
   function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, entry_id: number): void {
     if (expensesTableState) {
       let { name, value } = event.target;
-      let newExpensesTableState: expensesDataEntry[] = expensesTableState.map(((entry: expensesDataEntry) => {
+      let newExpensesTableStateData: expensesDataEntry[] = expensesTableState.data.map(((entry: expensesDataEntry) => {
         if (entry.entry_id === entry_id) {
           entry = { ...entry, [name]: value }
         }
         return entry;
       }))
-      setExpensesTableState(newExpensesTableState)
+      setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
     }
   }
 
   function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, id: number): void {
     if (expensesTableState) {
       let { name, value } = event.target;
-      let newIncomeTableState: incomeDataEntry[] = incomeTableState.map(((entry: incomeDataEntry) => {
+      let newIncomeTableStateData: incomeDataEntry[] = incomeTableState.data.map(((entry: incomeDataEntry) => {
         if (entry.id === id) {
           if (name === 'Source' || name === 'Person') {
             let state;
@@ -169,23 +176,11 @@ function App() {
         }
         return entry;
       }))
-      setIncomeTableState(newIncomeTableState)
+      setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
     }
   }
 
-  useEffect(() => {
-    async function getDataLists(): Promise<void> {
-      switch (formState.form) {
-        case ("income"):
-          let { data } = await API.sources()
-          setSourcesState(data)
-          let res = await API.persons()
-          setPersonsState(res.data)
-          break;
-      }
-    }
-    getDataLists()
-  }, [formState.form])
+
 
   return (
     <div className="App">
@@ -220,164 +215,25 @@ function App() {
           <button className="btn btn-success">Submit</button>
         </form>
       </div>
-      {formState.form === "income" && incomeTableState[0].id ? (
-        <table>
-          <thead>
-            <tr>
-              <th>
-                Date
-              </th>
-              <th>
-                Amount
-              </th>
-              <th>
-                Source
-              </th>
-              <th>
-                Person
-              </th>
-            </tr>
-          </thead>
-          {incomeTableState.map((entry: incomeDataEntry) => (
-            <tbody key={entry.id}>
-              <tr>
-                <td><input
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                  name="Date"
-                  className="tableInput"
-                  value={entry.Date}
-                />
-                </td>
-                <td><span>$</span><input
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                  name="Amount"
-                  className="tableInput"
-                  value={entry.Amount}
-                />
-                </td>
-                <td><input
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                  name="Source"
-                  className="tableInput"
-                  value={entry.Source}
-                  list="source"
-                />
-                  {sourcesState ? (
-                    <datalist id="source">
-                      {sourcesState.map((entry: dataListStateType) => {
-                        return (
-                          <option
-                            value={entry.name}
-                            key={entry.id}
-                          />
-                        )
-                      })}
-                    </datalist>
-                  ) : null}
-                </td>
-                <td><input
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                  name="Person"
-                  className="tableInput"
-                  value={entry.Person}
-                  list="person"
-                />
-                  {personsState ? (
-                    <datalist id="person">
-                      {personsState.map((entry: dataListStateType) => {
-                        return (
-                          <option
-                            value={entry.name}
-                            key={entry.id}
-                          />
-                        )
-                      })}
-                    </datalist>
-                  ) : null}
-                </td>
-              </tr>
-            </tbody>
-          ))}
-        </table>
+      {formState.form === "income" && incomeTableState.data[0].id ? (
+        <Table
+          state={incomeTableState}
+          handleChange={handleIncomeChange}
+          setSourcesState={setSourcesState}
+          setPersonsState={setPersonsState}
+          sourcesState={sourcesState}
+          personsState={personsState}
+        />
       ) : null}
-      {formState.form === "expenses" && expensesTableState[0].entry_id ? (
-        <table>
-          <thead>
-            <tr>
-              <th>
-                Date
-              </th>
-              <th>
-                Vendor
-              </th>
-              <th>
-                Amount
-              </th>
-              <th>
-                Broad Category
-              </th>
-              <th>
-                Narrow Category
-              </th>
-              <th>
-                Person
-              </th>
-              <th>
-                Notes
-              </th>
-            </tr>
-          </thead>
-          {expensesTableState.map((entry: expensesDataEntry) => (
-            <tbody key={entry.entry_id}>
-              <tr>
-                <td><input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                  name="Date"
-                  className="tableInput"
-                  value={entry.Date} /></td>
-                <td><input
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                  name="Vendor"
-                  className="tableInput"
-                  value={entry.Vendor} /></td>
-                <td><span>$</span><input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                  name="Amount"
-                  className="tableInput"
-                  value={'$' + entry.Amount}
-                />
-                </td>
-                <td>
-                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                    name="Broad_category"
-                    className="tableInput"
-                    value={entry.Broad_category}
-                  />
-                </td>
-                <td>
-                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                    name="Narrow_category"
-                    className="tableInput"
-                    value={entry.Narrow_category || ""}
-                  />
-                </td>
-                <td>
-                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                    name="Person"
-                    className="tableInput"
-                    value={entry.Person || ""}
-                  />
-                </td>
-                <td>
-                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                    name="Notes"
-                    className="tableInput"
-                    value={entry.Notes || ""}
-                  />
-                </td>
-              </tr>
-
-            </tbody>
-          ))}
-        </table>
+      {formState.form === "expenses" && expensesTableState.data[0].entry_id ? (
+        <Table
+          state={expensesTableState}
+          handleChange={handleExpensesChange}
+          setSourcesState={setSourcesState}
+          setPersonsState={setPersonsState}
+          sourcesState={sourcesState}
+          personsState={personsState}
+        />
       ) : null}
       {formState.form === "pivot" && pivotTableState ? (
         <table>

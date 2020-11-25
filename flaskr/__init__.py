@@ -12,9 +12,10 @@ import os
 FLASK_DB_URI = os.environ.get("FLASK_DB_URI")
 
 app = Flask(__name__)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 def format_numbers(x):
-    return "${:.2f}".format(x)
+    return "{:.2f}".format(x)
 
 @app.route("/")
 def index():
@@ -33,7 +34,7 @@ def api_income():
     month = datetime.strptime(year_month, '%Y-%m')
     start_date = month.date()
     end_date = (month + relativedelta(months=+1)).date()
-    sql = "SELECT i.id, Date, Amount, s.name AS Source, p.name AS Person\
+    sql = "SELECT i.id, i.source_id, i.earner_id, Date, Amount, s.name AS Source, p.name AS Person\
                 FROM income i\
                 LEFT JOIN source s ON s.id=i.source_id\
                 LEFT JOIN person_earner p ON p.id=i.earner_id\
@@ -129,5 +130,19 @@ def wallchart():
     return send_file(buffer,  attachment_filename='plot.png',
                      mimetype='image/png')
 
-# if __name__ == "__main__":
-#     app.run(host='0.0.0.0')
+@app.route("/api/sources")
+def get_sources():
+    engine = create_engine(FLASK_DB_URI)
+    sql = "SELECT id, name FROM source ORDER BY name"
+    dataframe = pd.read_sql(sql, con=engine)
+    return dataframe.to_json(orient="table")
+
+@app.route("/api/persons")
+def get_persons():
+    engine = create_engine(FLASK_DB_URI)
+    sql = "SELECT id, name FROM person_earner ORDER BY name"
+    dataframe = pd.read_sql(sql, con=engine)
+    return dataframe.to_json(orient="table")
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')

@@ -3,13 +3,11 @@ import './App.css';
 import API from './utils/API'
 
 function App() {
-  const [formState, setFormState] = useState<{ form: "expenses" | "income" | "pivot", year: string, month: string }>(
-    {
-      form: "income",
-      year: "",
-      month: ""
-    }
-  )
+  interface formStateType {
+    form: "expenses" | "income" | "pivot",
+    year: string,
+    month: string
+  }
 
   interface expensesDataEntry {
     Amount: string,
@@ -28,7 +26,9 @@ function App() {
     Date: string,
     Source: string,
     Person: string,
-    id: number
+    id: number,
+    source_id: number,
+    earner_id: number
   }
 
   interface pivotDataEntry {
@@ -37,13 +37,28 @@ function App() {
     Amount: string
   }
 
+  interface dataListStateType {
+    id: number,
+    name: string
+  }
+
+  const [formState, setFormState] = useState<formStateType>(
+    {
+      form: "income",
+      year: "",
+      month: ""
+    }
+  )
+
   const [incomeTableState, setIncomeTableState] = useState<incomeDataEntry[]>(
     [{
       Amount: "",
       Date: "",
       Source: "",
       Person: "",
-      id: NaN
+      id: NaN,
+      source_id: NaN,
+      earner_id: NaN
     }]
   )
 
@@ -62,7 +77,8 @@ function App() {
   )
   const [pivotTableState, setPivotTableState] = useState<pivotDataEntry[]>()
 
-  const [wallchartState, setWallchartState] = useState<string>()
+  const [sourcesState, setSourcesState] = useState<dataListStateType[]>([])
+  const [personsState, setPersonsState] = useState<dataListStateType[]>([])
 
   function formatDates(entry:
     {
@@ -128,7 +144,28 @@ function App() {
       let { name, value } = event.target;
       let newIncomeTableState: incomeDataEntry[] = incomeTableState.map(((entry: incomeDataEntry) => {
         if (entry.id === id) {
-          entry = { ...entry, [name]: value }
+          if (name === 'Source' || name === 'Person') {
+            let state;
+            let id;
+            switch (name) {
+              case "Person":
+                state = personsState;
+                id = 'earner_id'
+                break;
+              case "Source":
+                state = sourcesState;
+                id = 'source_id'
+                break;
+            }
+            let sourcePerson = state.filter((i: dataListStateType) => i.name === value)[0]
+            if (sourcePerson) {
+              entry = { ...entry, [name]: value, [id]: sourcePerson.id }
+            } else {
+              entry = { ...entry, [name]: value, ...{} }
+            }
+          } else {
+            entry = { ...entry, [name]: value, ...{} }
+          }
         }
         return entry;
       }))
@@ -136,215 +173,246 @@ function App() {
     }
   }
 
-  // useEffect(() => {
-  //   API.wallchart()
-  //     .then((response: any) => response.blob())
-  //     .then((blob: any) => {
-  //       console.log(blob)
-  //       return setWallchartState(URL.createObjectURL(blob))})
-  //     .catch((err: any) => console.error(err));
-  // }, []);
+  useEffect(() => {
+    async function getDataLists(): Promise<void> {
+      switch (formState.form) {
+        case ("income"):
+          let { data } = await API.sources()
+          setSourcesState(data)
+          let res = await API.persons()
+          setPersonsState(res.data)
+          break;
+      }
+    }
+    getDataLists()
+  }, [formState.form])
 
-return (
-  <div className="App">
-    <div className="header">
-      <h1>Finances!</h1>
-      <img src="http://localhost:5000/api/wallchart" alt="Wall Chart" />
-      <form onSubmit={handleFormSubmit} className="form-inline">
-        <select name="form" value={formState.form} onChange={handleFormChange}>
-          <option value="income">Income</option>
-          <option value="expenses">Expenses</option>
-          <option value="pivot">Pivot Table</option>
-        </select>
-        <label htmlFor="year2">Year</label>
-        <input
-          onChange={handleFormChange}
-          value={formState.year}
-          type="text"
-          id="year2"
-          className="form-control"
-          name="year"
-          placeholder="YYYY"
-        />
-        <label htmlFor="month2">Month</label>
-        <input
-          onChange={handleFormChange}
-          value={formState.month}
-          type="text"
-          id="month2"
-          className="form-control"
-          name="month"
-          placeholder="MM" />
-        <button className="btn btn-success">Submit</button>
-      </form>
-    </div>
-    {formState.form === "income" && incomeTableState[0].id ? (
-      <table>
-        <thead>
-          <tr>
-            <th>
-              Date
-              </th>
-            <th>
-              Amount
-              </th>
-            <th>
-              Source
-              </th>
-            <th>
-              Person
-              </th>
-          </tr>
-        </thead>
-        {incomeTableState.map((entry: incomeDataEntry) => (
-          <tbody key={entry.id}>
+  return (
+    <div className="App">
+      <div className="header">
+        <h1>Finances!</h1>
+        <img src="/api/wallchart" alt="Wall Chart" />
+        <form onSubmit={handleFormSubmit} className="form-inline">
+          <select name="form" value={formState.form} onChange={handleFormChange}>
+            <option value="income">Income</option>
+            <option value="expenses">Expenses</option>
+            <option value="pivot">Pivot Table</option>
+          </select>
+          <label htmlFor="year2">Year</label>
+          <input
+            onChange={handleFormChange}
+            value={formState.year}
+            type="text"
+            id="year2"
+            className="form-control"
+            name="year"
+            placeholder="YYYY"
+          />
+          <label htmlFor="month2">Month</label>
+          <input
+            onChange={handleFormChange}
+            value={formState.month}
+            type="text"
+            id="month2"
+            className="form-control"
+            name="month"
+            placeholder="MM" />
+          <button className="btn btn-success">Submit</button>
+        </form>
+      </div>
+      {formState.form === "income" && incomeTableState[0].id ? (
+        <table>
+          <thead>
             <tr>
-              <td><input
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                name="Date"
-                className="tableInput"
-                value={entry.Date}
-              />
-              </td>
-              <td><input
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                name="Amount"
-                className="tableInput"
-                value={entry.Amount}
-              />
-              </td>
-              <td><input
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                name="Source"
-                className="tableInput"
-                value={entry.Source}
-              />
-              </td>
-              <td><input
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
-                name="Person"
-                className="tableInput"
-                value={entry.Person}
-              />
-              </td>
+              <th>
+                Date
+              </th>
+              <th>
+                Amount
+              </th>
+              <th>
+                Source
+              </th>
+              <th>
+                Person
+              </th>
             </tr>
-          </tbody>
-        ))}
-      </table>
-    ) : null}
-    {formState.form === "expenses" && expensesTableState[0].entry_id ? (
-      <table>
-        <thead>
-          <tr>
-            <th>
-              Date
-              </th>
-            <th>
-              Vendor
-              </th>
-            <th>
-              Amount
-              </th>
-            <th>
-              Broad Category
-              </th>
-            <th>
-              Narrow Category
-              </th>
-            <th>
-              Person
-              </th>
-            <th>
-              Notes
-              </th>
-          </tr>
-        </thead>
-        {expensesTableState.map((entry: expensesDataEntry) => (
-          <tbody key={entry.entry_id}>
-            <tr>
-              <td><input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                name="Date"
-                className="tableInput"
-                value={entry.Date} /></td>
-              <td><input
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                name="Vendor"
-                className="tableInput"
-                value={entry.Vendor} /></td>
-              <td><input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                name="Amount"
-                className="tableInput"
-                value={entry.Amount}
-              />
-              </td>
-              <td>
-                <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                  name="Broad_category"
+          </thead>
+          {incomeTableState.map((entry: incomeDataEntry) => (
+            <tbody key={entry.id}>
+              <tr>
+                <td><input
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
+                  name="Date"
                   className="tableInput"
-                  value={entry.Broad_category}
+                  value={entry.Date}
                 />
-              </td>
-              <td>
-                <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                  name="Narrow_category"
+                </td>
+                <td><span>$</span><input
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
+                  name="Amount"
                   className="tableInput"
-                  value={entry.Narrow_category || ""}
+                  value={entry.Amount}
                 />
-              </td>
-              <td>
-                <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                </td>
+                <td><input
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
+                  name="Source"
+                  className="tableInput"
+                  value={entry.Source}
+                  list="source"
+                />
+                  {sourcesState ? (
+                    <datalist id="source">
+                      {sourcesState.map((entry: dataListStateType) => {
+                        return (
+                          <option
+                            value={entry.name}
+                            key={entry.id}
+                          />
+                        )
+                      })}
+                    </datalist>
+                  ) : null}
+                </td>
+                <td><input
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange(e, entry.id)}
                   name="Person"
                   className="tableInput"
-                  value={entry.Person || ""}
+                  value={entry.Person}
+                  list="person"
                 />
-              </td>
-              <td>
-                <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
-                  name="Notes"
-                  className="tableInput"
-                  value={entry.Notes || ""}
-                />
-              </td>
-            </tr>
-
-          </tbody>
-        ))}
-      </table>
-    ) : null}
-    {formState.form === "pivot" && pivotTableState ? (
-      <table>
-        <thead>
-          <tr>
-            <th>
-              Broad Category
-              </th>
-            <th>
-              Narrow Category
-              </th>
-            <th>
-              Amount
-              </th>
-          </tr>
-        </thead>
-        {pivotTableState.map((entry: pivotDataEntry, i: number) => (
-          <tbody key={i}>
+                  {personsState ? (
+                    <datalist id="person">
+                      {personsState.map((entry: dataListStateType) => {
+                        return (
+                          <option
+                            value={entry.name}
+                            key={entry.id}
+                          />
+                        )
+                      })}
+                    </datalist>
+                  ) : null}
+                </td>
+              </tr>
+            </tbody>
+          ))}
+        </table>
+      ) : null}
+      {formState.form === "expenses" && expensesTableState[0].entry_id ? (
+        <table>
+          <thead>
             <tr>
-              <td>
-                {entry.Broad_category}
-              </td>
-              <td>
-                {entry.Narrow_category}
-              </td>
-              <td>
-                {entry.Amount}
-              </td>
+              <th>
+                Date
+              </th>
+              <th>
+                Vendor
+              </th>
+              <th>
+                Amount
+              </th>
+              <th>
+                Broad Category
+              </th>
+              <th>
+                Narrow Category
+              </th>
+              <th>
+                Person
+              </th>
+              <th>
+                Notes
+              </th>
             </tr>
-          </tbody>
-        ))}
-      </table>
-    ) : null}
-  </div>
-);
+          </thead>
+          {expensesTableState.map((entry: expensesDataEntry) => (
+            <tbody key={entry.entry_id}>
+              <tr>
+                <td><input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                  name="Date"
+                  className="tableInput"
+                  value={entry.Date} /></td>
+                <td><input
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                  name="Vendor"
+                  className="tableInput"
+                  value={entry.Vendor} /></td>
+                <td><span>$</span><input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                  name="Amount"
+                  className="tableInput"
+                  value={'$' + entry.Amount}
+                />
+                </td>
+                <td>
+                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                    name="Broad_category"
+                    className="tableInput"
+                    value={entry.Broad_category}
+                  />
+                </td>
+                <td>
+                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                    name="Narrow_category"
+                    className="tableInput"
+                    value={entry.Narrow_category || ""}
+                  />
+                </td>
+                <td>
+                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                    name="Person"
+                    className="tableInput"
+                    value={entry.Person || ""}
+                  />
+                </td>
+                <td>
+                  <input onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleExpensesChange(e, entry.entry_id)}
+                    name="Notes"
+                    className="tableInput"
+                    value={entry.Notes || ""}
+                  />
+                </td>
+              </tr>
+
+            </tbody>
+          ))}
+        </table>
+      ) : null}
+      {formState.form === "pivot" && pivotTableState ? (
+        <table>
+          <thead>
+            <tr>
+              <th>
+                Broad Category
+              </th>
+              <th>
+                Narrow Category
+              </th>
+              <th>
+                Amount
+              </th>
+            </tr>
+          </thead>
+          {pivotTableState.map((entry: pivotDataEntry, i: number) => (
+            <tbody key={i}>
+              <tr>
+                <td>
+                  {entry.Broad_category}
+                </td>
+                <td>
+                  {entry.Narrow_category}
+                </td>
+                <td>
+                  {entry.Amount}
+                </td>
+              </tr>
+            </tbody>
+          ))}
+        </table>
+      ) : null}
+    </div>
+  );
 }
 
 export default App;

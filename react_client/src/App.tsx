@@ -38,10 +38,27 @@ function App() {
     Amount: string
   }
 
+  interface tableDataEntry {
+    Amount: string,
+    Date: string,
+    Source: string,
+    Person: string,
+    id?: number,
+    source_id?: number,
+    earner_id?: number,
+    Vendor?: string,
+    Broad_category?: string,
+    Narrow_category?: string,
+    Notes?: string,
+    entry_id?: number
+  }
+
   interface dataListStateType {
     id: number,
     name: string
   }
+
+  type InputName = "Person" | "Source" | "Broad_category" | "Narrow_category"
 
   const [formState, setFormState] = useState<formStateType>(
     {
@@ -85,8 +102,11 @@ function App() {
   )
   const [pivotTableState, setPivotTableState] = useState<pivotDataEntry[]>()
 
+  // State for datalists
   const [sourcesState, setSourcesState] = useState<dataListStateType[]>([])
   const [personsState, setPersonsState] = useState<dataListStateType[]>([])
+  const [broadState, setBroadState] = useState<dataListStateType[]>([])
+  const [narrowState, setNarrowState] = useState<dataListStateType[]>([])
 
   function formatDates(entry:
     {
@@ -133,54 +153,95 @@ function App() {
     }
   }
 
-  function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, entry_id: number): void {
-    if (expensesTableState) {
-      let { name, value } = event.target;
-      let newExpensesTableStateData: expensesDataEntry[] = expensesTableState.data.map(((entry: expensesDataEntry) => {
-        if (entry.entry_id === entry_id) {
-          entry = { ...entry, [name]: value }
-        }
-        return entry;
-      }))
-      setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
+  function assignId(
+    name: InputName,
+    value: string) {
+
+    let state;
+    let id;
+
+    switch (name) {
+      case "Person":
+        state = personsState;
+        id = 'earner_id'
+        break;
+      case "Source":
+        state = sourcesState;
+        id = 'source_id'
+        break;
+      case "Broad_category":
+        state = broadState;
+        id = 'broad_category_id'
+        break;
+      case "Narrow_category":
+        state = narrowState;
+        id = 'narrow_category_id'
+        break;
     }
+    let dataListItem = state.filter((i: dataListStateType) => i.name === value)[0]
+    if (dataListItem) {
+      return { id: id, dataListItem: dataListItem }
+    } else {
+      return { id: null, dataListItem: null }
+    }
+  }
+
+  function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, entry_id: number): void {
+    let { name, value } = event.target;
+    let newExpensesTableStateData: expensesDataEntry[] = expensesTableState.data.map(((entry: expensesDataEntry) => {
+      if (entry.entry_id === entry_id) {
+        entry = { ...entry, [name]: value, ...{} }
+        if (name === "Person" || name === "Broad_category" || name === "Narrow_category") {
+          let { id, dataListItem } = assignId(name as InputName, value)
+          if (id && dataListItem) {
+            entry = { ...entry, [id]: dataListItem.id }
+          }
+        }
+      }
+      return entry;
+    }))
+    setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
   }
 
   function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, id: number): void {
-    if (expensesTableState) {
-      let { name, value } = event.target;
-      let newIncomeTableStateData: incomeDataEntry[] = incomeTableState.data.map(((entry: incomeDataEntry) => {
-        if (entry.id === id) {
-          if (name === 'Source' || name === 'Person') {
-            let state;
-            let id;
-            switch (name) {
-              case "Person":
-                state = personsState;
-                id = 'earner_id'
-                break;
-              case "Source":
-                state = sourcesState;
-                id = 'source_id'
-                break;
-            }
-            let sourcePerson = state.filter((i: dataListStateType) => i.name === value)[0]
-            if (sourcePerson) {
-              entry = { ...entry, [name]: value, [id]: sourcePerson.id }
-            } else {
-              entry = { ...entry, [name]: value, ...{} }
-            }
-          } else {
-            entry = { ...entry, [name]: value, ...{} }
+    let { name, value } = event.target;
+    let newIncomeTableStateData: incomeDataEntry[] = incomeTableState.data.map(((entry: incomeDataEntry) => {
+      if (entry.id === id) {
+        entry = { ...entry, [name]: value, ...{} }
+        if (name === "Person" || name === "Source") {
+          let { id, dataListItem } = assignId(name as InputName, value)
+          if (id && dataListItem) {
+            entry = { ...entry, [id]: dataListItem.id }
           }
         }
-        return entry;
-      }))
-      setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
-    }
+      }
+      return entry;
+    }))
+    setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
   }
 
 
+  useEffect(() => {
+    async function getDataLists(): Promise<void> {
+      if (sourcesState.length === 0) {
+        let { data } = await API.sources()
+        setSourcesState(data)
+      }
+      if (personsState.length === 0) {
+        let res = await API.persons()
+        setPersonsState(res.data)
+      }
+      if (narrowState.length === 0) {
+        let res = await API.narrow()
+        setNarrowState(res.data)
+      }
+      if (broadState.length === 0) {
+        let res = await API.broad()
+        setBroadState(res.data)
+      }
+    }
+    getDataLists()
+  }, [])
 
   return (
     <div className="App">
@@ -218,21 +279,23 @@ function App() {
       {formState.form === "income" && incomeTableState.data[0].id ? (
         <Table
           state={incomeTableState}
+          sourcesState={sourcesState}
+          personsState={personsState}
           handleChange={handleIncomeChange}
           setSourcesState={setSourcesState}
           setPersonsState={setPersonsState}
-          sourcesState={sourcesState}
-          personsState={personsState}
         />
       ) : null}
       {formState.form === "expenses" && expensesTableState.data[0].entry_id ? (
         <Table
           state={expensesTableState}
-          handleChange={handleExpensesChange}
-          setSourcesState={setSourcesState}
-          setPersonsState={setPersonsState}
-          sourcesState={sourcesState}
           personsState={personsState}
+          broadState={broadState}
+          narrowState={narrowState}
+          handleChange={handleExpensesChange}
+          setPersonsState={setPersonsState}
+          setBroadState={setBroadState}
+          setNarrowState={setNarrowState}
         />
       ) : null}
       {formState.form === "pivot" && pivotTableState ? (

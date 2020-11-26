@@ -4,14 +4,7 @@ interface sourcesStateType {
     name: string
 }
 
-const API: {
-    expenses: Function,
-    income: Function,
-    pivot: Function,
-    wallchart: Function,
-    sources: Function,
-    persons: Function
-} = {
+const API = {
     expenses: function (yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
         return fetch(`/api/expenses?year=${yearMonthObj.year}&month=${yearMonthObj.month}`)
     },
@@ -24,11 +17,17 @@ const API: {
     wallchart: function (): Promise<Response> {
         return fetch('/api/wallchart')
     },
-    sources: function (): Promise<sourcesStateType[]> {
+    sources: function (): Promise<{data: sourcesStateType[]}> {
         return fetch('/api/sources').then(res=>res.json())
     },
-    persons: function (): Promise<sourcesStateType[]> {
+    persons: function (): Promise<{data: sourcesStateType[]}> {
         return fetch('/api/persons').then(res=>res.json())
+    },
+    narrow: function (): Promise<{data: sourcesStateType[]}> {
+        return fetch('/api/narrows').then(res=>res.json())
+    },
+    broad: function (): Promise<{data: sourcesStateType[]}> {
+        return fetch('/api/broads').then(res=>res.json())
     }
 }
 

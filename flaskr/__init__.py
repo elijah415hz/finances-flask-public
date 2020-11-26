@@ -54,7 +54,7 @@ def api_expenses():
     month = datetime.strptime(year_month, '%Y-%m')
     start_date = month.date()
     end_date = (month + relativedelta(months=+1)).date()
-    sql = "SELECT entry_id, Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
+    sql = "SELECT entry_id, broad_category_id, narrow_category_id, Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
                 LEFT JOIN vendor v ON v.id=e.vendor_id \
                 LEFT JOIN broad_category b ON b.id=e.broad_category_id \
                 LEFT JOIN person_earner p ON p.id=e.person_id \
@@ -94,7 +94,6 @@ def api_pivot():
     PT_report['Amount'] = PT_report['Amount'].apply(format_numbers)
     return PT_report.to_json(orient="table")
 
-# Figure out how to send matplotlib...
 @app.route("/api/wallchart")
 def wallchart():
     engine = create_engine(FLASK_DB_URI)    
@@ -141,6 +140,20 @@ def get_sources():
 def get_persons():
     engine = create_engine(FLASK_DB_URI)
     sql = "SELECT id, name FROM person_earner ORDER BY name"
+    dataframe = pd.read_sql(sql, con=engine)
+    return dataframe.to_json(orient="table")
+
+@app.route("/api/narrows")
+def get_narrows():
+    engine = create_engine(FLASK_DB_URI)
+    sql = "SELECT id, name FROM narrow_category ORDER BY name"
+    dataframe = pd.read_sql(sql, con=engine)
+    return dataframe.to_json(orient="table")
+
+@app.route("/api/broads")
+def get_broads():
+    engine = create_engine(FLASK_DB_URI)
+    sql = "SELECT id, name FROM broad_category ORDER BY name"
     dataframe = pd.read_sql(sql, con=engine)
     return dataframe.to_json(orient="table")
 

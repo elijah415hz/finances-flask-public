@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import API from "../utils/API"
+import React from 'react'
 
 interface tableDataEntry {
     Amount: string,
@@ -32,11 +31,15 @@ export default function Table(props:
             data: tableDataEntry[]
 
         },
-        sourcesState: dataListStateType[],
-        personsState: dataListStateType[]
+        sourcesState?: dataListStateType[],
+        personsState: dataListStateType[],
+        broadState?: dataListStateType[],
+        narrowState?: dataListStateType[],
         handleChange: Function,
-        setSourcesState: Function,
-        setPersonsState: Function
+        setSourcesState?: Function,
+        setPersonsState: Function,
+        setBroadState?: Function,
+        setNarrowState?: Function
     }) {
 
     function makeDataList(propsState: dataListStateType[], id: string) {
@@ -54,19 +57,6 @@ export default function Table(props:
         )
     }
 
-    useEffect(() => {
-        async function getDataLists(): Promise<void> {
-            if (props.sourcesState.length === 0) {
-                let { data } = await API.sources()
-                props.setSourcesState(data)
-            }
-            if (props.personsState.length === 0) {
-                let res = await API.persons()
-                props.setPersonsState(res.data)
-            }
-        }
-        getDataLists()
-    }, [])
 
     return (
         <table>
@@ -100,11 +90,17 @@ export default function Table(props:
                                                 value={entry[column.name as keyof tableDataEntry] || ""}
                                                 list={column.name}
                                             />
-                                            {column.name === 'Source' ? (
+                                            {column.name === 'Source' && props.sourcesState ? (
                                                 makeDataList(props.sourcesState, column.name)
                                                 ) : null}
                                             {column.name === 'Person' ? (
                                                 makeDataList(props.personsState, column.name)
+                                            ) : null}
+                                            {column.name === 'Narrow_category' && props.narrowState ? (
+                                                makeDataList(props.narrowState, column.name)
+                                            ) : null}
+                                            {column.name === 'Broad_category' && props.broadState ? (
+                                                makeDataList(props.broadState, column.name)
                                             ) : null}
                                         </td>
                                     )

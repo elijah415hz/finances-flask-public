@@ -1,10 +1,11 @@
 import React from 'react'
+import InputRow from './InputRow'
 
 interface tableDataEntry {
     Amount: string,
-    Date: string,
-    Source: string,
-    Person: string,
+    Date?: string,
+    Source?: string,
+    Person?: string,
     id?: number,
     source_id?: number,
     earner_id?: number,
@@ -32,31 +33,15 @@ export default function Table(props:
 
         },
         sourcesState?: dataListStateType[],
-        personsState: dataListStateType[],
+        personsState?: dataListStateType[],
         broadState?: dataListStateType[],
         narrowState?: dataListStateType[],
-        handleChange: Function,
+        handleChange?: Function,
         setSourcesState?: Function,
-        setPersonsState: Function,
+        setPersonsState?: Function,
         setBroadState?: Function,
         setNarrowState?: Function
     }) {
-
-    function makeDataList(propsState: dataListStateType[], id: string) {
-        return (
-            <datalist id={id}>
-                {propsState.map((entry: dataListStateType) => {
-                    return (
-                        <option
-                            value={entry.name}
-                            key={entry.id}
-                        />
-                    )
-                })}
-            </datalist>
-        )
-    }
-
 
     return (
         <table>
@@ -74,40 +59,22 @@ export default function Table(props:
                 </tr>
             </thead>
             {(props.state.data).map((entry: tableDataEntry, i: number) => {
-                return (
-                    <tbody key={i}>
-                        <tr>
-                            {props.state.schema.fields
-                                .filter(column => !column.name.includes("id"))
-                                .map(column => {
-                                    return (
-                                        <td key={i + column.name}>
-                                            {column.name === 'Amount' ? <span>$</span> : null}
-                                            <input
-                                                name={column.name}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => props.handleChange(e, (entry.id ? entry.id : entry.entry_id))}
-                                                className="tableInput"
-                                                value={entry[column.name as keyof tableDataEntry] || ""}
-                                                list={column.name}
-                                            />
-                                            {column.name === 'Source' && props.sourcesState ? (
-                                                makeDataList(props.sourcesState, column.name)
-                                                ) : null}
-                                            {column.name === 'Person' ? (
-                                                makeDataList(props.personsState, column.name)
-                                            ) : null}
-                                            {column.name === 'Narrow_category' && props.narrowState ? (
-                                                makeDataList(props.narrowState, column.name)
-                                            ) : null}
-                                            {column.name === 'Broad_category' && props.broadState ? (
-                                                makeDataList(props.broadState, column.name)
-                                            ) : null}
-                                        </td>
-                                    )
-                                })}
-                        </tr>
-                    </tbody>
-                )
+                return (<InputRow
+                    entry={entry}
+                    i={i}
+                    key={i}
+                    fields={props.state.schema.fields}
+                    handleChange={props.handleChange}
+                    sourcesState={props.sourcesState}
+                    personsState={props.personsState}
+                    broadState={props.broadState}
+                    narrowState={props.narrowState}
+
+                    setPersonsState={props.setPersonsState}
+                    setSourcesState={props.setSourcesState}
+                    setBroadState={props.setBroadState}
+                    setNarrowState={props.setNarrowState}
+                />)
             })}
         </table>
     )

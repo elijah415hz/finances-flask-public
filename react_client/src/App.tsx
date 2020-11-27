@@ -38,20 +38,6 @@ function App() {
     Amount: string
   }
 
-  interface tableDataEntry {
-    Amount: string,
-    Date: string,
-    Source: string,
-    Person: string,
-    id?: number,
-    source_id?: number,
-    earner_id?: number,
-    Vendor?: string,
-    Broad_category?: string,
-    Narrow_category?: string,
-    Notes?: string,
-    entry_id?: number
-  }
 
   interface dataListStateType {
     id: number,
@@ -100,7 +86,16 @@ function App() {
     }
 
   )
-  const [pivotTableState, setPivotTableState] = useState<pivotDataEntry[]>()
+  const [pivotTableState, setPivotTableState] = useState<{ schema: { fields: [] }, data: pivotDataEntry[] }>(
+    {
+      schema: { fields: [] },
+      data: [{
+        Amount: "",
+        Broad_category: "",
+        Narrow_category: ""
+      }]
+    }
+  )
 
   // State for datalists
   const [sourcesState, setSourcesState] = useState<dataListStateType[]>([])
@@ -186,37 +181,31 @@ function App() {
     }
   }
 
-  function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, entry_id: number): void {
+  function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void {
     let { name, value } = event.target;
-    let newExpensesTableStateData: expensesDataEntry[] = expensesTableState.data.map(((entry: expensesDataEntry) => {
-      if (entry.entry_id === entry_id) {
-        entry = { ...entry, [name]: value, ...{} }
-        if (name === "Person" || name === "Broad_category" || name === "Narrow_category") {
-          let { id, dataListItem } = assignId(name as InputName, value)
-          if (id && dataListItem) {
-            entry = { ...entry, [id]: dataListItem.id }
-          }
-        }
+    let newExpensesTableStateData: expensesDataEntry[] = [...expensesTableState.data]
+    let updatedRow: expensesDataEntry = { ...newExpensesTableStateData[index], [name]: value }
+    if (name === "Person" || name === "Broad_category" || name === "Narrow_category") {
+      let { id, dataListItem } = assignId(name as InputName, value)
+      if (id && dataListItem) {
+        updatedRow = { ...updatedRow, [id]: dataListItem.id }
       }
-      return entry;
-    }))
+    }
+    newExpensesTableStateData[index] = updatedRow
     setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
   }
 
-  function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, id: number): void {
+  function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void {
     let { name, value } = event.target;
-    let newIncomeTableStateData: incomeDataEntry[] = incomeTableState.data.map(((entry: incomeDataEntry) => {
-      if (entry.id === id) {
-        entry = { ...entry, [name]: value, ...{} }
-        if (name === "Person" || name === "Source") {
-          let { id, dataListItem } = assignId(name as InputName, value)
-          if (id && dataListItem) {
-            entry = { ...entry, [id]: dataListItem.id }
-          }
-        }
+    let newIncomeTableStateData: incomeDataEntry[] = [...incomeTableState.data]
+    let updatedRow: incomeDataEntry = { ...newIncomeTableStateData[index], [name]: value }
+    if (name === "Person" || name === "Source") {
+      let { id, dataListItem } = assignId(name as InputName, value)
+      if (id && dataListItem) {
+        updatedRow = { ...updatedRow, [id]: dataListItem.id }
       }
-      return entry;
-    }))
+    }
+    newIncomeTableStateData[index] = updatedRow
     setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
   }
 
@@ -299,36 +288,9 @@ function App() {
         />
       ) : null}
       {formState.form === "pivot" && pivotTableState ? (
-        <table>
-          <thead>
-            <tr>
-              <th>
-                Broad Category
-              </th>
-              <th>
-                Narrow Category
-              </th>
-              <th>
-                Amount
-              </th>
-            </tr>
-          </thead>
-          {pivotTableState.map((entry: pivotDataEntry, i: number) => (
-            <tbody key={i}>
-              <tr>
-                <td>
-                  {entry.Broad_category}
-                </td>
-                <td>
-                  {entry.Narrow_category}
-                </td>
-                <td>
-                  {entry.Amount}
-                </td>
-              </tr>
-            </tbody>
-          ))}
-        </table>
+        <Table
+          state={pivotTableState}
+        />
       ) : null}
     </div>
   );

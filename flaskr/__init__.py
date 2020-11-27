@@ -11,7 +11,7 @@ from io import BytesIO
 import os
 FLASK_DB_URI = os.environ.get("FLASK_DB_URI")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../build', static_url_path="/")
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 def format_numbers(x):
@@ -19,11 +19,7 @@ def format_numbers(x):
 
 @app.route("/")
 def index():
-    return render_template('form.html')
-
-@app.route("/react")
-def react():
-    return render_template('react_client/build/index.html')
+    return app.send_static_file('index.html')
 
 @app.route("/api/income")
 def api_income():

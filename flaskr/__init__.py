@@ -152,6 +152,3 @@ def get_broads():
     sql = "SELECT id, name FROM broad_category ORDER BY name"
     dataframe = pd.read_sql(sql, con=engine)
     return dataframe.to_json(orient="table")
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')

@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, Response, render_template, send_file
 from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
@@ -10,6 +10,8 @@ from io import BytesIO
 
 import os
 FLASK_DB_URI = os.environ.get("FLASK_DB_URI")
+USER_NAME = os.environ.get("USER_NAME")
+PASSWORD = os.environ.get("PASSWORD")
 
 app = Flask(__name__, static_folder='../build', static_url_path="/")
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -20,6 +22,15 @@ def format_numbers(x):
 @app.route("/")
 def index():
     return app.send_static_file('index.html')
+
+@app.route("/api/login", methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+    if username == USER_NAME and password == PASSWORD:
+        return "Login Successful!"
+    else:
+        return Response("Wrong credentials!", status=404)
 
 @app.route("/api/income")
 def api_income():

@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, render_template, send_file
+from flask import Flask, request, Response, render_template, send_file, jsonify
 from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import base64
 from io import BytesIO
+import bcrypt
+import jwt
 
 import os
 FLASK_DB_URI = os.environ.get("FLASK_DB_URI")
@@ -15,9 +17,26 @@ PASSWORD = os.environ.get("PASSWORD")
 
 app = Flask(__name__, static_folder='../build', static_url_path="/")
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['SECRET_KEY'] = os.urandom(5)
 
 def format_numbers(x):
     return "{:.2f}".format(x)
+
+def checkAuth(request):
+    try :
+        token = request.headers['Authorization'].split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'])
+        print(decoded)
+        return decoded
+    except jwt.ExpiredSignatureError:
+        print("Token has expired!")
+        return False
+    except jwt.InvalidSignatureError:
+        print("Key mismatch")
+        return False
+    except:
+        print("An Error")
+        return False
 
 @app.route("/")
 def index():
@@ -25,12 +44,22 @@ def index():
 
 @app.route("/api/login", methods=['POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
-    if username == USER_NAME and password == PASSWORD:
-        return "Login Successful!"
+    json = request.get_json()
+    username = json['username']
+    password = json['password']
+    if username == USER_NAME and bcrypt.checkpw(password, PASSWORD):
+        token = jwt.encode({'username': username, 'exp' : datetime.utcnow() + timedelta(minutes=30)}, app.config['SECRET_KEY'])  
+        return jsonify({'token' : token.decode('UTF-8')}) 
     else:
-        return Response("Wrong credentials!", status=404)
+        return Response("Wrong credentials!", status=401)
+
+@app.route("/api/checkAuth", methods=['GET'])
+def callCheckAuth():
+    validToken = checkAuth(request)
+    if validToken:
+        return validToken
+    else:
+        return Response("Nice try!", status=401)
 
 @app.route("/api/income")
 def api_income():

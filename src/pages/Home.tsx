@@ -133,6 +133,7 @@ function Home() {
             let response = await (await API[route](token, formState)).json()
             // Formatting the dates the hard way because javascript doesn't support strftime...
             response.data = response.data.map(formatDates)
+            console.log(response)
             switch (route) {
                 case "expenses":
                     setExpensesTableState(response)
@@ -273,7 +274,7 @@ function Home() {
                     <button className="btn btn-success">Submit</button>
                 </form>
             </div>
-            {formState.form === "income" && incomeTableState.data[0].id ? (
+            {formState.form === "income" && incomeTableState.data[0]?.id ? (
                 <Table
                     state={incomeTableState}
                     sourcesState={sourcesState}
@@ -283,7 +284,7 @@ function Home() {
                     setPersonsState={setPersonsState}
                 />
             ) : null}
-            {formState.form === "expenses" && expensesTableState.data[0].entry_id ? (
+            {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
                 <Table
                     state={expensesTableState}
                     personsState={personsState}

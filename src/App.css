@@ -9,3 +9,8 @@
 th {
   text-align: start;
 }
+
+.logout {
+  float: right;
+  margin-right: 20px;
+}

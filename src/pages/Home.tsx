@@ -211,6 +211,11 @@ function Home() {
         setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
     }
 
+    function logout() {
+        localStorage.removeItem("token")
+        window.location.reload()
+    }
+
 
     useEffect(() => {
         async function getDataLists(): Promise<void> {
@@ -241,6 +246,7 @@ function Home() {
     return (
         <div className="App">
             <div className="header">
+                <button className="logout" onClick={logout}>Logout</button>
                 <h1>Finances!</h1>
                 {token ?
                     <img src="/api/wallchart" alt="Wall Chart" />

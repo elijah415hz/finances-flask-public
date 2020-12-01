@@ -35,7 +35,7 @@ def checkAuth(request):
         print("Key mismatch")
         return False
     except:
-        print("An Error")
+        print("Invalid Token")
         return False
 
 @app.route("/")

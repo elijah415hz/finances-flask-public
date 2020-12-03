@@ -1,5 +1,6 @@
 import React from 'react'
 import InputRow from './InputRow'
+import StaticRow from './StaticRow'
 
 interface tableDataEntry {
     Amount: string,
@@ -40,7 +41,9 @@ export default function Table(props:
         setSourcesState?: Function,
         setPersonsState?: Function,
         setBroadState?: Function,
-        setNarrowState?: Function
+        setNarrowState?: Function,
+        deleteEntry: Function,
+        formState: { form: string }
     }) {
 
     return (
@@ -59,23 +62,33 @@ export default function Table(props:
                 </tr>
             </thead>
             {(props.state.data).map((entry: tableDataEntry, i: number) => {
-                return (<InputRow
-                    entry={entry}
-                    i={i}
-                    key={i}
-                    fields={props.state.schema.fields}
-                    handleChange={props.handleChange}
-                    sourcesState={props.sourcesState}
-                    personsState={props.personsState}
-                    broadState={props.broadState}
-                    narrowState={props.narrowState}
+                return props.formState.form === "pivot" ?
+                    <StaticRow
+                        entry={entry}
+                        i={i}
+                        key={i}
+                        fields={props.state.schema.fields}
+                        formState={props.formState}
+                    /> :
+                    <InputRow
+                        entry={entry}
+                        i={i}
+                        key={i}
+                        fields={props.state.schema.fields}
+                        handleChange={props.handleChange}
+                        sourcesState={props.sourcesState}
+                        personsState={props.personsState}
+                        broadState={props.broadState}
+                        narrowState={props.narrowState}
 
-                    setPersonsState={props.setPersonsState}
-                    setSourcesState={props.setSourcesState}
-                    setBroadState={props.setBroadState}
-                    setNarrowState={props.setNarrowState}
-                />)
+                        setPersonsState={props.setPersonsState}
+                        setSourcesState={props.setSourcesState}
+                        setBroadState={props.setBroadState}
+                        setNarrowState={props.setNarrowState}
+                        deleteEntry={props.deleteEntry}
+                    />
             })}
+
         </table>
     )
 }

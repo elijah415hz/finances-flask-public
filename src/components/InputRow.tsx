@@ -34,7 +34,8 @@ export default function InputRow(props:
         setSourcesState?: Function,
         setPersonsState?: Function,
         setBroadState?: Function,
-        setNarrowState?: Function
+        setNarrowState?: Function,
+        deleteEntry: Function
     }) {
 
     const [state, setState] = useState(props.entry)
@@ -60,8 +61,10 @@ export default function InputRow(props:
     }
 
     function nothing(): void {
-        console.log("nothing")
+        console.log("nothing");
     }
+
+
 
     return (
         <tbody>
@@ -77,7 +80,7 @@ export default function InputRow(props:
                                     onBlur={(e: React.ChangeEvent<HTMLInputElement>) => {
                                         props.handleChange ? props.handleChange(e, props.i) : nothing()
                                     }}
-                                    onChange={state.Person ? handleInputRowChange : undefined}
+                                    onChange={state.Date ? handleInputRowChange : undefined}
                                     className="tableInput"
                                     value={state[column.name as keyof tableDataEntry] || ""}
                                     list={column.name}
@@ -97,6 +100,9 @@ export default function InputRow(props:
                             </td>
                         )
                     })}
+                    <td>
+                        <button onClick={(e)=> props.deleteEntry(e, state.entry_id || state.id)}>Delete</button>
+                    </td>
             </tr>
         </tbody>
     )

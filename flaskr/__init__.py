@@ -19,6 +19,10 @@ app = Flask(__name__, static_folder='../build', static_url_path="/")
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['SECRET_KEY'] = os.urandom(5)
 
+# Create database connection
+engine = create_engine(FLASK_DB_URI) 
+
+
 def format_numbers(x):
     return "{:.2f}".format(x)
 
@@ -63,7 +67,6 @@ def callCheckAuth():
 
 @app.route("/api/income")
 def api_income():
-    engine = create_engine(FLASK_DB_URI)    
     year = request.args.get("year")
     month = request.args.get("month")
     year_month = year + "-" + month
@@ -83,7 +86,6 @@ def api_income():
 
 @app.route("/api/expenses")
 def api_expenses():
-    engine = create_engine(FLASK_DB_URI)    
     year = request.args.get("year")
     month = request.args.get("month")
     year_month = year + "-" + month    
@@ -104,9 +106,28 @@ def api_expenses():
     EXP_report['Amount'] = EXP_report['Amount'].apply(format_numbers)
     return EXP_report.to_json(orient="table")
 
+@app.route("/api/expenses/<int:id>", methods=['DELETE'])
+def delete_expenses(id):
+    try: 
+        sql = f"DELETE FROM expenses WHERE entry_id = '{id}';"
+        executed = engine.connect().execute(sql)
+        print(executed)
+        return Response(f'id: {id} Deleted', status=200)
+    except:
+        return Response("Server Error", status=500)
+
+@app.route("/api/income/<int:id>", methods=['DELETE'])
+def delete_income(id):
+    try: 
+        sql = f"DELETE FROM income WHERE id = '{id}';"
+        executed = engine.connect().execute(sql)
+        print(executed)
+        return Response(f'id: {id} Deleted', status=200)
+    except:
+        return Response("Server Error", status=500)
+
 @app.route("/api/pivot")
 def api_pivot():
-    engine = create_engine(FLASK_DB_URI)    
     year = request.args.get("year")
     month = request.args.get("month")
     year_month = year + "-" + month    
@@ -132,7 +153,6 @@ def api_pivot():
 
 @app.route("/api/wallchart")
 def wallchart():
-    engine = create_engine(FLASK_DB_URI)    
     EXP_sql = "SELECT Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
                     LEFT JOIN vendor v ON v.id=e.vendor_id \
                     LEFT JOIN broad_category b ON b.id=e.broad_category_id \
@@ -167,28 +187,24 @@ def wallchart():
 
 @app.route("/api/sources")
 def get_sources():
-    engine = create_engine(FLASK_DB_URI)
     sql = "SELECT id, name FROM source ORDER BY name"
     dataframe = pd.read_sql(sql, con=engine)
     return dataframe.to_json(orient="table")
 
 @app.route("/api/persons")
 def get_persons():
-    engine = create_engine(FLASK_DB_URI)
     sql = "SELECT id, name FROM person_earner ORDER BY name"
     dataframe = pd.read_sql(sql, con=engine)
     return dataframe.to_json(orient="table")
 
 @app.route("/api/narrows")
 def get_narrows():
-    engine = create_engine(FLASK_DB_URI)
     sql = "SELECT id, name FROM narrow_category ORDER BY name"
     dataframe = pd.read_sql(sql, con=engine)
     return dataframe.to_json(orient="table")
 
 @app.route("/api/broads")
 def get_broads():
-    engine = create_engine(FLASK_DB_URI)
     sql = "SELECT id, name FROM broad_category ORDER BY name"
     dataframe = pd.read_sql(sql, con=engine)
     return dataframe.to_json(orient="table")

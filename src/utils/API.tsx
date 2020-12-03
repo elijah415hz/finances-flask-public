@@ -12,6 +12,22 @@ const API = {
             }
         })
     },
+    deleteExpenses: function (token: string | null, id: number | undefined): Promise<Response | string> {
+        return fetch(`/api/expenses/${id}`, {
+            method: 'DELETE',
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        }).then(res=>res.text())
+    },
+    deleteIncome: function (token: string | null, id: number | undefined): Promise<Response | string> {
+        return fetch(`/api/income/${id}`, {
+            method: 'DELETE',
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        }).then(res=>res.text())
+    },
     income: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
         return fetch(`/api/income?year=${yearMonthObj.year}&month=${yearMonthObj.month}`, {
             headers: {

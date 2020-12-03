@@ -20,7 +20,6 @@ export default function Login(props: {isLoggedIn: boolean, setIsLoggedIn: Functi
 
     const formSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
-        console.log(loginFormState)
         API.login(loginFormState).then(newToken => {
             localStorage.setItem("token", newToken.token)
             props.setIsLoggedIn(true)

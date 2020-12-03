@@ -133,7 +133,6 @@ function Home() {
             let response = await (await API[route](token, formState)).json()
             // Formatting the dates the hard way because javascript doesn't support strftime...
             response.data = response.data.map(formatDates)
-            console.log(response)
             switch (route) {
                 case "expenses":
                     setExpensesTableState(response)
@@ -209,6 +208,24 @@ function Home() {
         }
         newIncomeTableStateData[index] = updatedRow
         setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
+    }
+
+    async function deleteEntry(event: React.SyntheticEvent, id: number | undefined) {
+        let token = localStorage.getItem("token");
+        try {
+            if (formState.form === "expenses") {
+                let response = await API.deleteExpenses(token, id);
+                console.log(response);
+                handleFormSubmit(event);
+            } else if (formState.form === "income") {
+                let response = await API.deleteIncome(token, id);
+                console.log(response);
+                handleFormSubmit(event);            
+            }
+        } catch (err) {
+            console.error(err)
+        }
+
     }
 
     function logout() {
@@ -288,6 +305,8 @@ function Home() {
                     handleChange={handleIncomeChange}
                     setSourcesState={setSourcesState}
                     setPersonsState={setPersonsState}
+                    deleteEntry={deleteEntry}
+                    formState={formState}
                 />
             ) : null}
             {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
@@ -300,11 +319,15 @@ function Home() {
                     setPersonsState={setPersonsState}
                     setBroadState={setBroadState}
                     setNarrowState={setNarrowState}
+                    deleteEntry={deleteEntry}
+                    formState={formState}
                 />
             ) : null}
             {formState.form === "pivot" && pivotTableState ? (
                 <Table
                     state={pivotTableState}
+                    deleteEntry={deleteEntry}
+                    formState={formState}
                 />
             ) : null}
         </div>

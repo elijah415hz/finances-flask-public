@@ -65,13 +65,14 @@ def callCheckAuth():
     else:
         return Response("Nice try!", status=401)
 
+# Get expenses
 @app.route("/api/expenses")
 def api_expenses():
     year = request.args.get("year")
     month = request.args.get("month")
     year_month = year + "-" + month    
     month = datetime.strptime(year_month, '%Y-%m')
-    start_date = month.date()
+    start_date = (month - timedelta(days=1)).date()
     end_date = (month + relativedelta(months=+1)).date()
     sql = "SELECT entry_id, person_id, broad_category_id, narrow_category_id, vendor_id, Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
                 LEFT JOIN vendor v ON v.id=e.vendor_id \
@@ -87,18 +88,34 @@ def api_expenses():
     EXP_report['Amount'] = EXP_report['Amount'].apply(format_numbers)
     return EXP_report.to_json(orient="table")
 
+# Edit expenses
 @app.route("/api/expenses/<int:id>", methods=['PUT'])
 def update_expenses(id):  
     json = request.get_json()
+    # Parse dates
     date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
-    vendor = json['vendor_id']
-    amount = json['Amount']
-    bCat = json['broad_category_id']
-    nCat = json['narrow_category_id']
+    # Convert any null values
+    if json['Amount']:
+        amount = json['Amount']
+    else :
+        amount = 0
     if json['person_id']:
         person = json['person_id']
     else:
         person = 'NULL'
+    if json['broad_category_id']:
+        bCat = json['broad_category_id']
+    else:
+        bCat = 'NULL'
+    if json['narrow_category_id']:
+        nCat = json['narrow_category_id']
+    else:
+        nCat = 'NULL'
+    if json['vendor_id']:
+        vendor = json['vendor_id']
+    else:
+        vendor = 'NULL'
+
     notes = json['Notes']
     print(json)
     sql = f"UPDATE expenses \
@@ -110,10 +127,9 @@ def update_expenses(id):
     print(sql)
     executed = engine.connect().execute(sql)
     print(executed)
-    return Response(f'id: {id} Update', status=200)
+    return Response(f'id: {id} Updated', status=200)
    
-
-
+# Delete expenses
 @app.route("/api/expenses/<int:id>", methods=['DELETE'])
 def delete_expenses(id):
     try: 
@@ -130,7 +146,7 @@ def api_income():
     month = request.args.get("month")
     year_month = year + "-" + month
     month = datetime.strptime(year_month, '%Y-%m')
-    start_date = month.date()
+    start_date = (month - timedelta(days=1)).date()
     end_date = (month + relativedelta(months=+1)).date()
     sql = "SELECT i.id, i.source_id, i.earner_id as person_id, Date, Amount, s.name AS Source, p.name AS Person\
                 FROM income i\
@@ -142,6 +158,38 @@ def api_income():
     INC_report.set_index('Date', inplace=True)
     INC_report['Amount'] = INC_report['Amount'].apply(format_numbers)
     return INC_report.to_json(orient="table")
+
+# Edit income
+@app.route("/api/income/<int:id>", methods=['PUT'])
+def update_income(id):  
+    json = request.get_json()
+    # Parse dates
+    date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+    # Convert any null values
+    if json['Amount']:
+        amount = json['Amount']
+    else :
+        amount = 0
+    if json['person_id']:
+        person = json['person_id']
+    else:
+        person = 'NULL'
+    if json['source_id']:
+        source = json['source_id']
+    else:
+        source = 'NULL'
+
+    print(json)
+    sql = f"UPDATE income \
+        SET date=DATE('{date}'), \
+        amount={amount}, \
+        earner_id={person}, \
+        source_id={source} \
+        WHERE id={id};"
+    print(sql)
+    executed = engine.connect().execute(sql)
+    print(executed)
+    return Response(f'id: {id} Updated', status=200)
 
 @app.route("/api/income/<int:id>", methods=['DELETE'])
 def delete_income(id):

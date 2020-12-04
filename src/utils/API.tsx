@@ -52,6 +52,16 @@ const API = {
             }
         })
     },
+    updateIncome: function (token: string | null, data: tableDataEntry): Promise<Response | string> {
+        return fetch(`/api/income/${data.id}`, {
+            method: 'PUT',
+            headers: {
+                "authorization": `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res=>res.text())
+    },
     deleteIncome: function (token: string | null, id: number | undefined): Promise<Response | string> {
         return fetch(`/api/income/${id}`, {
             method: 'DELETE',

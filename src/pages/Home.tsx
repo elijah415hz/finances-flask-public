@@ -213,6 +213,8 @@ function Home() {
                 updatedRow = { ...updatedRow, [id]: dataListItem.id }
             }
         }
+        console.log(updatedRow);
+        API.updateIncome(token, updatedRow).then(res=>console.log(res)).catch(err=>console.error(err))
         newIncomeTableStateData[index] = updatedRow
         setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
     }
@@ -296,7 +298,7 @@ function Home() {
                     <button className="btn btn-success">Submit</button>
                 </form>
             </header>
-            <body>
+            <div className="body">
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (
                     <Table
                         state={incomeTableState}
@@ -332,7 +334,7 @@ function Home() {
                         form={formState.form}
                     />
                 ) : null}
-            </body>
+            </div>
         </div>
     );
 }

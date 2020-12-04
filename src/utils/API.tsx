@@ -4,6 +4,21 @@ interface sourcesStateType {
     name: string
 }
 
+interface tableDataEntry {
+    Amount: string,
+    Date?: string,
+    Source?: string,
+    Person?: string,
+    id?: number,
+    source_id?: number,
+    earner_id?: number,
+    Vendor?: string,
+    Broad_category?: string,
+    Narrow_category?: string,
+    Notes?: string,
+    entry_id?: number
+}
+
 const API = {
     expenses: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
         return fetch(`/api/expenses?year=${yearMonthObj.year}&month=${yearMonthObj.month}`, {
@@ -20,12 +35,14 @@ const API = {
             }
         }).then(res=>res.text())
     },
-    deleteIncome: function (token: string | null, id: number | undefined): Promise<Response | string> {
-        return fetch(`/api/income/${id}`, {
-            method: 'DELETE',
+    updateExpenses: function (token: string | null, data: tableDataEntry): Promise<Response | string> {
+        return fetch(`/api/expenses/${data.entry_id}`, {
+            method: 'PUT',
             headers: {
-                "authorization": `Bearer ${token}`
-            }
+                "authorization": `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         }).then(res=>res.text())
     },
     income: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
@@ -34,6 +51,14 @@ const API = {
                 "authorization": `Bearer ${token}`
             }
         })
+    },
+    deleteIncome: function (token: string | null, id: number | undefined): Promise<Response | string> {
+        return fetch(`/api/income/${id}`, {
+            method: 'DELETE',
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        }).then(res=>res.text())
     },
     pivot: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
         return fetch(`/api/pivot?year=${yearMonthObj.year}&month=${yearMonthObj.month}`, {
@@ -72,6 +97,13 @@ const API = {
     },
     broad: function (token: string | null,): Promise<{ data: sourcesStateType[] }> {
         return fetch('/api/broads', {
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        }).then(res => res.json())
+    },
+    vendors: function (token: string | null,): Promise<{ data: sourcesStateType[] }> {
+        return fetch('/api/vendors', {
             headers: {
                 "authorization": `Bearer ${token}`
             }

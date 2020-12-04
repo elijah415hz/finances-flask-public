@@ -37,6 +37,7 @@ export default function Table(props:
         personsState?: dataListStateType[],
         broadState?: dataListStateType[],
         narrowState?: dataListStateType[],
+        vendorsState?: dataListStateType[],
         handleChange: Function,
         setSourcesState?: Function,
         setPersonsState?: Function,
@@ -79,6 +80,7 @@ export default function Table(props:
                         personsState={props.personsState}
                         broadState={props.broadState}
                         narrowState={props.narrowState}
+                        vendorsState={props.vendorsState}
 
                         setPersonsState={props.setPersonsState}
                         setSourcesState={props.setSourcesState}

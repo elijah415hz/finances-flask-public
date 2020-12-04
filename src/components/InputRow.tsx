@@ -30,6 +30,7 @@ export default function InputRow(props:
         personsState?: dataListStateType[],
         broadState?: dataListStateType[],
         narrowState?: dataListStateType[],
+        vendorsState?: dataListStateType[],
         handleChange: Function,
         setSourcesState?: Function,
         setPersonsState?: Function,
@@ -94,6 +95,9 @@ export default function InputRow(props:
                                 ) : null}
                                 {column.name === 'Broad_category' && props.broadState ? (
                                     makeDataList(props.broadState, column.name)
+                                ) : null}
+                                {column.name === 'Vendor' && props.vendorsState ? (
+                                    makeDataList(props.vendorsState, column.name)
                                 ) : null}
                             </td>
                         )

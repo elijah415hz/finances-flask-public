@@ -43,7 +43,7 @@ function Home() {
         name: string
     }
 
-    type InputName = "Person" | "Source" | "Broad_category" | "Narrow_category"
+    type InputName = "Person" | "Source" | "Broad_category" | "Narrow_category" | "Vendor"
 
     const [token, setToken] = useState("")
 
@@ -103,6 +103,7 @@ function Home() {
     const [personsState, setPersonsState] = useState<dataListStateType[]>([])
     const [broadState, setBroadState] = useState<dataListStateType[]>([])
     const [narrowState, setNarrowState] = useState<dataListStateType[]>([])
+    const [vendorsState, setVendorsState] = useState<dataListStateType[]>([])
 
     function formatDates(entry:
         {
@@ -111,10 +112,10 @@ function Home() {
             Date: string
         } {
         let date = new Date(entry.Date);
-        let year = date.getFullYear();
-        let month = (1 + date.getMonth()).toString();
+        let year = date.getUTCFullYear();
+        let month = (1 + date.getUTCMonth()).toString();
         month = month.length > 1 ? month : '0' + month;
-        let day = date.getDate().toString();
+        let day = date.getUTCDate().toString();
         day = day.length > 1 ? day : '0' + day;
         let dateString = month + '/' + day + '/' + year;
         entry.Date = dateString
@@ -159,19 +160,23 @@ function Home() {
         switch (name) {
             case "Person":
                 state = personsState;
-                id = 'earner_id'
+                id = 'person_id';
                 break;
             case "Source":
                 state = sourcesState;
-                id = 'source_id'
+                id = 'source_id';
                 break;
             case "Broad_category":
                 state = broadState;
-                id = 'broad_category_id'
+                id = 'broad_category_id';
                 break;
             case "Narrow_category":
                 state = narrowState;
-                id = 'narrow_category_id'
+                id = 'narrow_category_id';
+                break;
+            case "Vendor":
+                state = vendorsState;
+                id = 'vendor_id';
                 break;
         }
         let dataListItem = state.filter((i: dataListStateType) => i.name === value)[0]
@@ -186,12 +191,14 @@ function Home() {
         let { name, value } = event.target;
         let newExpensesTableStateData: expensesDataEntry[] = [...expensesTableState.data]
         let updatedRow: expensesDataEntry = { ...newExpensesTableStateData[index], [name]: value }
-        if (name === "Person" || name === "Broad_category" || name === "Narrow_category") {
+        if (name === "Person" || name === "Broad_category" || name === "Narrow_category" || name === "Vendor") {
             let { id, dataListItem } = assignId(name as InputName, value)
             if (id && dataListItem) {
                 updatedRow = { ...updatedRow, [id]: dataListItem.id }
             }
         }
+        console.log(updatedRow)
+        API.updateExpenses(token, updatedRow).then(res=>console.log(res)).catch(err=>console.error(err))
         newExpensesTableStateData[index] = updatedRow
         setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
     }
@@ -225,7 +232,6 @@ function Home() {
         } catch (err) {
             console.error(err)
         }
-
     }
 
     function logout() {
@@ -233,29 +239,22 @@ function Home() {
         window.location.reload()
     }
 
-
     useEffect(() => {
         async function getDataLists(): Promise<void> {
             let newToken = localStorage.getItem("token")
             if (newToken) {
                 setToken(newToken)
             }
-            if (sourcesState.length === 0) {
                 let { data } = await API.sources(newToken)
                 setSourcesState(data)
-            }
-            if (personsState.length === 0) {
-                let res = await API.persons(newToken)
-                setPersonsState(res.data)
-            }
-            if (narrowState.length === 0) {
-                let res = await API.narrow(newToken)
-                setNarrowState(res.data)
-            }
-            if (broadState.length === 0) {
-                let res = await API.broad(newToken)
-                setBroadState(res.data)
-            }
+                let persons = await API.persons(newToken)
+                setPersonsState(persons.data)
+                let narrow = await API.narrow(newToken)
+                setNarrowState(narrow.data)
+                let broad = await API.broad(newToken)
+                setBroadState(broad.data)
+                let vendors = await API.vendors(newToken)
+                setVendorsState(vendors.data)
         }
         getDataLists()
     }, [])
@@ -316,6 +315,7 @@ function Home() {
                         personsState={personsState}
                         broadState={broadState}
                         narrowState={narrowState}
+                        vendorsState={vendorsState}
                         handleChange={handleExpensesChange}
                         setPersonsState={setPersonsState}
                         setBroadState={setBroadState}

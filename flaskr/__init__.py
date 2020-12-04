@@ -65,25 +65,6 @@ def callCheckAuth():
     else:
         return Response("Nice try!", status=401)
 
-@app.route("/api/income")
-def api_income():
-    year = request.args.get("year")
-    month = request.args.get("month")
-    year_month = year + "-" + month
-    month = datetime.strptime(year_month, '%Y-%m')
-    start_date = month.date()
-    end_date = (month + relativedelta(months=+1)).date()
-    sql = "SELECT i.id, i.source_id, i.earner_id, Date, Amount, s.name AS Source, p.name AS Person\
-                FROM income i\
-                LEFT JOIN source s ON s.id=i.source_id\
-                LEFT JOIN person_earner p ON p.id=i.earner_id\
-		        WHERE date > '{}' AND date < '{}'\
-                ORDER BY date;".format(start_date, end_date)
-    INC_report = pd.read_sql(sql, con=engine, parse_dates=['Date'])
-    INC_report.set_index('Date', inplace=True)
-    INC_report['Amount'] = INC_report['Amount'].apply(format_numbers)
-    return INC_report.to_json(orient="table")
-
 @app.route("/api/expenses")
 def api_expenses():
     year = request.args.get("year")
@@ -92,7 +73,7 @@ def api_expenses():
     month = datetime.strptime(year_month, '%Y-%m')
     start_date = month.date()
     end_date = (month + relativedelta(months=+1)).date()
-    sql = "SELECT entry_id, broad_category_id, narrow_category_id, Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
+    sql = "SELECT entry_id, person_id, broad_category_id, narrow_category_id, vendor_id, Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
                 LEFT JOIN vendor v ON v.id=e.vendor_id \
                 LEFT JOIN broad_category b ON b.id=e.broad_category_id \
                 LEFT JOIN person_earner p ON p.id=e.person_id \
@@ -106,6 +87,33 @@ def api_expenses():
     EXP_report['Amount'] = EXP_report['Amount'].apply(format_numbers)
     return EXP_report.to_json(orient="table")
 
+@app.route("/api/expenses/<int:id>", methods=['PUT'])
+def update_expenses(id):  
+    json = request.get_json()
+    date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+    vendor = json['vendor_id']
+    amount = json['Amount']
+    bCat = json['broad_category_id']
+    nCat = json['narrow_category_id']
+    if json['person_id']:
+        person = json['person_id']
+    else:
+        person = 'NULL'
+    notes = json['Notes']
+    print(json)
+    sql = f"UPDATE expenses \
+        SET date=DATE('{date}'), vendor_id={vendor}, \
+        amount={amount}, broad_category_id={bCat}, \
+        narrow_category_id={nCat}, person_id={person}, \
+        notes='{notes}'\
+        WHERE entry_id = '{id}';"
+    print(sql)
+    executed = engine.connect().execute(sql)
+    print(executed)
+    return Response(f'id: {id} Update', status=200)
+   
+
+
 @app.route("/api/expenses/<int:id>", methods=['DELETE'])
 def delete_expenses(id):
     try: 
@@ -115,6 +123,25 @@ def delete_expenses(id):
         return Response(f'id: {id} Deleted', status=200)
     except:
         return Response("Server Error", status=500)
+
+@app.route("/api/income")
+def api_income():
+    year = request.args.get("year")
+    month = request.args.get("month")
+    year_month = year + "-" + month
+    month = datetime.strptime(year_month, '%Y-%m')
+    start_date = month.date()
+    end_date = (month + relativedelta(months=+1)).date()
+    sql = "SELECT i.id, i.source_id, i.earner_id as person_id, Date, Amount, s.name AS Source, p.name AS Person\
+                FROM income i\
+                LEFT JOIN source s ON s.id=i.source_id\
+                LEFT JOIN person_earner p ON p.id=i.earner_id\
+		        WHERE date > '{}' AND date < '{}'\
+                ORDER BY date;".format(start_date, end_date)
+    INC_report = pd.read_sql(sql, con=engine, parse_dates=['Date'])
+    INC_report.set_index('Date', inplace=True)
+    INC_report['Amount'] = INC_report['Amount'].apply(format_numbers)
+    return INC_report.to_json(orient="table")
 
 @app.route("/api/income/<int:id>", methods=['DELETE'])
 def delete_income(id):
@@ -206,5 +233,11 @@ def get_narrows():
 @app.route("/api/broads")
 def get_broads():
     sql = "SELECT id, name FROM broad_category ORDER BY name"
+    dataframe = pd.read_sql(sql, con=engine)
+    return dataframe.to_json(orient="table")
+
+@app.route("/api/vendors")
+def get_vendors():
+    sql = "SELECT id, name FROM vendor ORDER BY name"
     dataframe = pd.read_sql(sql, con=engine)
     return dataframe.to_json(orient="table")

@@ -20,7 +20,6 @@ export default function StaticRow(props:
         entry: tableDataEntry,
         i: number,
         fields: { name: string }[],
-        formState: {form: string}
     }) {
 
     return (

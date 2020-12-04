@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 
 interface tableDataEntry {
     Amount: string,
@@ -30,7 +30,7 @@ export default function InputRow(props:
         personsState?: dataListStateType[],
         broadState?: dataListStateType[],
         narrowState?: dataListStateType[],
-        handleChange?: Function,
+        handleChange: Function,
         setSourcesState?: Function,
         setPersonsState?: Function,
         setBroadState?: Function,
@@ -38,7 +38,7 @@ export default function InputRow(props:
         deleteEntry: Function
     }) {
 
-    const [state, setState] = useState(props.entry)
+    const [state, setState] = useState<tableDataEntry>({Amount: ""})
 
     function makeDataList(propsState: dataListStateType[], id: string) {
         return (
@@ -60,11 +60,9 @@ export default function InputRow(props:
         setState({...state, [name]: value})
     }
 
-    function nothing(): void {
-        console.log("nothing");
-    }
-
-
+    useEffect(() => {
+        setState(props.entry)
+    }, [props.entry])
 
     return (
         <tbody>
@@ -73,14 +71,14 @@ export default function InputRow(props:
                     .filter(column => !column.name.includes("id"))
                     .map(column => {
                         return (
-                            <td key={props.i + column.name}>
+                            <td>
                                 {column.name === 'Amount' ? <span>$</span> : null}
                                 <input
                                     name={column.name}
                                     onBlur={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                        props.handleChange ? props.handleChange(e, props.i) : nothing()
+                                        props.handleChange(e, props.i)
                                     }}
-                                    onChange={state.Date ? handleInputRowChange : undefined}
+                                    onChange={handleInputRowChange}
                                     className="tableInput"
                                     value={state[column.name as keyof tableDataEntry] || ""}
                                     list={column.name}
@@ -101,7 +99,7 @@ export default function InputRow(props:
                         )
                     })}
                     <td>
-                        <button onClick={(e)=> props.deleteEntry(e, state.entry_id || state.id)}>Delete</button>
+                        <button onClick={()=> props.deleteEntry(state.entry_id || state.id)}>Delete</button>
                     </td>
             </tr>
         </tbody>

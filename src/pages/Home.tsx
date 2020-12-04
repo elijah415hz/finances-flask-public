@@ -210,17 +210,17 @@ function Home() {
         setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
     }
 
-    async function deleteEntry(event: React.SyntheticEvent, id: number | undefined) {
+    async function deleteEntry(id: number | undefined) {
         let token = localStorage.getItem("token");
         try {
             if (formState.form === "expenses") {
-                let response = await API.deleteExpenses(token, id);
-                console.log(response);
-                handleFormSubmit(event);
+                await API.deleteExpenses(token, id);
+                let newExpensesTableStateData = expensesTableState.data.filter(entry=>entry.entry_id !== id)
+                setExpensesTableState({...expensesTableState, data: newExpensesTableStateData})
             } else if (formState.form === "income") {
-                let response = await API.deleteIncome(token, id);
-                console.log(response);
-                handleFormSubmit(event);            
+                await API.deleteIncome(token, id);
+                let newIncomeTableStateData = incomeTableState.data.filter(entry=>entry.id !== id)
+                setIncomeTableState({...incomeTableState, data: newIncomeTableStateData})
             }
         } catch (err) {
             console.error(err)
@@ -306,7 +306,7 @@ function Home() {
                     setSourcesState={setSourcesState}
                     setPersonsState={setPersonsState}
                     deleteEntry={deleteEntry}
-                    formState={formState}
+                    form={formState.form}
                 />
             ) : null}
             {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
@@ -320,14 +320,15 @@ function Home() {
                     setBroadState={setBroadState}
                     setNarrowState={setNarrowState}
                     deleteEntry={deleteEntry}
-                    formState={formState}
+                    form={formState.form}
                 />
             ) : null}
             {formState.form === "pivot" && pivotTableState ? (
                 <Table
                     state={pivotTableState}
                     deleteEntry={deleteEntry}
-                    formState={formState}
+                    handleChange={()=>false}
+                    form={formState.form}
                 />
             ) : null}
         </div>

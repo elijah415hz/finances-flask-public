@@ -37,13 +37,13 @@ export default function Table(props:
         personsState?: dataListStateType[],
         broadState?: dataListStateType[],
         narrowState?: dataListStateType[],
-        handleChange?: Function,
+        handleChange: Function,
         setSourcesState?: Function,
         setPersonsState?: Function,
         setBroadState?: Function,
         setNarrowState?: Function,
         deleteEntry: Function,
-        formState: { form: string }
+        form?: string
     }) {
 
     return (
@@ -62,13 +62,12 @@ export default function Table(props:
                 </tr>
             </thead>
             {(props.state.data).map((entry: tableDataEntry, i: number) => {
-                return props.formState.form === "pivot" ?
+                return props.form === "pivot" ?
                     <StaticRow
                         entry={entry}
                         i={i}
-                        key={i}
+                        key={entry.entry_id || entry.id}
                         fields={props.state.schema.fields}
-                        formState={props.formState}
                     /> :
                     <InputRow
                         entry={entry}

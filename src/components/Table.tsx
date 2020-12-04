@@ -1,26 +1,7 @@
 import React from 'react'
 import InputRow from './InputRow'
 import StaticRow from './StaticRow'
-
-interface tableDataEntry {
-    Amount: string,
-    Date?: string,
-    Source?: string,
-    Person?: string,
-    id?: number,
-    source_id?: number,
-    earner_id?: number,
-    Vendor?: string,
-    Broad_category?: string,
-    Narrow_category?: string,
-    Notes?: string,
-    entry_id?: number
-}
-
-interface dataListStateType {
-    id: number,
-    name: string
-}
+import type {tableDataEntry, dataListStateType} from "../interfaces/Interfaces"
 
 export default function Table(props:
     {

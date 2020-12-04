@@ -1,31 +1,12 @@
-
-interface sourcesStateType {
-    id: number,
-    name: string
-}
-
-interface tableDataEntry {
-    Amount: string,
-    Date?: string,
-    Source?: string,
-    Person?: string,
-    id?: number,
-    source_id?: number,
-    earner_id?: number,
-    Vendor?: string,
-    Broad_category?: string,
-    Narrow_category?: string,
-    Notes?: string,
-    entry_id?: number
-}
+import type {dataListStateType, tableDataEntry} from '../interfaces/Interfaces'
 
 const API = {
-    expenses: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
+    expenses: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
         return fetch(`/api/expenses?year=${yearMonthObj.year}&month=${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        })
+        }).then(res=>res.json())
     },
     deleteExpenses: function (token: string | null, id: number | undefined): Promise<Response | string> {
         return fetch(`/api/expenses/${id}`, {
@@ -45,12 +26,12 @@ const API = {
             body: JSON.stringify(data)
         }).then(res=>res.text())
     },
-    income: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
+    income: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
         return fetch(`/api/income?year=${yearMonthObj.year}&month=${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        })
+        }).then(res=>res.json())
     },
     updateIncome: function (token: string | null, data: tableDataEntry): Promise<Response | string> {
         return fetch(`/api/income/${data.id}`, {
@@ -70,49 +51,42 @@ const API = {
             }
         }).then(res=>res.text())
     },
-    pivot: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<Response> {
+    pivot: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
         return fetch(`/api/pivot?year=${yearMonthObj.year}&month=${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        })
+        }).then(res=>res.json())
     },
-    wallchart: function (token: string | null,): Promise<Response> {
-        return fetch('/api/wallchart', {
-            headers: {
-                "authorization": `Bearer ${token}`
-            }
-        })
-    },
-    sources: function (token: string | null,): Promise<{ data: sourcesStateType[] }> {
+    sources: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
         return fetch('/api/sources', {
             headers: {
                 "authorization": `Bearer ${token}`
             }
         }).then(res => res.json())
     },
-    persons: function (token: string | null,): Promise<{ data: sourcesStateType[] }> {
+    persons: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
         return fetch('/api/persons', {
             headers: {
                 "authorization": `Bearer ${token}`
             }
         }).then(res => res.json())
     },
-    narrow: function (token: string | null,): Promise<{ data: sourcesStateType[] }> {
+    narrow: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
         return fetch('/api/narrows', {
             headers: {
                 "authorization": `Bearer ${token}`
             }
         }).then(res => res.json())
     },
-    broad: function (token: string | null,): Promise<{ data: sourcesStateType[] }> {
+    broad: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
         return fetch('/api/broads', {
             headers: {
                 "authorization": `Bearer ${token}`
             }
         }).then(res => res.json())
     },
-    vendors: function (token: string | null,): Promise<{ data: sourcesStateType[] }> {
+    vendors: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
         return fetch('/api/vendors', {
             headers: {
                 "authorization": `Bearer ${token}`

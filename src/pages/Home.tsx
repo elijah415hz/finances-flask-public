@@ -1,50 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../components/Table';
 import API from '../utils/API'
+import type {tableDataEntry, dataListStateType, formStateType, InputName} from '../interfaces/Interfaces'
 
 function Home() {
-    interface formStateType {
-        form: "expenses" | "income" | "pivot",
-        year: string,
-        month: string
-    }
-
-    interface expensesDataEntry {
-        Amount: string,
-        Date: string,
-        Source: string,
-        Vendor: string,
-        Broad_category: string,
-        Narrow_category: string,
-        Person: string,
-        Notes: string,
-        entry_id: number
-    }
-
-    interface incomeDataEntry {
-        Amount: string,
-        Date: string,
-        Source: string,
-        Person: string,
-        id: number,
-        source_id: number,
-        earner_id: number
-    }
-
-    interface pivotDataEntry {
-        Broad_category: string,
-        Narrow_category: string,
-        Amount: string
-    }
-
-
-    interface dataListStateType {
-        id: number,
-        name: string
-    }
-
-    type InputName = "Person" | "Source" | "Broad_category" | "Narrow_category" | "Vendor"
-
+    
     const [token, setToken] = useState("")
 
     const [formState, setFormState] = useState<formStateType>(
@@ -55,7 +15,7 @@ function Home() {
         }
     )
 
-    const [incomeTableState, setIncomeTableState] = useState<{ schema: { fields: [] }, data: incomeDataEntry[] }>(
+    const [incomeTableState, setIncomeTableState] = useState<{ schema: { fields: [] }, data: tableDataEntry[] }>(
         {
             schema: { fields: [] },
             data: [{
@@ -70,7 +30,7 @@ function Home() {
         }
     )
 
-    const [expensesTableState, setExpensesTableState] = useState<{ schema: { fields: [] }, data: expensesDataEntry[] }>(
+    const [expensesTableState, setExpensesTableState] = useState<{ schema: { fields: [] }, data: tableDataEntry[] }>(
         {
             schema: { fields: [] },
             data: [{
@@ -87,7 +47,7 @@ function Home() {
         }
 
     )
-    const [pivotTableState, setPivotTableState] = useState<{ schema: { fields: [] }, data: pivotDataEntry[] }>(
+    const [pivotTableState, setPivotTableState] = useState<{ schema: { fields: [] }, data: tableDataEntry[] }>(
         {
             schema: { fields: [] },
             data: [{
@@ -105,21 +65,20 @@ function Home() {
     const [narrowState, setNarrowState] = useState<dataListStateType[]>([])
     const [vendorsState, setVendorsState] = useState<dataListStateType[]>([])
 
-    function formatDates(entry:
-        {
-            Date: string
-        }): {
-            Date: string
-        } {
-        let date = new Date(entry.Date);
-        let year = date.getUTCFullYear();
-        let month = (1 + date.getUTCMonth()).toString();
-        month = month.length > 1 ? month : '0' + month;
-        let day = date.getUTCDate().toString();
-        day = day.length > 1 ? day : '0' + day;
-        let dateString = month + '/' + day + '/' + year;
-        entry.Date = dateString
-        return entry
+    function formatDates(entry: tableDataEntry): tableDataEntry {
+        if (!entry.Date) {
+            return entry
+        } else {
+            let date = new Date(entry.Date);
+            let year = date.getUTCFullYear();
+            let month = (1 + date.getUTCMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            let day = date.getUTCDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            let dateString = month + '/' + day + '/' + year;
+            entry.Date = dateString
+            return entry
+        }
     }
 
     function handleFormChange(event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>): void {
@@ -131,9 +90,11 @@ function Home() {
         try {
             event.preventDefault()
             let route = formState.form
-            let response = await (await API[route](token, formState)).json()
+            let response = await API[route](token, formState)
             // Formatting the dates the hard way because javascript doesn't support strftime...
-            response.data = response.data.map(formatDates)
+            if (route !== 'pivot') {
+                response.data = response.data.map(formatDates)
+            }
             switch (route) {
                 case "expenses":
                     setExpensesTableState(response)
@@ -189,8 +150,8 @@ function Home() {
 
     function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void {
         let { name, value } = event.target;
-        let newExpensesTableStateData: expensesDataEntry[] = [...expensesTableState.data]
-        let updatedRow: expensesDataEntry = { ...newExpensesTableStateData[index], [name]: value }
+        let newExpensesTableStateData: tableDataEntry[] = [...expensesTableState.data]
+        let updatedRow: tableDataEntry = { ...newExpensesTableStateData[index], [name]: value }
         if (name === "Person" || name === "Broad_category" || name === "Narrow_category" || name === "Vendor") {
             let { id, dataListItem } = assignId(name as InputName, value)
             if (id && dataListItem) {
@@ -205,8 +166,8 @@ function Home() {
 
     function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void {
         let { name, value } = event.target;
-        let newIncomeTableStateData: incomeDataEntry[] = [...incomeTableState.data]
-        let updatedRow: incomeDataEntry = { ...newIncomeTableStateData[index], [name]: value }
+        let newIncomeTableStateData: tableDataEntry[] = [...incomeTableState.data]
+        let updatedRow: tableDataEntry = { ...newIncomeTableStateData[index], [name]: value }
         if (name === "Person" || name === "Source") {
             let { id, dataListItem } = assignId(name as InputName, value)
             if (id && dataListItem) {

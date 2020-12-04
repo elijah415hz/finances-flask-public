@@ -1,24 +1,5 @@
 import React, {useState, useEffect} from 'react'
-
-interface tableDataEntry {
-    Amount: string,
-    Date?: string,
-    Source?: string,
-    Person?: string,
-    id?: number,
-    source_id?: number,
-    earner_id?: number,
-    Vendor?: string,
-    Broad_category?: string,
-    Narrow_category?: string,
-    Notes?: string,
-    entry_id?: number
-}
-
-interface dataListStateType {
-    id: number,
-    name: string
-}
+import {dataListStateType, tableDataEntry} from '../interfaces/Interfaces'
 
 export default function InputRow(props:
     {

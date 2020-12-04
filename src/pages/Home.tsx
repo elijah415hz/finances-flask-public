@@ -215,12 +215,12 @@ function Home() {
         try {
             if (formState.form === "expenses") {
                 await API.deleteExpenses(token, id);
-                let newExpensesTableStateData = expensesTableState.data.filter(entry=>entry.entry_id !== id)
-                setExpensesTableState({...expensesTableState, data: newExpensesTableStateData})
+                let newExpensesTableStateData = expensesTableState.data.filter(entry => entry.entry_id !== id)
+                setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
             } else if (formState.form === "income") {
                 await API.deleteIncome(token, id);
-                let newIncomeTableStateData = incomeTableState.data.filter(entry=>entry.id !== id)
-                setIncomeTableState({...incomeTableState, data: newIncomeTableStateData})
+                let newIncomeTableStateData = incomeTableState.data.filter(entry => entry.id !== id)
+                setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
             }
         } catch (err) {
             console.error(err)
@@ -261,8 +261,8 @@ function Home() {
     }, [])
 
     return (
-        <div className="App">
-            <div className="header">
+        <div className="Home">
+            <header className="header">
                 <button className="logout" onClick={logout}>Logout</button>
                 <h1>Finances!</h1>
                 {token ?
@@ -296,41 +296,43 @@ function Home() {
                         placeholder="MM" />
                     <button className="btn btn-success">Submit</button>
                 </form>
-            </div>
-            {formState.form === "income" && incomeTableState.data[0]?.id ? (
-                <Table
-                    state={incomeTableState}
-                    sourcesState={sourcesState}
-                    personsState={personsState}
-                    handleChange={handleIncomeChange}
-                    setSourcesState={setSourcesState}
-                    setPersonsState={setPersonsState}
-                    deleteEntry={deleteEntry}
-                    form={formState.form}
-                />
-            ) : null}
-            {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
-                <Table
-                    state={expensesTableState}
-                    personsState={personsState}
-                    broadState={broadState}
-                    narrowState={narrowState}
-                    handleChange={handleExpensesChange}
-                    setPersonsState={setPersonsState}
-                    setBroadState={setBroadState}
-                    setNarrowState={setNarrowState}
-                    deleteEntry={deleteEntry}
-                    form={formState.form}
-                />
-            ) : null}
-            {formState.form === "pivot" && pivotTableState ? (
-                <Table
-                    state={pivotTableState}
-                    deleteEntry={deleteEntry}
-                    handleChange={()=>false}
-                    form={formState.form}
-                />
-            ) : null}
+            </header>
+            <body>
+                {formState.form === "income" && incomeTableState.data[0]?.id ? (
+                    <Table
+                        state={incomeTableState}
+                        sourcesState={sourcesState}
+                        personsState={personsState}
+                        handleChange={handleIncomeChange}
+                        setSourcesState={setSourcesState}
+                        setPersonsState={setPersonsState}
+                        deleteEntry={deleteEntry}
+                        form={formState.form}
+                    />
+                ) : null}
+                {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
+                    <Table
+                        state={expensesTableState}
+                        personsState={personsState}
+                        broadState={broadState}
+                        narrowState={narrowState}
+                        handleChange={handleExpensesChange}
+                        setPersonsState={setPersonsState}
+                        setBroadState={setBroadState}
+                        setNarrowState={setNarrowState}
+                        deleteEntry={deleteEntry}
+                        form={formState.form}
+                    />
+                ) : null}
+                {formState.form === "pivot" && pivotTableState ? (
+                    <Table
+                        state={pivotTableState}
+                        deleteEntry={deleteEntry}
+                        handleChange={() => false}
+                        form={formState.form}
+                    />
+                ) : null}
+            </body>
         </div>
     );
 }

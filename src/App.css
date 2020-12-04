@@ -1,14 +1,26 @@
-.tableInput {
-  border: none;
-}
 
 .header {
   text-align: center;
 }
 
+body {
+  text-align: center;
+}
+
+table {
+  margin: 0 auto;
+}
+
+.tableInput {
+  border: none;
+}
+
 th {
   text-align: start;
 }
+
+tbody:nth-child(even) {background-color: #f2f2f2;}
+tbody:nth-child(even) input {background-color: #f2f2f2;}
 
 .logout {
   float: right;

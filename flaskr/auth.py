@@ -11,20 +11,20 @@ PASSWORD = os.environ.get("PASSWORD")
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 def checkAuth(request):
-        try :
-            token = request.headers['Authorization'].split(" ")[1]
-            decoded = jwt.decode(token, current_app.config['SECRET_KEY'])
-            print(decoded)
-            return decoded
-        except jwt.ExpiredSignatureError:
-            print("Token has expired!")
-            return False
-        except jwt.InvalidSignatureError:
-            print("Key mismatch")
-            return False
-        except:
-            print("Invalid Token")
-            return False
+    try :
+        token = request.headers['Authorization'].split(" ")[1]
+        decoded = jwt.decode(token, current_app.config['SECRET_KEY'])
+        print(decoded)
+        return decoded
+    except jwt.ExpiredSignatureError:
+        print("Token has expired!")
+        return False
+    except jwt.InvalidSignatureError:
+        print("Key mismatch")
+        return False
+    except:
+        print("Invalid Token")
+        return False
 
 # Routes
 @bp.route("/login", methods=['POST'])

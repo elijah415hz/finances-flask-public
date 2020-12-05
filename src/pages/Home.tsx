@@ -107,7 +107,7 @@ function Home() {
                     break;
             }
         } catch (err) {
-            console.error(err)
+            console.log(err)
         }
     }
 
@@ -228,7 +228,7 @@ function Home() {
                 <button className="logout" onClick={logout}>Logout</button>
                 <h1>Finances!</h1>
                 {token ?
-                    <img src="/api/wallchart" alt="Wall Chart" />
+                    <img src="/wallchart" alt="Wall Chart" />
                     : null
                 }
                 <form onSubmit={handleFormSubmit} className="form-inline">

@@ -1,4 +1,4 @@
-from flask import Blueprint, send_file
+from flask import Blueprint, send_file, current_app
 import pandas as pd
 from matplotlib.figure import Figure
 import base64
@@ -9,7 +9,7 @@ bp = Blueprint('views', __name__, url_prefix='')
 
 @bp.route("/")
 def index():
-    return bp.send_static_file('index.html')
+    return current_app.send_static_file('index.html')
 
 @bp.route("/wallchart")
 def wallchart():

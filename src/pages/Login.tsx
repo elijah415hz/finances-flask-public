@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
-import {Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
+import {AuthContext} from '../App'
 
-export default function Login(props: {isLoggedIn: boolean, setIsLoggedIn: Function}) {
+export default function Login() {
+    const {Auth, setAuth} = React.useContext(AuthContext)
+
     const [loginFormState, setLoginFormState] = useState({
         username: "",
         password: "",
@@ -21,13 +24,11 @@ export default function Login(props: {isLoggedIn: boolean, setIsLoggedIn: Functi
     const formSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
         API.login(loginFormState).then(newToken => {
-            localStorage.setItem("token", newToken.token)
-            props.setIsLoggedIn(true)
-            
+            setAuth({type: 'LOGIN', payload: {user: 'blarvis', token: newToken.token}})
         }).catch(err => setFailure(true))
     }
 
-    if (props.isLoggedIn) {
+    if (Auth.loggedIn) {
         return <Redirect to='/' />
     }
 

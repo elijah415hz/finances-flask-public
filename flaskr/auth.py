@@ -14,7 +14,6 @@ def checkAuth(request):
     try :
         token = request.headers['Authorization'].split(" ")[1]
         decoded = jwt.decode(token, current_app.config['SECRET_KEY'])
-        print(decoded)
         return decoded
     except jwt.ExpiredSignatureError:
         print("Token has expired!")

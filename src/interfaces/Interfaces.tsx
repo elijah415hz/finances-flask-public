@@ -26,4 +26,11 @@ interface dataListStateType {
     name: string
 }
 
-export type {tableDataEntry, dataListStateType, formStateType, InputName}
+interface tableType {
+    schema: { 
+        fields: [] 
+    }, 
+    data: tableDataEntry[]
+}
+
+export type {tableDataEntry, dataListStateType, formStateType, InputName, tableType}

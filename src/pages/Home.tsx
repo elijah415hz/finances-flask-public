@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../components/Table';
 import API from '../utils/API'
-import type {tableDataEntry, dataListStateType, formStateType, InputName} from '../interfaces/Interfaces'
+import { AuthContext } from '../App'
+import type { tableDataEntry, dataListStateType, formStateType, InputName } from '../interfaces/Interfaces'
 
 function Home() {
-    
-    const [token, setToken] = useState("")
-
+    const { Auth, setAuth } = React.useContext(AuthContext)
     const [formState, setFormState] = useState<formStateType>(
         {
             form: "income",
@@ -90,7 +89,7 @@ function Home() {
         try {
             event.preventDefault()
             let route = formState.form
-            let response = await API[route](token, formState)
+            let response = await API[route](Auth.token, formState)
             // Formatting the dates the hard way because javascript doesn't support strftime...
             if (route !== 'pivot') {
                 response.data = response.data.map(formatDates)
@@ -107,7 +106,9 @@ function Home() {
                     break;
             }
         } catch (err) {
-            console.log(err)
+            if (err === "Unauthorized") {
+                setAuth({ type: 'LOGOUT' })
+            }
         }
     }
 
@@ -148,20 +149,27 @@ function Home() {
         }
     }
 
-    function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void {
-        let { name, value } = event.target;
-        let newExpensesTableStateData: tableDataEntry[] = [...expensesTableState.data]
-        let updatedRow: tableDataEntry = { ...newExpensesTableStateData[index], [name]: value }
-        if (name === "Person" || name === "Broad_category" || name === "Narrow_category" || name === "Vendor") {
-            let { id, dataListItem } = assignId(name as InputName, value)
-            if (id && dataListItem) {
-                updatedRow = { ...updatedRow, [id]: dataListItem.id }
+    async function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, index: number): Promise<void> {
+        try {
+            let { name, value } = event.target;
+            let newExpensesTableStateData: tableDataEntry[] = [...expensesTableState.data]
+            let updatedRow: tableDataEntry = { ...newExpensesTableStateData[index], [name]: value }
+            if (name === "Person" || name === "Broad_category" || name === "Narrow_category" || name === "Vendor") {
+                let { id, dataListItem } = assignId(name as InputName, value)
+                if (id && dataListItem) {
+                    updatedRow = { ...updatedRow, [id]: dataListItem.id }
+                }
+            }
+            let res = await API.updateExpenses(Auth.token, updatedRow)
+            console.log(res)
+            newExpensesTableStateData[index] = updatedRow
+            setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
+        } catch (err) {
+            console.log("Error Message: " + err.message)
+            if (err.message === "Unauthorized") {
+                setAuth({ type: 'LOGOUT' })
             }
         }
-        console.log(updatedRow)
-        API.updateExpenses(token, updatedRow).then(res=>console.log(res)).catch(err=>console.error(err))
-        newExpensesTableStateData[index] = updatedRow
-        setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
     }
 
     function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void {
@@ -175,49 +183,49 @@ function Home() {
             }
         }
         console.log(updatedRow);
-        API.updateIncome(token, updatedRow).then(res=>console.log(res)).catch(err=>console.error(err))
+        API.updateIncome(Auth.token, updatedRow)
+            .then(res => console.log(res))
+            .catch(err => {
+                console.error(err)
+                if (err === 'Unauthorized') {
+                    setAuth({ type: 'LOGOUT' })
+                }
+            })
         newIncomeTableStateData[index] = updatedRow
         setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
     }
 
     async function deleteEntry(id: number | undefined) {
-        let token = localStorage.getItem("token");
         try {
             if (formState.form === "expenses") {
-                await API.deleteExpenses(token, id);
+                await API.deleteExpenses(Auth.token, id);
                 let newExpensesTableStateData = expensesTableState.data.filter(entry => entry.entry_id !== id)
                 setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
             } else if (formState.form === "income") {
-                await API.deleteIncome(token, id);
+                await API.deleteIncome(Auth.token, id);
                 let newIncomeTableStateData = incomeTableState.data.filter(entry => entry.id !== id)
                 setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
             }
         } catch (err) {
             console.error(err)
+            if (err === 'Unauthorized') {
+                setAuth({ type: 'LOGOUT' })
+            }
         }
-    }
-
-    function logout() {
-        localStorage.removeItem("token")
-        window.location.reload()
     }
 
     useEffect(() => {
         async function getDataLists(): Promise<void> {
-            let newToken = localStorage.getItem("token")
-            if (newToken) {
-                setToken(newToken)
-            }
-                let { data } = await API.sources(newToken)
-                setSourcesState(data)
-                let persons = await API.persons(newToken)
-                setPersonsState(persons.data)
-                let narrow = await API.narrow(newToken)
-                setNarrowState(narrow.data)
-                let broad = await API.broad(newToken)
-                setBroadState(broad.data)
-                let vendors = await API.vendors(newToken)
-                setVendorsState(vendors.data)
+            let { data } = await API.sources(Auth.token)
+            setSourcesState(data)
+            let persons = await API.persons(Auth.token)
+            setPersonsState(persons.data)
+            let narrow = await API.narrow(Auth.token)
+            setNarrowState(narrow.data)
+            let broad = await API.broad(Auth.token)
+            setBroadState(broad.data)
+            let vendors = await API.vendors(Auth.token)
+            setVendorsState(vendors.data)
         }
         getDataLists()
     }, [])
@@ -225,9 +233,9 @@ function Home() {
     return (
         <div className="Home">
             <header className="header">
-                <button className="logout" onClick={logout}>Logout</button>
+                <button className="logout" onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</button>
                 <h1>Finances!</h1>
-                {token ?
+                {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" />
                     : null
                 }

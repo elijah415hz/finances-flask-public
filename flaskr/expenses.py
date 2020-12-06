@@ -69,16 +69,14 @@ def update_expenses(id):
             vendor = 'NULL'
 
         notes = json['Notes']
-        print(json)
+        
         sql = "UPDATE expenses \
             SET date=DATE(%s), vendor_id=%s, \
             amount=%s, broad_category_id=%s, \
             narrow_category_id=%s, person_id=%s, \
-            notes='%s'\
+            notes=%s\
             WHERE entry_id=%s;"
-        print(sql)
         executed = engine.connect().execute(sql, [date, vendor, amount, bCat, nCat, person, notes, id])
-        print(executed)
         return Response(f'id: {id} Updated', status=200)
 
     # Delete expenses
@@ -90,7 +88,6 @@ def delete_expenses(id):
     else:
         sql = "DELETE FROM expenses WHERE entry_id=%s;"
         executed = engine.connect().execute(sql, [id])
-        print(executed)
         return Response(f'id: {id} Deleted', status=200)
 
 @bp.route("/pivot/<year>/<month>")

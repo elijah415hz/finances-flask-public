@@ -59,9 +59,7 @@ def update_income(id):
             earner_id=%s, \
             source_id=%s \
             WHERE id=%s;"
-        print(sql)
         executed = engine.connect().execute(sql, [date, amount, person, source, id])
-        print(executed)
         return Response(f'id: {id} Updated', status=200)
 
 @bp.route("/<int:id>", methods=['DELETE'])
@@ -72,6 +70,5 @@ def delete_income(id):
     else:
         sql = "DELETE FROM income WHERE id=%s;"
         executed = engine.connect().execute(sql, [id])
-        print(executed)
         return Response(f'id: {id} Deleted', status=200)
     

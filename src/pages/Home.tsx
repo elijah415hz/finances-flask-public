@@ -106,7 +106,7 @@ function Home() {
                     break;
             }
         } catch (err) {
-            if (err === "Unauthorized") {
+            if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
         }
@@ -160,39 +160,39 @@ function Home() {
                     updatedRow = { ...updatedRow, [id]: dataListItem.id }
                 }
             }
-            let res = await API.updateExpenses(Auth.token, updatedRow)
-            console.log(res)
             newExpensesTableStateData[index] = updatedRow
             setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
+            let res = await API.updateExpenses(Auth.token, updatedRow)
+            console.log(res)
         } catch (err) {
-            console.log("Error Message: " + err.message)
+            console.error(err)
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
         }
     }
 
-    function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void {
-        let { name, value } = event.target;
-        let newIncomeTableStateData: tableDataEntry[] = [...incomeTableState.data]
-        let updatedRow: tableDataEntry = { ...newIncomeTableStateData[index], [name]: value }
-        if (name === "Person" || name === "Source") {
-            let { id, dataListItem } = assignId(name as InputName, value)
-            if (id && dataListItem) {
-                updatedRow = { ...updatedRow, [id]: dataListItem.id }
+    async function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, index: number): Promise<void> {
+        try {
+            let { name, value } = event.target;
+            let newIncomeTableStateData: tableDataEntry[] = [...incomeTableState.data]
+            let updatedRow: tableDataEntry = { ...newIncomeTableStateData[index], [name]: value }
+            if (name === "Person" || name === "Source") {
+                let { id, dataListItem } = assignId(name as InputName, value)
+                if (id && dataListItem) {
+                    updatedRow = { ...updatedRow, [id]: dataListItem.id }
+                }
+            }
+            newIncomeTableStateData[index] = updatedRow
+            setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
+            let res = await API.updateIncome(Auth.token, updatedRow)
+            console.log(res)
+        } catch (err) {
+            console.error(err)
+            if (err.message === 'Unauthorized') {
+                setAuth({ type: 'LOGOUT' })
             }
         }
-        console.log(updatedRow);
-        API.updateIncome(Auth.token, updatedRow)
-            .then(res => console.log(res))
-            .catch(err => {
-                console.error(err)
-                if (err === 'Unauthorized') {
-                    setAuth({ type: 'LOGOUT' })
-                }
-            })
-        newIncomeTableStateData[index] = updatedRow
-        setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
     }
 
     async function deleteEntry(id: number | undefined) {

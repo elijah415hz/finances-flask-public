@@ -1,6 +1,6 @@
 from flask import Blueprint
 import pandas as pd
-from . import engine
+from .db import engine
 
 bp = Blueprint('datalists', __name__, url_prefix='/api')
 

@@ -1,11 +1,6 @@
 from flask import Flask
-from sqlalchemy import create_engine
 import os
 from . import auth, expenses, income, datalists, views
-FLASK_DB_URI = os.environ.get("FLASK_DB_URI")
-
-# Create database connection
-engine = create_engine(FLASK_DB_URI) 
 
 # Setup app
 app = Flask(__name__, static_folder='../build', static_url_path="/")

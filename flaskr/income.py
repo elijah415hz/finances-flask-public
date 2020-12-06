@@ -2,7 +2,7 @@ from flask import Blueprint, Response, request, jsonify, current_app
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import pandas as pd
-from . import engine
+from .db import engine
 from .expenses import format_numbers
 from .auth import checkAuth
 

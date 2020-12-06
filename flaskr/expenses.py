@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 import numpy as np
-from . import engine
+from .db import engine
 from .auth import checkAuth
 
 bp = Blueprint('expenses', __name__, url_prefix='/api/expenses')

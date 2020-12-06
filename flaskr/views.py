@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib.figure import Figure
 import base64
 from io import BytesIO
-from . import engine
+from .db import engine
 
 bp = Blueprint('views', __name__, url_prefix='')
 

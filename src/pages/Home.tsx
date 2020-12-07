@@ -66,12 +66,7 @@ function Home() {
         broad_category: [],
         vendor: []
     })
-    const [sourcesState, setSourcesState] = useState<dataListStateType[]>([])
-    const [personsState, setPersonsState] = useState<dataListStateType[]>([])
-    const [broadState, setBroadState] = useState<dataListStateType[]>([])
-    const [narrowState, setNarrowState] = useState<dataListStateType[]>([])
-    const [vendorsState, setVendorsState] = useState<dataListStateType[]>([])
-
+    
     function formatDates(entry: tableDataEntry): tableDataEntry {
         if (!entry.Date) {
             return entry

@@ -216,15 +216,15 @@ function Home() {
 
     useEffect(() => {
         async function getDataLists(): Promise<void> {
-            let { data } = await API.sources(Auth.token)
+            let { data } = await API.dataList(Auth.token, "sources")
             setSourcesState(data)
-            let persons = await API.persons(Auth.token)
+            let persons = await API.dataList(Auth.token, "persons")
             setPersonsState(persons.data)
-            let narrow = await API.narrow(Auth.token)
+            let narrow = await API.dataList(Auth.token, "narrows")
             setNarrowState(narrow.data)
-            let broad = await API.broad(Auth.token)
+            let broad = await API.dataList(Auth.token, "broads")
             setBroadState(broad.data)
-            let vendors = await API.vendors(Auth.token)
+            let vendors = await API.dataList(Auth.token, "vendors")
             setVendorsState(vendors.data)
         }
         getDataLists()

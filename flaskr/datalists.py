@@ -4,6 +4,20 @@ from .db import engine
 
 bp = Blueprint('datalists', __name__, url_prefix='/api')
 
+@bp.route("/datalists/<datalist>")
+def get_datalist(datalist):
+    switch = {
+        'sources': "source",
+        'persons': "person_earner",
+        'narrows': "narrow_category",
+        'broads': "broad_category",
+        'vendors': "vendor"
+    }
+
+    sql = "SELECT id, name FROM %s ORDER BY name"
+    dataframe = pd.read_sql(sql, params=[switch[datalist]], con=engine)
+    return dataframe.to_json(orient="table")
+
 @bp.route("/sources")
 def get_sources():
     sql = "SELECT id, name FROM source ORDER BY name"

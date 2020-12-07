@@ -70,6 +70,13 @@ const API = {
             }
         }).then(res=>checkStatus<tableType>(res, 'json'))
     },
+    dataList: function (token: string | null, list: string): Promise<{ data: dataListStateType[] }> {
+        return fetch(`/api/datalists/${list}`, {
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
+    },
     sources: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
         return fetch('/api/sources', {
             headers: {

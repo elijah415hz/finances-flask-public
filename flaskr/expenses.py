@@ -50,23 +50,23 @@ def update_expenses(id):
         if json['Amount']:
             amount = json['Amount']
         else :
-            amount = 0
+            amount = None
         if json['person_id']:
             person = json['person_id']
         else:
-            person = 'NULL'
+            person = None
         if json['broad_category_id']:
             bCat = json['broad_category_id']
         else:
-            bCat = 'NULL'
+            bCat = None
         if json['narrow_category_id']:
             nCat = json['narrow_category_id']
         else:
-            nCat = 'NULL'
+            nCat = None
         if json['vendor_id']:
             vendor = json['vendor_id']
         else:
-            vendor = 'NULL'
+            vendor = None
 
         notes = json['Notes']
         
@@ -76,7 +76,7 @@ def update_expenses(id):
             narrow_category_id=%s, person_id=%s, \
             notes=%s\
             WHERE entry_id=%s;"
-        executed = engine.connect().execute(sql, [date, vendor, amount, bCat, nCat, person, notes, id])
+        engine.connect().execute(sql, [date, vendor, amount, bCat, nCat, person, notes, id])
         return Response(f'id: {id} Updated', status=200)
 
     # Delete expenses
@@ -87,7 +87,7 @@ def delete_expenses(id):
         return Response("Nice Try!", status=401)
     else:
         sql = "DELETE FROM expenses WHERE entry_id=%s;"
-        executed = engine.connect().execute(sql, [id])
+        engine.connect().execute(sql, [id])
         return Response(f'id: {id} Deleted', status=200)
 
 @bp.route("/pivot/<year>/<month>")

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import bcrypt
 import jwt
+import sys
 
 import os
 USER_NAME = os.environ.get("USER_NAME")
@@ -22,7 +23,7 @@ def checkAuth(request):
         print("Key mismatch")
         return False
     except:
-        print("Invalid Token")
+        print("JWT Error:", sys.exc_info())
         return False
 
 # Routes

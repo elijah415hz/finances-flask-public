@@ -1,22 +1,13 @@
 import React, {useState, useEffect} from 'react'
-import {dataListStateType, tableDataEntry} from '../interfaces/Interfaces'
+import {dataListStateType, tableDataEntry, allDataListsType} from '../interfaces/Interfaces'
 
 export default function InputRow(props:
     {
         entry: tableDataEntry,
         i: number,
         fields: { name: string }[],
-
-        sourcesState?: dataListStateType[],
-        personsState?: dataListStateType[],
-        broadState?: dataListStateType[],
-        narrowState?: dataListStateType[],
-        vendorsState?: dataListStateType[],
+        dataLists?: allDataListsType
         handleChange: Function,
-        setSourcesState?: Function,
-        setPersonsState?: Function,
-        setBroadState?: Function,
-        setNarrowState?: Function,
         deleteEntry: Function
     }) {
 
@@ -65,20 +56,20 @@ export default function InputRow(props:
                                     value={state[column.name as keyof tableDataEntry] || ""}
                                     list={column.name}
                                 />
-                                {column.name === 'Source' && props.sourcesState ? (
-                                    makeDataList(props.sourcesState, column.name)
+                                {column.name === 'Source' && props.dataLists?.source ? (
+                                    makeDataList(props.dataLists?.source, column.name)
                                 ) : null}
-                                {column.name === 'Person' && props.personsState ? (
-                                    makeDataList(props.personsState, column.name)
+                                {column.name === 'Person' && props.dataLists?.person_earner ? (
+                                    makeDataList(props.dataLists?.person_earner, column.name)
                                 ) : null}
-                                {column.name === 'Narrow_category' && props.narrowState ? (
-                                    makeDataList(props.narrowState, column.name)
+                                {column.name === 'Narrow_category' && props.dataLists?.narrow_category ? (
+                                    makeDataList(props.dataLists?.narrow_category, column.name)
                                 ) : null}
-                                {column.name === 'Broad_category' && props.broadState ? (
-                                    makeDataList(props.broadState, column.name)
+                                {column.name === 'Broad_category' && props.dataLists?.broad_category ? (
+                                    makeDataList(props.dataLists?.broad_category, column.name)
                                 ) : null}
-                                {column.name === 'Vendor' && props.vendorsState ? (
-                                    makeDataList(props.vendorsState, column.name)
+                                {column.name === 'Vendor' && props.dataLists?.vendor ? (
+                                    makeDataList(props.dataLists?.vendor, column.name)
                                 ) : null}
                             </td>
                         )

@@ -1,4 +1,9 @@
-import type {dataListStateType, tableDataEntry, tableType} from '../interfaces/Interfaces'
+import type {
+    dataListStateType, 
+    unprocessedDataListsType, 
+    allDataListsType, 
+    tableDataEntry, 
+    tableType} from '../interfaces/Interfaces'
 
 
 function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
@@ -70,48 +75,49 @@ const API = {
             }
         }).then(res=>checkStatus<tableType>(res, 'json'))
     },
-    dataList: function (token: string | null, list: string): Promise<{ data: dataListStateType[] }> {
-        return fetch(`/api/datalists/${list}`, {
+    dataList: function (token: string | null): Promise<allDataListsType> {
+        return fetch(`/api/datalists`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
+        }).then(res => checkStatus<allDataListsType>(res, 'json'))
+            
     },
-    sources: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
-        return fetch('/api/sources', {
-            headers: {
-                "authorization": `Bearer ${token}`
-            }
-        }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
-    },
-    persons: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
-        return fetch('/api/persons', {
-            headers: {
-                "authorization": `Bearer ${token}`
-            }
-        }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
-    },
-    narrow: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
-        return fetch('/api/narrows', {
-            headers: {
-                "authorization": `Bearer ${token}`
-            }
-        }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
-    },
-    broad: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
-        return fetch('/api/broads', {
-            headers: {
-                "authorization": `Bearer ${token}`
-            }
-        }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
-    },
-    vendors: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
-        return fetch('/api/vendors', {
-            headers: {
-                "authorization": `Bearer ${token}`
-            }
-        }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
-    },
+    // sources: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
+    //     return fetch('/api/sources', {
+    //         headers: {
+    //             "authorization": `Bearer ${token}`
+    //         }
+    //     }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
+    // },
+    // persons: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
+    //     return fetch('/api/persons', {
+    //         headers: {
+    //             "authorization": `Bearer ${token}`
+    //         }
+    //     }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
+    // },
+    // narrow: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
+    //     return fetch('/api/narrows', {
+    //         headers: {
+    //             "authorization": `Bearer ${token}`
+    //         }
+    //     }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
+    // },
+    // broad: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
+    //     return fetch('/api/broads', {
+    //         headers: {
+    //             "authorization": `Bearer ${token}`
+    //         }
+    //     }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
+    // },
+    // vendors: function (token: string | null,): Promise<{ data: dataListStateType[] }> {
+    //     return fetch('/api/vendors', {
+    //         headers: {
+    //             "authorization": `Bearer ${token}`
+    //         }
+    //     }).then(res => checkStatus<{ data: dataListStateType[] }>(res, 'json'))
+    // },
     login: function (data: { username: string, password: string }): Promise<{ token: string }> {
         return fetch('/auth/login', {
             method: "POST",

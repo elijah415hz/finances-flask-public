@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Table from '../components/Table';
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import type { tableDataEntry, dataListStateType, formStateType, InputName } from '../interfaces/Interfaces'
+import type { tableDataEntry, dataListStateType, allDataListsType, formStateType, InputName } from '../interfaces/Interfaces'
 
 function Home() {
     const { Auth, setAuth } = React.useContext(AuthContext)
@@ -58,6 +58,14 @@ function Home() {
     )
 
     // State for datalists
+
+    const [dataListsState, setDataListsState] = useState<allDataListsType>({
+        source: [], 
+        person_earner: [],
+        narrow_category: [],
+        broad_category: [],
+        vendor: []
+    })
     const [sourcesState, setSourcesState] = useState<dataListStateType[]>([])
     const [personsState, setPersonsState] = useState<dataListStateType[]>([])
     const [broadState, setBroadState] = useState<dataListStateType[]>([])
@@ -121,23 +129,23 @@ function Home() {
 
         switch (name) {
             case "Person":
-                state = personsState;
+                state = dataListsState.person_earner;
                 id = 'person_id';
                 break;
             case "Source":
-                state = sourcesState;
+                state = dataListsState.source;
                 id = 'source_id';
                 break;
             case "Broad_category":
-                state = broadState;
+                state = dataListsState.broad_category;
                 id = 'broad_category_id';
                 break;
             case "Narrow_category":
-                state = narrowState;
+                state = dataListsState.narrow_category;
                 id = 'narrow_category_id';
                 break;
             case "Vendor":
-                state = vendorsState;
+                state = dataListsState.vendor;
                 id = 'vendor_id';
                 break;
         }
@@ -216,16 +224,19 @@ function Home() {
 
     useEffect(() => {
         async function getDataLists(): Promise<void> {
-            let { data } = await API.dataList(Auth.token, "sources")
-            setSourcesState(data)
-            let persons = await API.dataList(Auth.token, "persons")
-            setPersonsState(persons.data)
-            let narrow = await API.dataList(Auth.token, "narrows")
-            setNarrowState(narrow.data)
-            let broad = await API.dataList(Auth.token, "broads")
-            setBroadState(broad.data)
-            let vendors = await API.dataList(Auth.token, "vendors")
-            setVendorsState(vendors.data)
+            let datalists = await API.dataList(Auth.token)
+            
+            setDataListsState(datalists)
+            // let { data } = await API.dataList(Auth.token, "sources")
+            // setSourcesState(data)
+            // let persons = await API.dataList(Auth.token, "persons")
+            // setPersonsState(persons.data)
+            // let narrow = await API.dataList(Auth.token, "narrows")
+            // setNarrowState(narrow.data)
+            // let broad = await API.dataList(Auth.token, "broads")
+            // setBroadState(broad.data)
+            // let vendors = await API.dataList(Auth.token, "vendors")
+            // setVendorsState(vendors.data)
         }
         getDataLists()
     }, [])
@@ -271,11 +282,8 @@ function Home() {
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (
                     <Table
                         state={incomeTableState}
-                        sourcesState={sourcesState}
-                        personsState={personsState}
+                        dataLists={dataListsState}
                         handleChange={handleIncomeChange}
-                        setSourcesState={setSourcesState}
-                        setPersonsState={setPersonsState}
                         deleteEntry={deleteEntry}
                         form={formState.form}
                     />
@@ -283,14 +291,8 @@ function Home() {
                 {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
                     <Table
                         state={expensesTableState}
-                        personsState={personsState}
-                        broadState={broadState}
-                        narrowState={narrowState}
-                        vendorsState={vendorsState}
+                        dataLists={dataListsState}
                         handleChange={handleExpensesChange}
-                        setPersonsState={setPersonsState}
-                        setBroadState={setBroadState}
-                        setNarrowState={setNarrowState}
                         deleteEntry={deleteEntry}
                         form={formState.form}
                     />
@@ -299,7 +301,7 @@ function Home() {
                     <Table
                         state={pivotTableState}
                         deleteEntry={deleteEntry}
-                        handleChange={() => false}
+                        handleChange={() => null}
                         form={formState.form}
                     />
                 ) : null}

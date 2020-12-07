@@ -1,7 +1,7 @@
 import React from 'react'
 import InputRow from './InputRow'
 import StaticRow from './StaticRow'
-import type {tableDataEntry, dataListStateType} from "../interfaces/Interfaces"
+import type {tableDataEntry, allDataListsType} from "../interfaces/Interfaces"
 
 export default function Table(props:
     {
@@ -14,16 +14,8 @@ export default function Table(props:
             data: tableDataEntry[]
 
         },
-        sourcesState?: dataListStateType[],
-        personsState?: dataListStateType[],
-        broadState?: dataListStateType[],
-        narrowState?: dataListStateType[],
-        vendorsState?: dataListStateType[],
+        dataLists?: allDataListsType
         handleChange: Function,
-        setSourcesState?: Function,
-        setPersonsState?: Function,
-        setBroadState?: Function,
-        setNarrowState?: Function,
         deleteEntry: Function,
         form?: string
     }) {
@@ -57,16 +49,7 @@ export default function Table(props:
                         key={i}
                         fields={props.state.schema.fields}
                         handleChange={props.handleChange}
-                        sourcesState={props.sourcesState}
-                        personsState={props.personsState}
-                        broadState={props.broadState}
-                        narrowState={props.narrowState}
-                        vendorsState={props.vendorsState}
-
-                        setPersonsState={props.setPersonsState}
-                        setSourcesState={props.setSourcesState}
-                        setBroadState={props.setBroadState}
-                        setNarrowState={props.setNarrowState}
+                        dataLists={props.dataLists}
                         deleteEntry={props.deleteEntry}
                     />
             })}

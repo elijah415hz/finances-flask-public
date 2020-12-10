@@ -165,13 +165,28 @@ function Home() {
             }
             newExpensesTableStateData[index] = updatedRow
             setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
-            let res = await API.updateExpenses(Auth.token, updatedRow)
-            console.log(res)
+            
         } catch (err) {
             console.error(err)
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
+        }
+    }
+    async function updateExpensesRow(index: number): Promise<void> {
+        try {
+            let res = await API.updateExpenses(Auth.token, expensesTableState.data[index])
+            console.log(res)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    async function updateIncomeRow(index: number): Promise<void> {
+        try {
+            let res = await API.updateIncome(Auth.token, incomeTableState.data[index])
+            console.log(res)
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -188,8 +203,6 @@ function Home() {
             }
             newIncomeTableStateData[index] = updatedRow
             setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
-            let res = await API.updateIncome(Auth.token, updatedRow)
-            console.log(res)
         } catch (err) {
             console.error(err)
             if (err.message === 'Unauthorized') {
@@ -219,19 +232,8 @@ function Home() {
 
     useEffect(() => {
         async function getDataLists(): Promise<void> {
-            let datalists = await API.dataList(Auth.token)
-            
+            let datalists = await API.dataList(Auth.token)  
             setDataListsState(datalists)
-            // let { data } = await API.dataList(Auth.token, "sources")
-            // setSourcesState(data)
-            // let persons = await API.dataList(Auth.token, "persons")
-            // setPersonsState(persons.data)
-            // let narrow = await API.dataList(Auth.token, "narrows")
-            // setNarrowState(narrow.data)
-            // let broad = await API.dataList(Auth.token, "broads")
-            // setBroadState(broad.data)
-            // let vendors = await API.dataList(Auth.token, "vendors")
-            // setVendorsState(vendors.data)
         }
         getDataLists()
     }, [])
@@ -279,6 +281,7 @@ function Home() {
                         state={incomeTableState}
                         dataLists={dataListsState}
                         handleChange={handleIncomeChange}
+                        handleUpdate={updateIncomeRow}
                         deleteEntry={deleteEntry}
                         form={formState.form}
                     />
@@ -288,6 +291,7 @@ function Home() {
                         state={expensesTableState}
                         dataLists={dataListsState}
                         handleChange={handleExpensesChange}
+                        handleUpdate={updateExpensesRow}
                         deleteEntry={deleteEntry}
                         form={formState.form}
                     />
@@ -295,7 +299,8 @@ function Home() {
                 {formState.form === "pivot" && pivotTableState ? (
                     <Table
                         state={pivotTableState}
-                        deleteEntry={deleteEntry}
+                        deleteEntry={() => null}
+                        handleUpdate={() => null}
                         handleChange={() => null}
                         form={formState.form}
                     />

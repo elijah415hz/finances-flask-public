@@ -34,14 +34,6 @@ interface allDataListsType {
     vendor: dataListStateType[]
 }
 
-interface unprocessedDataListsType {
-    source: {data: dataListStateType[]}, 
-    person_earner: {data: dataListStateType[]},
-    narrow_category: {data: dataListStateType[]},
-    broad_category: {data: dataListStateType[]},
-    vendor: {data: dataListStateType[]}
-}
-
 interface tableType {
     schema: { 
         fields: [] 
@@ -52,7 +44,6 @@ interface tableType {
 export type {
     tableDataEntry,
     dataListStateType, 
-    unprocessedDataListsType,
     allDataListsType,
     formStateType,
     InputName, 

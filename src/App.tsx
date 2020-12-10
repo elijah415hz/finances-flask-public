@@ -44,8 +44,8 @@ const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
   
   const reducer = (state: Auth, action: {type: string, payload?: {user: string, token: string}}): Auth => {
     if (action.type === 'LOGIN' && action.payload) {
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem("token", JSON.stringify(action.payload.token));
+      localStorage.setItem("user", action.payload.user);
+      localStorage.setItem("token", action.payload.token);
       return {
         ...state,
         loggedIn: true,
@@ -75,11 +75,13 @@ const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
     
   useEffect(() => {
     const token = localStorage.getItem("token")
-    API.checkAuth(token)
-      .then(res => setAuth({type: 'LOGIN', payload: {user: res.username, token: res.token}}))
+    if (token) {
+      API.checkAuth(token)
+      .then(res => setAuth({type: 'LOGIN', payload: {user: res.username, token: token}}))
       .catch(err => {
-        setAuth({type: 'LOGOUT'})
+        // setAuth({type: 'LOGOUT'})
       })
+    }
   }, [])
 
   return (

@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
-import {AuthContext} from '../App'
+import { AuthContext } from '../App'
 
 export default function Login() {
-    const {Auth, setAuth} = React.useContext(AuthContext)
+    const { Auth, setAuth } = React.useContext(AuthContext)
 
     const [loginFormState, setLoginFormState] = useState({
         username: "",
@@ -21,11 +21,19 @@ export default function Login() {
         });
     };
 
-    const formSubmit = (event: React.SyntheticEvent) => {
+    const formSubmit = async (event: React.SyntheticEvent) => {
         event.preventDefault();
-        API.login(loginFormState).then(newToken => {
-            setAuth({type: 'LOGIN', payload: {user: 'blarvis', token: newToken.token}})
-        }).catch(err => setFailure(true))
+        try {
+            API.login(loginFormState).then(newToken => {
+                console.log("Login Token: " + newToken.token)
+                setAuth({ type: 'LOGIN', payload: { user: loginFormState.username, token: newToken.token } })
+            })
+        } catch (err) {
+            console.log(err)
+            setFailure(true)
+        }
+
+
     }
 
     if (Auth.loggedIn) {

@@ -8,6 +8,7 @@ export default function InputRow(props:
         fields: { name: string }[],
         dataLists?: allDataListsType
         handleChange: Function,
+        handleUpdate: Function,
         deleteEntry: Function
     }) {
 
@@ -74,6 +75,9 @@ export default function InputRow(props:
                             </td>
                         )
                     })}
+                    <td>
+                        <button onClick={()=> props.handleUpdate(props.i)}>Update</button>
+                    </td>
                     <td>
                         <button onClick={()=> props.deleteEntry(state.entry_id || state.id)}>Delete</button>
                     </td>

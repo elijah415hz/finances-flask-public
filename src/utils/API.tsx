@@ -79,7 +79,6 @@ const API = {
                 "authorization": `Bearer ${token}`
             }
         }).then(res => checkStatus<allDataListsType>(res, 'json'))
-            
     },
     login: function (data: { username: string, password: string }): Promise<{ token: string }> {
         return fetch('/auth/login', {

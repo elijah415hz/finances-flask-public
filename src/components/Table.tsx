@@ -16,6 +16,7 @@ export default function Table(props:
         },
         dataLists?: allDataListsType
         handleChange: Function,
+        handleUpdate: Function,
         deleteEntry: Function,
         form?: string
     }) {
@@ -49,6 +50,7 @@ export default function Table(props:
                         key={i}
                         fields={props.state.schema.fields}
                         handleChange={props.handleChange}
+                        handleUpdate={props.handleUpdate}
                         dataLists={props.dataLists}
                         deleteEntry={props.deleteEntry}
                     />

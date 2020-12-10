@@ -1,7 +1,7 @@
 interface formStateType {
     form: "expenses" | "income" | "pivot",
-    year: string,
-    month: string
+    year: number,
+    month: number
 }
 
 type InputName = "Person" | "Source" | "Broad_category" | "Narrow_category" | "Vendor"

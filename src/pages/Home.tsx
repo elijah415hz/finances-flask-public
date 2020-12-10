@@ -8,9 +8,9 @@ function Home() {
     const { Auth, setAuth } = React.useContext(AuthContext)
     const [formState, setFormState] = useState<formStateType>(
         {
-            form: "income",
-            year: "",
-            month: ""
+            form: "expenses",
+            year: new Date(Date.now()).getUTCFullYear(),
+            month: new Date(Date.now()).getUTCMonth()
         }
     )
 
@@ -247,6 +247,7 @@ function Home() {
                     <img src="/wallchart" alt="Wall Chart" />
                     : null
                 }
+
                 <form onSubmit={handleFormSubmit} className="form-inline">
                     <select name="form" value={formState.form} onChange={handleFormChange}>
                         <option value="income">Income</option>
@@ -257,21 +258,33 @@ function Home() {
                     <input
                         onChange={handleFormChange}
                         value={formState.year}
-                        type="text"
+                        type="number"
                         id="year2"
                         className="form-control"
                         name="year"
                         placeholder="YYYY"
                     />
                     <label htmlFor="month2">Month</label>
-                    <input
+                    <select
                         onChange={handleFormChange}
                         value={formState.month}
-                        type="text"
                         id="month2"
                         className="form-control"
                         name="month"
-                        placeholder="MM" />
+                        placeholder="MM">
+                            <option value={1}>January</option>
+                            <option value={2}>February</option>
+                            <option value={3}>March</option>
+                            <option value={4}>April</option>
+                            <option value={5}>May</option>
+                            <option value={6}>June</option>
+                            <option value={7}>July</option>
+                            <option value={8}>August</option>
+                            <option value={9}>September</option>
+                            <option value={10}>October</option>
+                            <option value={11}>November</option>
+                            <option value={12}>December</option>
+                            </select>
                     <button className="btn btn-success">Submit</button>
                 </form>
             </header>

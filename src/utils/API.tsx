@@ -1,5 +1,6 @@
 import type {
     allDataListsType, 
+    formStateType, 
     tableDataEntry, 
     tableType} from '../interfaces/Interfaces'
 
@@ -16,7 +17,7 @@ function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
 }
 
 const API = {
-    expenses: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
+    expenses: function (token: string | null, yearMonthObj: formStateType): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
         return fetch(`/api/expenses/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
@@ -41,7 +42,7 @@ const API = {
             body: JSON.stringify(data)
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    income: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
+    income: function (token: string | null, yearMonthObj: formStateType): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
         return fetch(`/api/income/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
@@ -66,7 +67,7 @@ const API = {
             }
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    pivot: function (token: string | null, yearMonthObj: { form: string, year: string, month: string }): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
+    pivot: function (token: string | null, yearMonthObj: formStateType): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
         return fetch(`/api/expenses/pivot/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`

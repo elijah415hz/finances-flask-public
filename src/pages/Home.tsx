@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Table from '../components/Table';
+import ReportTable from '../components/Table';
 import API from '../utils/API'
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
 import type { tableDataEntry, dataListStateType, allDataListsType, formStateType, InputName } from '../interfaces/Interfaces'
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 
 function Home() {
     const { Auth, setAuth } = React.useContext(AuthContext)
@@ -60,13 +62,13 @@ function Home() {
     // State for datalists
 
     const [dataListsState, setDataListsState] = useState<allDataListsType>({
-        source: [], 
+        source: [],
         person_earner: [],
         narrow_category: [],
         broad_category: [],
         vendor: []
     })
-    
+
     function formatDates(entry: tableDataEntry): tableDataEntry {
         if (!entry.Date) {
             return entry
@@ -83,9 +85,9 @@ function Home() {
         }
     }
 
-    function handleFormChange(event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>): void {
-        let { name, value } = event.target;
-        setFormState({ ...formState, [name]: value })
+    function handleFormChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }> | React.ChangeEvent<HTMLSelectElement>): void {
+        let name = event.target.name as keyof typeof formState
+        setFormState({ ...formState, [name]: event.target.value })
     }
 
     async function handleFormSubmit(event: React.SyntheticEvent): Promise<any> {
@@ -165,7 +167,7 @@ function Home() {
             }
             newExpensesTableStateData[index] = updatedRow
             setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
-            
+
         } catch (err) {
             console.error(err)
             if (err.message === "Unauthorized") {
@@ -230,9 +232,33 @@ function Home() {
         }
     }
 
+    const useStyles = makeStyles((theme: Theme) =>
+        createStyles({
+            formControl: {
+                margin: theme.spacing(1),
+                minWidth: 120,
+            },
+            selectEmpty: {
+                marginTop: theme.spacing(2),
+            },
+            root: {
+                display: 'flex',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                '& > *': {
+                    margin: theme.spacing(1),
+                    width: '15ch',
+                }
+            }
+        })
+    );
+
+    const classes = useStyles();
+
+
     useEffect(() => {
         async function getDataLists(): Promise<void> {
-            let datalists = await API.dataList(Auth.token)  
+            let datalists = await API.dataList(Auth.token)
             setDataListsState(datalists)
         }
         getDataLists()
@@ -241,56 +267,71 @@ function Home() {
     return (
         <div className="Home">
             <header className="header">
-                <button className="logout" onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</button>
+                <Button variant="contained" color="primary" className="logout" onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</Button>
                 <h1>Finances!</h1>
                 {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" />
                     : null
                 }
 
-                <form onSubmit={handleFormSubmit} className="form-inline">
-                    <select name="form" value={formState.form} onChange={handleFormChange}>
-                        <option value="income">Income</option>
-                        <option value="expenses">Expenses</option>
-                        <option value="pivot">Pivot Table</option>
-                    </select>
-                    <label htmlFor="year2">Year</label>
-                    <input
+                <form onSubmit={handleFormSubmit} className={classes.root}>
+                    <FormControl variant="outlined" className={classes.formControl}>
+                        <InputLabel htmlFor="form">Report</InputLabel>
+                        <Select
+                            name="form"
+                            label="Report"
+                            labelId="form"
+                            value={formState.form}
+                            onChange={handleFormChange}>
+                            <MenuItem value="income">Income</MenuItem>
+                            <MenuItem value="expenses">Expenses</MenuItem>
+                            <MenuItem value="pivot">Pivot Table</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <TextField
                         onChange={handleFormChange}
                         value={formState.year}
-                        type="number"
-                        id="year2"
-                        className="form-control"
+                        label="Year"
                         name="year"
-                        placeholder="YYYY"
+                        type="number"
+                        variant="outlined"
                     />
-                    <label htmlFor="month2">Month</label>
-                    <select
-                        onChange={handleFormChange}
-                        value={formState.month}
-                        id="month2"
-                        className="form-control"
-                        name="month"
-                        placeholder="MM">
-                            <option value={1}>January</option>
-                            <option value={2}>February</option>
-                            <option value={3}>March</option>
-                            <option value={4}>April</option>
-                            <option value={5}>May</option>
-                            <option value={6}>June</option>
-                            <option value={7}>July</option>
-                            <option value={8}>August</option>
-                            <option value={9}>September</option>
-                            <option value={10}>October</option>
-                            <option value={11}>November</option>
-                            <option value={12}>December</option>
-                            </select>
-                    <button className="btn btn-success">Submit</button>
+                    <FormControl variant="outlined" className={classes.formControl}>
+
+                        <InputLabel htmlFor="month2">Month</InputLabel>
+                        <Select
+                            onChange={handleFormChange}
+                            value={formState.month}
+                            name="month"
+                            labelId="month2"
+                            label="Month"
+                        >
+                            <MenuItem value={1}>January</MenuItem>
+                            <MenuItem value={2}>February</MenuItem>
+                            <MenuItem value={3}>March</MenuItem>
+                            <MenuItem value={4}>April</MenuItem>
+                            <MenuItem value={5}>May</MenuItem>
+                            <MenuItem value={6}>June</MenuItem>
+                            <MenuItem value={7}>July</MenuItem>
+                            <MenuItem value={8}>August</MenuItem>
+                            <MenuItem value={9}>September</MenuItem>
+                            <MenuItem value={10}>October</MenuItem>
+                            <MenuItem value={11}>November</MenuItem>
+                            <MenuItem value={12}>December</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Button 
+                    type="submit" 
+                    variant="contained" 
+                    color="primary"
+                    >
+                        Submit
+                        </Button>
                 </form>
             </header>
             <div className="body">
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (
-                    <Table
+                    <ReportTable
                         state={incomeTableState}
                         dataLists={dataListsState}
                         handleChange={handleIncomeChange}
@@ -300,7 +341,7 @@ function Home() {
                     />
                 ) : null}
                 {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
-                    <Table
+                    <ReportTable
                         state={expensesTableState}
                         dataLists={dataListsState}
                         handleChange={handleExpensesChange}
@@ -310,7 +351,7 @@ function Home() {
                     />
                 ) : null}
                 {formState.form === "pivot" && pivotTableState ? (
-                    <Table
+                    <ReportTable
                         state={pivotTableState}
                         deleteEntry={() => null}
                         handleUpdate={() => null}

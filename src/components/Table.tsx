@@ -1,9 +1,18 @@
 import React from 'react'
 import InputRow from './InputRow'
 import StaticRow from './StaticRow'
-import type {tableDataEntry, allDataListsType} from "../interfaces/Interfaces"
+import type { tableDataEntry, allDataListsType } from "../interfaces/Interfaces"
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import { makeStyles, createStyles, lighten, Theme } from '@material-ui/core/styles';
 
-export default function Table(props:
+
+
+export default function ReportTable(props:
     {
         state:
         {
@@ -21,41 +30,53 @@ export default function Table(props:
         form?: string
     }) {
 
+    const useStyles = makeStyles((theme: Theme) => 
+        createStyles({
+            table: {
+                minWidth: 650,
+            },
+        })
+    );
+    const classes = useStyles();
     return (
-        <table>
-            <thead>
-                <tr>
+        <Table className={classes.table}>
+            <TableHead>
+                <TableRow>
                     {props.state.schema.fields
                         .filter(column => !column.name.includes("id"))
                         .map(column => {
                             return (
-                                <th key={column.name}>
+                                <TableCell key={column.name}>
                                     {column.name.replace("_", " ")}
-                                </th>
+                                </TableCell>
                             )
                         })}
-                </tr>
-            </thead>
-            {(props.state.data).map((entry: tableDataEntry, i: number) => {
-                return props.form === "pivot" ?
-                    <StaticRow
-                        entry={entry}
-                        i={i}
-                        key={entry.entry_id || entry.id}
-                        fields={props.state.schema.fields}
-                    /> :
-                    <InputRow
-                        entry={entry}
-                        i={i}
-                        key={i}
-                        fields={props.state.schema.fields}
-                        handleChange={props.handleChange}
-                        handleUpdate={props.handleUpdate}
-                        dataLists={props.dataLists}
-                        deleteEntry={props.deleteEntry}
-                    />
-            })}
+                        <TableCell><span>Save</span></TableCell>
+                        <TableCell><span>Delete</span></TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody className="tableBody">
+                {(props.state.data).map((entry: tableDataEntry, i: number) => {
+                    return props.form === "pivot" ?
+                        <StaticRow
+                            entry={entry}
+                            i={i}
+                            key={entry.entry_id || entry.id}
+                            fields={props.state.schema.fields}
+                        /> :
+                        <InputRow
+                            entry={entry}
+                            i={i}
+                            key={i}
+                            fields={props.state.schema.fields}
+                            handleChange={props.handleChange}
+                            handleUpdate={props.handleUpdate}
+                            dataLists={props.dataLists}
+                            deleteEntry={props.deleteEntry}
+                        />
+                })}
+            </TableBody>
 
-        </table>
+        </Table>
     )
 }

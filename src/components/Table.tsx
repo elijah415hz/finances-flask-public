@@ -8,7 +8,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { makeStyles, createStyles, lighten, Theme } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+
+import { makeStyles, createStyles, withStyles, lighten, Theme } from '@material-ui/core/styles';
 
 
 
@@ -30,7 +32,17 @@ export default function ReportTable(props:
         form?: string
     }) {
 
-    const useStyles = makeStyles((theme: Theme) => 
+    const StyledTableCell = withStyles((theme: Theme) =>
+        createStyles({
+            head: {
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.common.white,
+            },
+
+        }),
+    )(TableCell);
+
+    const useStyles = makeStyles((theme: Theme) =>
         createStyles({
             table: {
                 minWidth: 650,
@@ -39,44 +51,46 @@ export default function ReportTable(props:
     );
     const classes = useStyles();
     return (
-        <Table className={classes.table}>
-            <TableHead>
-                <TableRow>
-                    {props.state.schema.fields
-                        .filter(column => !column.name.includes("id"))
-                        .map(column => {
-                            return (
-                                <TableCell key={column.name}>
-                                    {column.name.replace("_", " ")}
-                                </TableCell>
-                            )
-                        })}
-                        <TableCell><span>Save</span></TableCell>
-                        <TableCell><span>Delete</span></TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody className="tableBody">
-                {(props.state.data).map((entry: tableDataEntry, i: number) => {
-                    return props.form === "pivot" ?
-                        <StaticRow
-                            entry={entry}
-                            i={i}
-                            key={entry.entry_id || entry.id}
-                            fields={props.state.schema.fields}
-                        /> :
-                        <InputRow
-                            entry={entry}
-                            i={i}
-                            key={i}
-                            fields={props.state.schema.fields}
-                            handleChange={props.handleChange}
-                            handleUpdate={props.handleUpdate}
-                            dataLists={props.dataLists}
-                            deleteEntry={props.deleteEntry}
-                        />
-                })}
-            </TableBody>
+        <TableContainer component={Paper}>
+            <Table className={classes.table}>
+                <TableHead>
+                    <TableRow>
+                        {props.state.schema.fields
+                            .filter(column => !column.name.includes("id"))
+                            .map(column => {
+                                return (
+                                    <StyledTableCell key={column.name}>
+                                        {column.name.replace("_", " ")}
+                                    </StyledTableCell>
+                                )
+                            })}
+                        <StyledTableCell><span>Save</span></StyledTableCell>
+                        <StyledTableCell><span>Delete</span></StyledTableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody className="tableBody">
+                    {(props.state.data).map((entry: tableDataEntry, i: number) => {
+                        return props.form === "pivot" ?
+                            <StaticRow
+                                entry={entry}
+                                i={i}
+                                key={entry.entry_id || entry.id}
+                                fields={props.state.schema.fields}
+                            /> :
+                            <InputRow
+                                entry={entry}
+                                i={i}
+                                key={i}
+                                fields={props.state.schema.fields}
+                                handleChange={props.handleChange}
+                                handleUpdate={props.handleUpdate}
+                                dataLists={props.dataLists}
+                                deleteEntry={props.deleteEntry}
+                            />
+                    })}
+                </TableBody>
 
-        </Table>
+            </Table>
+        </TableContainer>
     )
 }

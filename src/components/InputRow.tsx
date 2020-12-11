@@ -4,7 +4,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import { IconButton, TableCell, TableRow } from '@material-ui/core'
 import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { inherits } from 'util';
+
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -28,17 +28,11 @@ const StyledTableRow = withStyles((theme: Theme) =>
       },
       '& input': {
           backgroundColor: 'inherit',
-          maxWidth: '20ch',
-          padding: 0
+          paddingLeft: 0,
       }
     },
   }),
 )(TableRow);
-
-// const StyledInput = withStyles((theme: Theme) => 
-//     createStyles({
-//         background: inherits
-//     })
 
 export default function InputRow(props:
     {
@@ -96,7 +90,8 @@ export default function InputRow(props:
                                 className="tableInput"
                                 value={state[column.name as keyof tableDataEntry] || ""}
                                 list={column.name}
-                                style={{width: `${(state[column.name as keyof tableDataEntry]?.toString().length || 3) + 3.5}ch`}}
+                                style={{width: '80%'}}
+                                // style={{width: `${(state[column.name as keyof tableDataEntry]?.toString().length || 12) + 3.5}ch`}}
                             />
                             {column.name === 'Source' && props.dataLists?.source ? (
                                 makeDataList(props.dataLists?.source, column.name)

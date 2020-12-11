@@ -268,7 +268,7 @@ function Home() {
         <div className="Home">
             <header className="header">
                 <Button variant="contained" color="primary" className="logout" onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</Button>
-                <h1>Finances!</h1>
+                <h1 style={{textAlign: 'center'}}>Finances!</h1>
                 {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" />
                     : null

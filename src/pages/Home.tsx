@@ -236,7 +236,6 @@ function Home() {
         createStyles({
             formControl: {
                 margin: theme.spacing(1),
-                minWidth: 120,
             },
             selectEmpty: {
                 marginTop: theme.spacing(2),
@@ -247,8 +246,10 @@ function Home() {
                 flexWrap: 'wrap',
                 '& > *': {
                     margin: theme.spacing(1),
-                    width: '15ch',
-                }
+                    [theme.breakpoints.down('sm')]: {
+                        width: '100%',
+                      },
+                },
             }
         })
     );

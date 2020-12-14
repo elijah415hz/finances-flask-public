@@ -17,7 +17,7 @@ createStyles({
         flexWrap: 'wrap',
         '& > *': {
             margin: theme.spacing(1),
-            width: '15ch',
+            // width: '15ch',
         }
     }
 })

@@ -246,7 +246,7 @@ function Home() {
                 flexWrap: 'wrap',
                 '& > *': {
                     margin: theme.spacing(1),
-                    [theme.breakpoints.down('sm')]: {
+                    [theme.breakpoints.down('xs')]: {
                         width: '100%',
                       },
                 },

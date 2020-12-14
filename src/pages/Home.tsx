@@ -250,6 +250,13 @@ function Home() {
                         width: '100%',
                       },
                 },
+            },
+            wallchart: {
+                width: '100%'
+            },
+            logoutBtn: {
+                float: 'right',
+                marginRight: '1em'
             }
         })
     );
@@ -268,10 +275,10 @@ function Home() {
     return (
         <div className="Home">
             <header className="header">
-                <Button variant="contained" color="primary" className="logout" onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</Button>
+                <Button variant="contained" color="primary" className={classes.logoutBtn} onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</Button>
                 <h1 style={{textAlign: 'center'}}>Finances!</h1>
                 {Auth.token ?
-                    <img src="/wallchart" alt="Wall Chart" />
+                    <img src="/wallchart" alt="Wall Chart" className={classes.wallchart}/>
                     : null
                 }
 

@@ -31,6 +31,15 @@ interface RecordForm {
     notes: string
 }
 
+interface categoryType {
+    name: string, 
+    id: number, 
+    narrowCategories?: {
+        name: string, id: number
+    }[], 
+    person?: boolean
+}
+
 interface dataListStateType {
     id: number,
     name: string
@@ -58,4 +67,5 @@ export type {
     formStateType,
     InputName, 
     tableType,
-    RecordForm}
+    RecordForm,
+    categoryType}

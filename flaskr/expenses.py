@@ -36,6 +36,33 @@ def api_expenses(year, month):
         EXP_report['Amount'] = EXP_report['Amount'].apply(format_numbers)
         return EXP_report.to_json(orient="table")
 
+# Create Expense
+@bp.route("/", methods=["POST"])
+def post_expense():
+    json = request.get_json()
+    validToken = checkAuth(request)
+    print("JSON: ", json)
+    if not validToken:
+        return Response("Nice Try!", status=401)
+    else:
+        date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+        amount = json['Amount'] or None
+        person = json['person_id'] or  None
+        b_cat = json['broad_category_id'] or None
+        n_cat = json['narrow_category_id'] or None
+        vendor = json['vendor'] or None
+        notes = json['notes']
+        
+        insert_vendor_sql = "INSERT IGNORE INTO vendor(name) VALUES(%s)"
+        with engine.connect() as con:
+            con.execute(insert_vendor_sql, [vendor])
+            vendor_id = con.execute("SELECT id FROM vendor WHERE name=%s", [vendor]).fetchone()[0]
+            sql = "INSERT INTO expenses(date, vendor_id, amount, broad_category_id, narrow_category_id, person_id, notes)\
+                    VALUES(DATE(%s), %s, %s, %s, %s, %s, %s)"     
+            
+            con.execute(sql, [date, vendor_id, amount, b_cat, n_cat, person, notes])
+        return Response('Record Inserted!', status=200)
+
 # Edit expenses
 @bp.route("/<int:id>", methods=['PUT'])
 def update_expenses(id):
@@ -47,27 +74,11 @@ def update_expenses(id):
         # Parse dates
         date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
         # Convert any null values
-        if json['Amount']:
-            amount = json['Amount']
-        else :
-            amount = None
-        if json['person_id']:
-            person = json['person_id']
-        else:
-            person = None
-        if json['broad_category_id']:
-            bCat = json['broad_category_id']
-        else:
-            bCat = None
-        if json['narrow_category_id']:
-            nCat = json['narrow_category_id']
-        else:
-            nCat = None
-        if json['vendor_id']:
-            vendor = json['vendor_id']
-        else:
-            vendor = None
-
+        amount = json['Amount'] or None
+        person = json['person_id'] or  None
+        b_cat = json['broad_category_id'] or None
+        n_cat = json['narrow_category_id'] or None
+        vendor = json['vendor_id'] or None
         notes = json['Notes']
         
         sql = "UPDATE expenses \
@@ -76,10 +87,10 @@ def update_expenses(id):
             narrow_category_id=%s, person_id=%s, \
             notes=%s\
             WHERE entry_id=%s;"
-        engine.connect().execute(sql, [date, vendor, amount, bCat, nCat, person, notes, id])
+        engine.connect().execute(sql, [date, vendor, amount, b_cat, n_cat, person, notes, id])
         return Response(f'id: {id} Updated', status=200)
 
-    # Delete expenses
+# Delete expenses
 @bp.route("/<int:id>", methods=['DELETE'])
 def delete_expenses(id):
     validToken = checkAuth(request)
@@ -90,6 +101,7 @@ def delete_expenses(id):
         engine.connect().execute(sql, [id])
         return Response(f'id: {id} Deleted', status=200)
 
+# Return Pivot Table
 @bp.route("/pivot/<year>/<month>")
 def api_pivot(year, month):
     validToken = checkAuth(request)

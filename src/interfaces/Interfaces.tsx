@@ -21,6 +21,16 @@ interface tableDataEntry {
     entry_id?: number
 }
 
+interface RecordForm {
+    Date: Date | null,
+    Amount: number,
+    person_id: number,
+    broad_category_id: number,
+    narrow_category_id: number,
+    vendor: string,
+    notes: string
+}
+
 interface dataListStateType {
     id: number,
     name: string
@@ -47,4 +57,5 @@ export type {
     allDataListsType,
     formStateType,
     InputName, 
-    tableType}
+    tableType,
+    RecordForm}

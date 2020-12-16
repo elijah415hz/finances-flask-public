@@ -2,7 +2,8 @@ import type {
     allDataListsType, 
     formStateType, 
     tableDataEntry, 
-    tableType} from '../interfaces/Interfaces'
+    tableType,
+    RecordForm} from '../interfaces/Interfaces'
 
 
 function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
@@ -23,6 +24,16 @@ const API = {
                 "authorization": `Bearer ${token}`
             }
         }).then(res=>checkStatus<tableType>(res, 'json'))
+    },
+    postExpenses: function (token: string | null, data:RecordForm): Promise<Response | string> {
+        return fetch(`/api/expenses/`, {
+            method: 'POST',
+            headers: {
+                "authorization": `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res=>checkStatus<string>(res, 'text'))
     },
     deleteExpenses: function (token: string | null, id: number | undefined): Promise<Response | string> {
         return fetch(`/api/expenses/${id}`, {

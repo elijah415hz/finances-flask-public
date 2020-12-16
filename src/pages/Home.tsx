@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReportTable from '../components/Table';
+import AddRecordsForm from '../components/AddRecordsForm'
 import API from '../utils/API'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
@@ -236,6 +237,7 @@ function Home() {
         createStyles({
             formControl: {
                 margin: theme.spacing(1),
+                minWidth: '7em'
             },
             selectEmpty: {
                 marginTop: theme.spacing(2),
@@ -248,7 +250,7 @@ function Home() {
                     margin: theme.spacing(1),
                     [theme.breakpoints.down('xs')]: {
                         width: '100%',
-                      },
+                    },
                 },
             },
             wallchart: {
@@ -263,7 +265,6 @@ function Home() {
 
     const classes = useStyles();
 
-
     useEffect(() => {
         async function getDataLists(): Promise<void> {
             let datalists = await API.dataList(Auth.token)
@@ -276,12 +277,12 @@ function Home() {
         <div className="Home">
             <header className="header">
                 <Button variant="contained" color="primary" className={classes.logoutBtn} onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</Button>
-                <h1 style={{textAlign: 'center'}}>Finances!</h1>
+                <h1 style={{ textAlign: 'center' }}>Finances!</h1>
                 {Auth.token ?
-                    <img src="/wallchart" alt="Wall Chart" className={classes.wallchart}/>
+                    <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
                     : null
                 }
-
+                <AddRecordsForm classes={classes} />
                 <form onSubmit={handleFormSubmit} className={classes.root}>
                     <FormControl variant="outlined" className={classes.formControl}>
                         <InputLabel htmlFor="form">Report</InputLabel>
@@ -305,7 +306,6 @@ function Home() {
                         variant="outlined"
                     />
                     <FormControl variant="outlined" className={classes.formControl}>
-
                         <InputLabel htmlFor="month2">Month</InputLabel>
                         <Select
                             onChange={handleFormChange}
@@ -328,12 +328,12 @@ function Home() {
                             <MenuItem value={12}>December</MenuItem>
                         </Select>
                     </FormControl>
-                    <Button 
-                    type="submit" 
-                    variant="contained" 
-                    color="primary"
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
                     >
-                        Submit
+                        View
                         </Button>
                 </form>
             </header>

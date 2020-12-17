@@ -14,7 +14,6 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def checkAuth(request):
     try :
         token = request.headers['Authorization'].split(" ")[1].replace('"', '')
-        print(token)
         decoded = jwt.decode(token, current_app.config['SECRET_KEY'])
         return decoded
     except jwt.ExpiredSignatureError:

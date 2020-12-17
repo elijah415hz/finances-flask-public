@@ -8,6 +8,7 @@ from .auth import checkAuth
 
 bp = Blueprint('income', __name__, url_prefix='/api/income')
 
+# Get Income by Month
 @bp.route("/<year>/<month>")
 def api_income(year, month):
     validToken = checkAuth(request)
@@ -28,6 +29,31 @@ def api_income(year, month):
         INC_report.set_index('Date', inplace=True)
         INC_report['Amount'] = INC_report['Amount'].apply(format_numbers)
         return INC_report.to_json(orient="table")
+
+# Create Income Record
+@bp.route("/", methods=["POST"])
+def post_income():
+    json = request.get_json()
+    validToken = checkAuth(request)
+    print("JSON: ", json)
+    if not validToken:
+        return Response("Nice Try!", status=401)
+    else:
+        date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+        amount = json['amount'] or None
+        earner_id = json['earner_id'] or  None
+        source = json['source'] or None
+        
+        with engine.connect() as con:
+            insert_source_sql = "INSERT IGNORE INTO source(name) VALUES(%s)"
+            con.execute(insert_source_sql, [source])
+            source_id = con.execute("SELECT id FROM source WHERE name=%s", [source]).fetchone()[0]
+            sql = "INSERT INTO income(date, amount, source_id, earner_id)\
+                    VALUES(DATE(%s), %s, %s, %s)"     
+            
+            con.execute(sql, [date, amount, source_id, earner_id])
+        return Response('Record Inserted!', status=200)
+
 
 # Edit income
 @bp.route("/<int:id>", methods=['PUT'])

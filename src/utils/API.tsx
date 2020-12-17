@@ -3,7 +3,7 @@ import type {
     formStateType, 
     tableDataEntry, 
     tableType,
-    RecordForm} from '../interfaces/Interfaces'
+    expensesFormType} from '../interfaces/Interfaces'
 
 
 function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
@@ -25,8 +25,18 @@ const API = {
             }
         }).then(res=>checkStatus<tableType>(res, 'json'))
     },
-    postExpenses: function (token: string | null, data:RecordForm): Promise<Response | string> {
+    postExpenses: function (token: string | null, data:expensesFormType): Promise<Response | string> {
         return fetch(`/api/expenses/`, {
+            method: 'POST',
+            headers: {
+                "authorization": `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res=>checkStatus<string>(res, 'text'))
+    },
+    postIncome: function (token: string | null, data:expensesFormType): Promise<Response | string> {
+        return fetch(`/api/income/`, {
             method: 'POST',
             headers: {
                 "authorization": `Bearer ${token}`,

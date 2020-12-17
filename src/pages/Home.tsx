@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ReportTable from '../components/Table';
-import AddRecordsForm from '../components/AddRecordsForm'
+import AddExpensesForm from '../components/AddExpensesForm'
+import AddIncomeForm from '../components/AddIncomeForm'
 import API from '../utils/API'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
 import type { tableDataEntry, dataListStateType, allDataListsType, formStateType, InputName } from '../interfaces/Interfaces'
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
+import { Button, Container, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 
 function Home() {
     const { Auth, setAuth } = React.useContext(AuthContext)
@@ -69,6 +70,18 @@ function Home() {
         broad_category: [],
         vendor: []
     })
+
+    // Flag to set display of expense form
+    const [showAddExpensesForm, setShowAddExpensesForm] = useState<boolean>(false)
+    const [showAddIncomeForm, setShowAddIncomeForm] = useState<boolean>(false)
+
+    // Flag to show buttons
+    const [showFormButtons, setShowFormButtons] = useState<boolean>(true)
+
+    function hideForms(): void {
+        setShowAddExpensesForm(false)
+        setShowAddIncomeForm(false)
+    }
 
     function formatDates(entry: tableDataEntry): tableDataEntry {
         if (!entry.Date) {
@@ -246,6 +259,9 @@ function Home() {
                 display: 'flex',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
+                [theme.breakpoints.up('md')]: {
+                    flexWrap: 'noWrap',
+                },
                 '& > *': {
                     margin: theme.spacing(1),
                     [theme.breakpoints.down('xs')]: {
@@ -265,6 +281,8 @@ function Home() {
 
     const classes = useStyles();
 
+
+
     useEffect(() => {
         async function getDataLists(): Promise<void> {
             let datalists = await API.dataList(Auth.token)
@@ -276,13 +294,53 @@ function Home() {
     return (
         <div className="Home">
             <header className="header">
-                <Button variant="contained" color="primary" className={classes.logoutBtn} onClick={() => setAuth({ type: 'LOGOUT' })}>Logout</Button>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.logoutBtn}
+                    onClick={() => setAuth({ type: 'LOGOUT' })}
+                >Logout
+                </Button>
                 <h1 style={{ textAlign: 'center' }}>Finances!</h1>
                 {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
                     : null
                 }
-                <AddRecordsForm classes={classes} />
+                <Container className={classes.root}>
+                    {!showAddExpensesForm ? (
+                        !showAddIncomeForm ? (
+                            <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            className={classes.root}
+                            onClick={() => {
+                                setShowAddExpensesForm(true)
+                                setShowFormButtons(false)
+                            }}>
+                            Log Expense
+                        </Button>
+                        ) : null
+                    ) : (
+                            <AddExpensesForm classes={classes} hideForms={hideForms} />
+                        )}
+                    {!showAddIncomeForm ? (
+                        !showAddExpensesForm ? (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            className={classes.root}
+                            onClick={() => {
+                                setShowAddIncomeForm(true)
+                                setShowFormButtons(false)
+                            }}>
+                            Log Income
+                        </Button>
+                        ) : null
+                    ) : (
+                            <AddIncomeForm classes={classes} hideForms={hideForms} />
+                        )}
+                </Container>
                 <form onSubmit={handleFormSubmit} className={classes.root}>
                     <FormControl variant="outlined" className={classes.formControl}>
                         <InputLabel htmlFor="form">Report</InputLabel>
@@ -333,42 +391,42 @@ function Home() {
                         variant="contained"
                         color="primary"
                     >
-                        View
+                View
                         </Button>
                 </form>
-            </header>
-            <div className="body">
-                {formState.form === "income" && incomeTableState.data[0]?.id ? (
-                    <ReportTable
-                        state={incomeTableState}
-                        dataLists={dataListsState}
-                        handleChange={handleIncomeChange}
-                        handleUpdate={updateIncomeRow}
-                        deleteEntry={deleteEntry}
-                        form={formState.form}
-                    />
-                ) : null}
-                {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
-                    <ReportTable
-                        state={expensesTableState}
-                        dataLists={dataListsState}
-                        handleChange={handleExpensesChange}
-                        handleUpdate={updateExpensesRow}
-                        deleteEntry={deleteEntry}
-                        form={formState.form}
-                    />
-                ) : null}
-                {formState.form === "pivot" && pivotTableState ? (
-                    <ReportTable
-                        state={pivotTableState}
-                        deleteEntry={() => null}
-                        handleUpdate={() => null}
-                        handleChange={() => null}
-                        form={formState.form}
-                    />
-                ) : null}
-            </div>
+            </header >
+        <div className="body">
+            {formState.form === "income" && incomeTableState.data[0]?.id ? (
+                <ReportTable
+                    state={incomeTableState}
+                    dataLists={dataListsState}
+                    handleChange={handleIncomeChange}
+                    handleUpdate={updateIncomeRow}
+                    deleteEntry={deleteEntry}
+                    form={formState.form}
+                />
+            ) : null}
+            {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
+                <ReportTable
+                    state={expensesTableState}
+                    dataLists={dataListsState}
+                    handleChange={handleExpensesChange}
+                    handleUpdate={updateExpensesRow}
+                    deleteEntry={deleteEntry}
+                    form={formState.form}
+                />
+            ) : null}
+            {formState.form === "pivot" && pivotTableState ? (
+                <ReportTable
+                    state={pivotTableState}
+                    deleteEntry={() => null}
+                    handleUpdate={() => null}
+                    handleChange={() => null}
+                    form={formState.form}
+                />
+            ) : null}
         </div>
+        </div >
     );
 }
 

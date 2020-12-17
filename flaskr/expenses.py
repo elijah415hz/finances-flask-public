@@ -11,7 +11,7 @@ bp = Blueprint('expenses', __name__, url_prefix='/api/expenses')
 def format_numbers(x):
     return "{:.2f}".format(x)
 
-# Get expenses
+# Get expenses by month
 @bp.route("/<year>/<month>")
 def api_expenses(year, month):
     validToken = checkAuth(request)

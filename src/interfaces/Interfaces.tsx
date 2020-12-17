@@ -21,7 +21,7 @@ interface tableDataEntry {
     entry_id?: number
 }
 
-interface RecordForm {
+interface expensesFormType {
     Date: Date | null,
     Amount: number,
     person_id: number,
@@ -29,6 +29,13 @@ interface RecordForm {
     narrow_category_id: number,
     vendor: string,
     notes: string
+}
+
+interface incomeFormType {
+    date: Date | null,
+    amount: number,
+    earner_id: number,
+    source: string,
 }
 
 interface categoryType {
@@ -67,5 +74,6 @@ export type {
     formStateType,
     InputName, 
     tableType,
-    RecordForm,
+    expensesFormType,
+    incomeFormType,
     categoryType}

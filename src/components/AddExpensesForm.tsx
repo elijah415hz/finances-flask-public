@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import type { RecordForm, categoryType } from '../interfaces/Interfaces'
+import type { expensesFormType, categoryType } from '../interfaces/Interfaces'
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 // import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -14,12 +14,12 @@ import {
 
 
 export default function AddRecordsForm(props: {
-    classes: { root: string, formControl: string }
+    classes: { root: string, formControl: string },
+    hideForms: Function
 }) {
     const { Auth, setAuth } = React.useContext(AuthContext)
     
-    // Form control state
-    const [formState, setFormState] = useState<RecordForm>({
+    const initialFormState = {
         Date: new Date(Date.now()),
         Amount: NaN,
         person_id: NaN,
@@ -27,12 +27,12 @@ export default function AddRecordsForm(props: {
         narrow_category_id: NaN,
         vendor: "",
         notes: ""
-    })
-    
-    // Flag to set display of expense form
-    const [showForm, setShowForm] = useState<boolean>(false)
+    }
 
-    // State to hold category info
+    // Form control state
+    const [formState, setFormState] = useState<expensesFormType>(initialFormState)
+    
+        // State to hold category info
     const [currentCategory, setCurrentCategory] = useState<categoryType>({
         name: "",
         id: NaN,
@@ -206,17 +206,6 @@ export default function AddRecordsForm(props: {
 
     return (
         <div className={props.classes.root}>
-
-            {!showForm ? (
-            <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={props.classes.root}
-                onClick={() => setShowForm(true)}>
-                Log an Expense
-            </Button>
-        ) : (
             <form className={props.classes.root} onSubmit={handleFormSubmit}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <KeyboardDatePicker
@@ -263,7 +252,7 @@ export default function AddRecordsForm(props: {
                         ))}
                     </Select>
                 </FormControl>
-                {currentCategory && currentCategory.narrowCategories ? (
+                {currentCategory.narrowCategories ? (
                     <FormControl className={props.classes.formControl}>
                         <InputLabel htmlFor="narrow_category">Narrow Category</InputLabel>
                         <Select
@@ -280,7 +269,7 @@ export default function AddRecordsForm(props: {
                         </Select>
                     </FormControl>
                 ) : null}
-                {currentCategory && currentCategory.person ? (
+                {currentCategory.person ? (
 
                     <FormControl className={props.classes.formControl}>
                         <InputLabel htmlFor="person_id">Person</InputLabel>
@@ -313,10 +302,12 @@ export default function AddRecordsForm(props: {
             type="button"
             variant="contained"
             color="secondary"
-            onClick={()=>setShowForm(false)}
+            onClick={()=>{
+                setFormState(initialFormState)
+                props.hideForms()}
+            }
             >Cancel</Button>
             </form>
-            )}
         </div>
     )
 }

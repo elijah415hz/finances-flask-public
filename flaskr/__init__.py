@@ -4,7 +4,6 @@ from . import auth, expenses, income, datalists, views
 
 # Setup app
 app = Flask(__name__, static_folder='../build', static_url_path="/")
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.register_blueprint(auth.bp)
 app.register_blueprint(expenses.bp)

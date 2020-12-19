@@ -6,7 +6,7 @@ import API from '../utils/API'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
 import type { tableDataEntry, dataListStateType, allDataListsType, formStateType, InputName } from '../interfaces/Interfaces'
-import { Button, Container, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
+import { AppBar, Button, Container, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 
 function Home() {
     const { Auth, setAuth } = React.useContext(AuthContext)
@@ -74,9 +74,6 @@ function Home() {
     // Flag to set display of expense form
     const [showAddExpensesForm, setShowAddExpensesForm] = useState<boolean>(false)
     const [showAddIncomeForm, setShowAddIncomeForm] = useState<boolean>(false)
-
-    // Flag to show buttons
-    const [showFormButtons, setShowFormButtons] = useState<boolean>(true)
 
     function hideForms(): void {
         setShowAddExpensesForm(false)
@@ -274,14 +271,26 @@ function Home() {
             },
             logoutBtn: {
                 float: 'right',
-                marginRight: '1em'
+                margin: '1em',
+                
+            },
+            offline: {
+                backgroundColor: 'red',
+                color: 'white',
+                textAlign: 'center',
+                position: 'sticky'
             }
         })
     );
 
     const classes = useStyles();
 
+ 
+    const [offline, setOffline] = useState<boolean>(false)
 
+    window.addEventListener("offline", () => setOffline(true))
+    window.addEventListener("online", () => setOffline(false))
+  
 
     useEffect(() => {
         async function getDataLists(): Promise<void> {
@@ -289,10 +298,19 @@ function Home() {
             setDataListsState(datalists)
         }
         getDataLists()
+        if (!navigator.onLine) {
+            setOffline(true)
+        }
     }, [])
+
 
     return (
         <div className="Home">
+            {offline ? (
+                <AppBar className={classes.offline} position='sticky'>
+                    Offline
+                </AppBar>
+            ) : null}
             <header className="header">
                 <Button
                     variant="contained"
@@ -301,7 +319,9 @@ function Home() {
                     onClick={() => setAuth({ type: 'LOGOUT' })}
                 >Logout
                 </Button>
-                <h1 style={{ textAlign: 'center' }}>Finances!</h1>
+                <Container className={classes.root}>
+                    <h1 style={{ textAlign: 'center' }}>Finances!</h1>
+                    </Container>
                 {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
                     : null
@@ -310,32 +330,30 @@ function Home() {
                     {!showAddExpensesForm ? (
                         !showAddIncomeForm ? (
                             <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            className={classes.root}
-                            onClick={() => {
-                                setShowAddExpensesForm(true)
-                                setShowFormButtons(false)
-                            }}>
-                            Log Expense
-                        </Button>
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                className={classes.root}
+                                onClick={() => {
+                                    setShowAddExpensesForm(true)
+                                }}>
+                                Log Expense
+                            </Button>
                         ) : null
                     ) : (
                             <AddExpensesForm classes={classes} hideForms={hideForms} />
                         )}
                     {!showAddIncomeForm ? (
                         !showAddExpensesForm ? (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            className={classes.root}
-                            onClick={() => {
-                                setShowAddIncomeForm(true)
-                                setShowFormButtons(false)
-                            }}>
-                            Log Income
-                        </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                className={classes.root}
+                                onClick={() => {
+                                    setShowAddIncomeForm(true)
+                                }}>
+                                Log Income
+                            </Button>
                         ) : null
                     ) : (
                             <AddIncomeForm classes={classes} hideForms={hideForms} />
@@ -391,41 +409,41 @@ function Home() {
                         variant="contained"
                         color="primary"
                     >
-                View
+                        View
                         </Button>
                 </form>
             </header >
-        <div className="body">
-            {formState.form === "income" && incomeTableState.data[0]?.id ? (
-                <ReportTable
-                    state={incomeTableState}
-                    dataLists={dataListsState}
-                    handleChange={handleIncomeChange}
-                    handleUpdate={updateIncomeRow}
-                    deleteEntry={deleteEntry}
-                    form={formState.form}
-                />
-            ) : null}
-            {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
-                <ReportTable
-                    state={expensesTableState}
-                    dataLists={dataListsState}
-                    handleChange={handleExpensesChange}
-                    handleUpdate={updateExpensesRow}
-                    deleteEntry={deleteEntry}
-                    form={formState.form}
-                />
-            ) : null}
-            {formState.form === "pivot" && pivotTableState ? (
-                <ReportTable
-                    state={pivotTableState}
-                    deleteEntry={() => null}
-                    handleUpdate={() => null}
-                    handleChange={() => null}
-                    form={formState.form}
-                />
-            ) : null}
-        </div>
+            <div className="body">
+                {formState.form === "income" && incomeTableState.data[0]?.id ? (
+                    <ReportTable
+                        state={incomeTableState}
+                        dataLists={dataListsState}
+                        handleChange={handleIncomeChange}
+                        handleUpdate={updateIncomeRow}
+                        deleteEntry={deleteEntry}
+                        form={formState.form}
+                    />
+                ) : null}
+                {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
+                    <ReportTable
+                        state={expensesTableState}
+                        dataLists={dataListsState}
+                        handleChange={handleExpensesChange}
+                        handleUpdate={updateExpensesRow}
+                        deleteEntry={deleteEntry}
+                        form={formState.form}
+                    />
+                ) : null}
+                {formState.form === "pivot" && pivotTableState ? (
+                    <ReportTable
+                        state={pivotTableState}
+                        deleteEntry={() => null}
+                        handleUpdate={() => null}
+                        handleChange={() => null}
+                        form={formState.form}
+                    />
+                ) : null}
+            </div>
         </div >
     );
 }

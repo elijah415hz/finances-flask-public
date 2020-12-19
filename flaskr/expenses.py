@@ -36,6 +36,24 @@ def api_expenses(year, month):
         EXP_report['Amount'] = EXP_report['Amount'].apply(format_numbers)
         return EXP_report.to_json(orient="table")
 
+# Used by post_expense and post_expenses_batch
+def insert_expense(json):
+    date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+    amount = json['Amount'] or None
+    person = json['person_id'] or  None
+    b_cat = json['broad_category_id'] or None
+    n_cat = json['narrow_category_id'] or None
+    vendor = json['vendor'] or None
+    notes = json['notes']
+    
+    with engine.connect() as con:
+        insert_vendor_sql = "INSERT IGNORE INTO vendor(name) VALUES(%s)"
+        con.execute(insert_vendor_sql, [vendor])
+        vendor_id = con.execute("SELECT id FROM vendor WHERE name=%s", [vendor]).fetchone()[0]
+        sql = "INSERT INTO expenses(date, vendor_id, amount, broad_category_id, narrow_category_id, person_id, notes)\
+                VALUES(DATE(%s), %s, %s, %s, %s, %s, %s)"     
+        con.execute(sql, [date, vendor_id, amount, b_cat, n_cat, person, notes])
+
 # Create Expense
 @bp.route("/", methods=["POST"])
 def post_expense():
@@ -45,23 +63,22 @@ def post_expense():
     if not validToken:
         return Response("Nice Try!", status=401)
     else:
-        date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
-        amount = json['Amount'] or None
-        person = json['person_id'] or  None
-        b_cat = json['broad_category_id'] or None
-        n_cat = json['narrow_category_id'] or None
-        vendor = json['vendor'] or None
-        notes = json['notes']
-        
-        insert_vendor_sql = "INSERT IGNORE INTO vendor(name) VALUES(%s)"
-        with engine.connect() as con:
-            con.execute(insert_vendor_sql, [vendor])
-            vendor_id = con.execute("SELECT id FROM vendor WHERE name=%s", [vendor]).fetchone()[0]
-            sql = "INSERT INTO expenses(date, vendor_id, amount, broad_category_id, narrow_category_id, person_id, notes)\
-                    VALUES(DATE(%s), %s, %s, %s, %s, %s, %s)"     
-            
-            con.execute(sql, [date, vendor_id, amount, b_cat, n_cat, person, notes])
+        insert_expense(json)
         return Response('Record Inserted!', status=200)
+
+# Load in batch of expenses
+@bp.route("/batch", methods=["POST"])
+def post_batch_expense():
+    json = request.get_json()
+    validToken = checkAuth(request)
+    print("JSON: ", json)
+    if not validToken:
+        return Response("Nice Try!", status=401)
+    else:
+        for row in json:
+            insert_expense(row)
+        return Response('Records Inserted!', status=200)
+
 
 # Edit expenses
 @bp.route("/<int:id>", methods=['PUT'])

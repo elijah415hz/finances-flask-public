@@ -30,6 +30,21 @@ def api_income(year, month):
         INC_report['Amount'] = INC_report['Amount'].apply(format_numbers)
         return INC_report.to_json(orient="table")
 
+# Used by post_income and post_batch_income
+def insert_income(json):
+    date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+    amount = json['amount'] or None
+    earner_id = json['earner_id'] or  None
+    source = json['source'] or None
+    
+    with engine.connect() as con:
+        insert_source_sql = "INSERT IGNORE INTO source(name) VALUES(%s)"
+        con.execute(insert_source_sql, [source])
+        source_id = con.execute("SELECT id FROM source WHERE name=%s", [source]).fetchone()[0]
+        sql = "INSERT INTO income(date, amount, source_id, earner_id)\
+                VALUES(DATE(%s), %s, %s, %s)"     
+        con.execute(sql, [date, amount, source_id, earner_id])
+
 # Create Income Record
 @bp.route("/", methods=["POST"])
 def post_income():
@@ -39,20 +54,21 @@ def post_income():
     if not validToken:
         return Response("Nice Try!", status=401)
     else:
-        date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
-        amount = json['amount'] or None
-        earner_id = json['earner_id'] or  None
-        source = json['source'] or None
-        
-        with engine.connect() as con:
-            insert_source_sql = "INSERT IGNORE INTO source(name) VALUES(%s)"
-            con.execute(insert_source_sql, [source])
-            source_id = con.execute("SELECT id FROM source WHERE name=%s", [source]).fetchone()[0]
-            sql = "INSERT INTO income(date, amount, source_id, earner_id)\
-                    VALUES(DATE(%s), %s, %s, %s)"     
-            
-            con.execute(sql, [date, amount, source_id, earner_id])
+        insert_income(json)
         return Response('Record Inserted!', status=200)
+
+# Load in batch of income records
+@bp.route("/batch", methods=["POST"])
+def post_batch_income():
+    json = request.get_json()
+    validToken = checkAuth(request)
+    print("JSON: ", json)
+    if not validToken:
+        return Response("Nice Try!", status=401)
+    else:
+        for row in json:
+            insert_income(row)
+        return Response('Records Inserted!', status=200)
 
 
 # Edit income

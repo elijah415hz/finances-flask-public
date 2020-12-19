@@ -33,7 +33,7 @@ def login():
     username = json['username']
     password = json['password']
     if username == USER_NAME and bcrypt.checkpw(password, PASSWORD):
-        token = jwt.encode({'username': username, 'exp' : datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])  
+        token = jwt.encode({'username': username, 'exp' : datetime.utcnow() + timedelta(days=30)}, current_app.config['SECRET_KEY'])  
         return jsonify({'token' : token.decode('UTF-8')}) 
     else:
         return Response("Wrong credentials!", status=401)

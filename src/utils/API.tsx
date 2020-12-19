@@ -3,7 +3,8 @@ import type {
     formStateType, 
     tableDataEntry, 
     tableType,
-    expensesFormType} from '../interfaces/Interfaces'
+    expensesFormType,
+    incomeFormType} from '../interfaces/Interfaces'
 
 
 function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
@@ -35,8 +36,28 @@ const API = {
             body: JSON.stringify(data)
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    postIncome: function (token: string | null, data:expensesFormType): Promise<Response | string> {
+    postBatchExpenses: function (token: string | null, data:expensesFormType[]): Promise<Response | string> {
+        return fetch(`/api/expenses/batch`, {
+            method: 'POST',
+            headers: {
+                "authorization": `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res=>checkStatus<string>(res, 'text'))
+    },
+    postIncome: function (token: string | null, data:incomeFormType): Promise<Response | string> {
         return fetch(`/api/income/`, {
+            method: 'POST',
+            headers: {
+                "authorization": `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res=>checkStatus<string>(res, 'text'))
+    },
+    postBatchIncome: function (token: string | null, data:incomeFormType[]): Promise<Response | string> {
+        return fetch(`/api/income/batch`, {
             method: 'POST',
             headers: {
                 "authorization": `Bearer ${token}`,

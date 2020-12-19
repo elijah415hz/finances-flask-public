@@ -2,22 +2,20 @@ import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import {makeStyles, createStyles, Theme} from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme: Theme) =>
 createStyles({
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120,
-    },
     root: {
         display: 'flex',
         justifyContent: 'center',
         flexWrap: 'wrap',
         '& > *': {
             margin: theme.spacing(1),
-            // width: '15ch',
+            [theme.breakpoints.down('xs')]: {
+                width: '100%',
+            },
         }
     }
 })

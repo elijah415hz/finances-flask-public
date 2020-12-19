@@ -9,8 +9,7 @@ import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
-
-
+import { saveRecord } from '../utils/db';
 
 
 export default function AddRecordsForm(props: {
@@ -48,13 +47,14 @@ export default function AddRecordsForm(props: {
 
     async function handleFormSubmit(event: React.SyntheticEvent): Promise<any> {
         event.preventDefault()
+        let formStateConvertedDate: any = { ...formState }
         try {
-            let formStateConvertedDate: any = { ...formState }
             formStateConvertedDate.date = formStateConvertedDate.date?.toLocaleDateString("en-US")
             let response = await API.postIncome(Auth.token, formStateConvertedDate)
             setFormState(initialFormState)
             console.log(response)
         } catch (err) {
+            saveRecord('income', formStateConvertedDate)
             console.error(err)
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
@@ -64,8 +64,6 @@ export default function AddRecordsForm(props: {
 
     return (
         <div className={props.classes.root}>
-
-
             <form className={props.classes.root} onSubmit={handleFormSubmit}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <KeyboardDatePicker

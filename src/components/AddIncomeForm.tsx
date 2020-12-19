@@ -2,7 +2,15 @@ import React, { useState } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
 import type { incomeFormType, categoryType } from '../interfaces/Interfaces'
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
+import { 
+    Button,
+    FormControl, 
+    InputLabel, 
+    MenuItem, 
+    Select, 
+    TextField,
+    InputAdornment
+} from '@material-ui/core';
 // import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import {
@@ -94,6 +102,10 @@ export default function AddRecordsForm(props: {
                     label="Amount"
                     name="amount"
                     type="number"
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                      }}
+                    inputProps={{step:"0.01"}}
                 />
                 <FormControl className={props.classes.formControl}>
                     <InputLabel htmlFor="earner_id">Person</InputLabel>

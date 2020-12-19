@@ -14,7 +14,7 @@ function Home() {
         {
             form: "expenses",
             year: new Date(Date.now()).getUTCFullYear(),
-            month: new Date(Date.now()).getUTCMonth()
+            month: new Date(Date.now()).getUTCMonth() + 1
         }
     )
 

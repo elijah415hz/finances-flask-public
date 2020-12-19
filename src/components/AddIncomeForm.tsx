@@ -95,6 +95,7 @@ export default function AddRecordsForm(props: {
                     label="Source"
                     name="source"
                     type="string"
+                    InputLabelProps={{ shrink: true }}
                 />
                 <TextField
                     onChange={handleFormChange}

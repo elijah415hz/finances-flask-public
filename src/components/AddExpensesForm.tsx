@@ -263,6 +263,7 @@ export default function AddRecordsForm(props: {
                     label="Vendor"
                     name="vendor"
                     type="string"
+                    InputLabelProps={{ shrink: true }}
                 />
                 <TextField
                     onChange={handleFormChange}
@@ -330,6 +331,7 @@ export default function AddRecordsForm(props: {
                     label="Notes"
                     name="notes"
                     type="string"
+                    InputLabelProps={{ shrink: true }}
                 />
                 <Button
                     type="submit"

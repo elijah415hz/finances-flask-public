@@ -136,7 +136,7 @@ export default function AddRecordsForm(props: {
                         setFormState(initialFormState)
                         props.hideForms()
                     }}
-                >Cancel</Button>
+                >Close</Button>
             </form>
         </div>
     )

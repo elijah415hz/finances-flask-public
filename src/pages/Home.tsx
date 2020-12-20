@@ -74,10 +74,12 @@ function Home() {
     // Flag to set display of expense form
     const [showAddExpensesForm, setShowAddExpensesForm] = useState<boolean>(false)
     const [showAddIncomeForm, setShowAddIncomeForm] = useState<boolean>(false)
+    const [showReportsForm, setShowReportsForm] = useState<boolean>(false)
 
     function hideForms(): void {
         setShowAddExpensesForm(false)
         setShowAddIncomeForm(false)
+        setShowReportsForm(false)
     }
 
     function formatDates(entry: tableDataEntry): tableDataEntry {
@@ -186,6 +188,7 @@ function Home() {
             }
         }
     }
+
     async function updateExpensesRow(index: number): Promise<void> {
         try {
             let res = await API.updateExpenses(Auth.token, expensesTableState.data[index])
@@ -194,6 +197,7 @@ function Home() {
             console.log(err)
         }
     }
+
     async function updateIncomeRow(index: number): Promise<void> {
         try {
             let res = await API.updateIncome(Auth.token, incomeTableState.data[index])
@@ -218,9 +222,6 @@ function Home() {
             setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
         } catch (err) {
             console.error(err)
-            if (err.message === 'Unauthorized') {
-                setAuth({ type: 'LOGOUT' })
-            }
         }
     }
 
@@ -243,6 +244,8 @@ function Home() {
         }
     }
 
+
+    // Create classes to use for styling
     const useStyles = makeStyles((theme: Theme) =>
         createStyles({
             formControl: {
@@ -272,7 +275,7 @@ function Home() {
             logoutBtn: {
                 float: 'right',
                 margin: '1em',
-                
+
             },
             offline: {
                 backgroundColor: 'red',
@@ -282,15 +285,12 @@ function Home() {
             }
         })
     );
-
     const classes = useStyles();
 
- 
+    // Control display of Offline banner
     const [offline, setOffline] = useState<boolean>(false)
-
     window.addEventListener("offline", () => setOffline(true))
     window.addEventListener("online", () => setOffline(false))
-  
 
     useEffect(() => {
         async function getDataLists(): Promise<void> {
@@ -321,7 +321,7 @@ function Home() {
                 </Button>
                 <Container className={classes.root}>
                     <h1 style={{ textAlign: 'center' }}>Finances!</h1>
-                    </Container>
+                </Container>
                 {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
                     : null
@@ -329,89 +329,119 @@ function Home() {
                 <Container className={classes.root}>
                     {!showAddExpensesForm ? (
                         !showAddIncomeForm ? (
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                color="primary"
-                                className={classes.root}
-                                onClick={() => {
-                                    setShowAddExpensesForm(true)
-                                }}>
-                                Log Expense
-                            </Button>
+                            !showReportsForm ? (
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.root}
+                                    onClick={() => {
+                                        setShowAddExpensesForm(true)
+                                    }}>
+                                    Log Expense
+                                </Button>
+                            ) : null
                         ) : null
                     ) : (
                             <AddExpensesForm classes={classes} hideForms={hideForms} />
                         )}
                     {!showAddIncomeForm ? (
                         !showAddExpensesForm ? (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className={classes.root}
-                                onClick={() => {
-                                    setShowAddIncomeForm(true)
-                                }}>
-                                Log Income
-                            </Button>
+                            !showReportsForm ? (
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.root}
+                                    onClick={() => {
+                                        setShowAddIncomeForm(true)
+                                    }}>
+                                    Log Income
+                                </Button>
+                            ) : null
                         ) : null
                     ) : (
                             <AddIncomeForm classes={classes} hideForms={hideForms} />
                         )}
-                </Container>
-                <form onSubmit={handleFormSubmit} className={classes.root}>
-                    <FormControl variant="outlined" className={classes.formControl}>
-                        <InputLabel htmlFor="form">Report</InputLabel>
-                        <Select
-                            name="form"
-                            label="Report"
-                            labelId="form"
-                            value={formState.form}
-                            onChange={handleFormChange}>
-                            <MenuItem value="income">Income</MenuItem>
-                            <MenuItem value="expenses">Expenses</MenuItem>
-                            <MenuItem value="pivot">Pivot Table</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <TextField
-                        onChange={handleFormChange}
-                        value={formState.year}
-                        label="Year"
-                        name="year"
-                        type="number"
-                        variant="outlined"
-                    />
-                    <FormControl variant="outlined" className={classes.formControl}>
-                        <InputLabel htmlFor="month2">Month</InputLabel>
-                        <Select
-                            onChange={handleFormChange}
-                            value={formState.month}
-                            name="month"
-                            labelId="month2"
-                            label="Month"
-                        >
-                            <MenuItem value={1}>January</MenuItem>
-                            <MenuItem value={2}>February</MenuItem>
-                            <MenuItem value={3}>March</MenuItem>
-                            <MenuItem value={4}>April</MenuItem>
-                            <MenuItem value={5}>May</MenuItem>
-                            <MenuItem value={6}>June</MenuItem>
-                            <MenuItem value={7}>July</MenuItem>
-                            <MenuItem value={8}>August</MenuItem>
-                            <MenuItem value={9}>September</MenuItem>
-                            <MenuItem value={10}>October</MenuItem>
-                            <MenuItem value={11}>November</MenuItem>
-                            <MenuItem value={12}>December</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                    >
-                        View
+                    {!showReportsForm ? (
+                        !showAddIncomeForm ? (
+                            !showAddExpensesForm ? (
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    className={classes.root}
+                                    onClick={() => {
+                                        setShowReportsForm(true)
+                                    }}>
+                                    View Reports
+                                </Button>
+                            ) : null
+                        ) : null
+                    ) : (
+                            <form onSubmit={handleFormSubmit} className={classes.root}>
+                                <FormControl variant="outlined" className={classes.formControl}>
+                                    <InputLabel htmlFor="form">Report</InputLabel>
+                                    <Select
+                                        name="form"
+                                        label="Report"
+                                        labelId="form"
+                                        value={formState.form}
+                                        onChange={handleFormChange}>
+                                        <MenuItem value="income">Income</MenuItem>
+                                        <MenuItem value="expenses">Expenses</MenuItem>
+                                        <MenuItem value="pivot">Pivot Table</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <TextField
+                                    onChange={handleFormChange}
+                                    value={formState.year}
+                                    label="Year"
+                                    name="year"
+                                    type="number"
+                                    variant="outlined"
+                                />
+                                <FormControl variant="outlined" className={classes.formControl}>
+                                    <InputLabel htmlFor="month2">Month</InputLabel>
+                                    <Select
+                                        onChange={handleFormChange}
+                                        value={formState.month}
+                                        name="month"
+                                        labelId="month2"
+                                        label="Month"
+                                    >
+                                        <MenuItem value={1}>January</MenuItem>
+                                        <MenuItem value={2}>February</MenuItem>
+                                        <MenuItem value={3}>March</MenuItem>
+                                        <MenuItem value={4}>April</MenuItem>
+                                        <MenuItem value={5}>May</MenuItem>
+                                        <MenuItem value={6}>June</MenuItem>
+                                        <MenuItem value={7}>July</MenuItem>
+                                        <MenuItem value={8}>August</MenuItem>
+                                        <MenuItem value={9}>September</MenuItem>
+                                        <MenuItem value={10}>October</MenuItem>
+                                        <MenuItem value={11}>November</MenuItem>
+                                        <MenuItem value={12}>December</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                >
+                                    View
                         </Button>
-                </form>
+                                <Button
+                                    type="button"
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={() => {
+                                        hideForms()
+                                    }
+                                    }
+                                >Close</Button>
+                            </form>
+
+                        )}
+                </Container>
             </header >
             <div className="body">
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (

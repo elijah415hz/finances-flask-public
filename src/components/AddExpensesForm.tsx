@@ -347,7 +347,7 @@ export default function AddRecordsForm(props: {
                         props.hideForms()
                     }
                     }
-                >Cancel</Button>
+                >Close</Button>
             </form>
         </div>
     )

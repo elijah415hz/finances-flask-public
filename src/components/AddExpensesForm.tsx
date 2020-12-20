@@ -18,6 +18,7 @@ import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import CustomizedSnackbar from './SnackBar'
 
 
 
@@ -46,6 +47,9 @@ export default function AddRecordsForm(props: {
         name: "",
         id: NaN,
     })
+
+    const [showSuccess, setShowSuccess] = useState<boolean>(false)
+    const [showOfflineWarning, setShowOfflineWarning] = useState<boolean>(false)
 
     // Hardcoding categories because the database is a mess...
     const categories = [
@@ -221,14 +225,15 @@ export default function AddRecordsForm(props: {
         let formStateConvertedDate: any = { ...formState }
         formStateConvertedDate.Date = formStateConvertedDate.Date?.toLocaleDateString("en-US")
         try {
-            let response = await API.postExpenses(Auth.token, formStateConvertedDate)
-            console.log(response)
+            await API.postExpenses(Auth.token, formStateConvertedDate)
+            setShowSuccess(true)
         } catch (err) {
             saveRecord('expenses', formStateConvertedDate)
-            console.error(err)
+            console.error(err.message)
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
+            setShowOfflineWarning(true)
         } finally {
             setFormState(initialFormState)
             setCurrentCategory({
@@ -349,6 +354,16 @@ export default function AddRecordsForm(props: {
                     }
                 >Close</Button>
             </form>
+            <CustomizedSnackbar 
+            severity="success" 
+            message="Record Saved" 
+            open={showSuccess}
+            setOpen={setShowSuccess}/>
+            <CustomizedSnackbar 
+            severity="warning" 
+            message="Record Saved Locally" 
+            open={showOfflineWarning}
+            setOpen={setShowOfflineWarning}/>
         </div>
     )
 }

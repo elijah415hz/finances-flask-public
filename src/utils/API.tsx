@@ -11,6 +11,9 @@ function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
     if (res.status === 401) {
         throw new Error("Unauthorized")
     }
+    if (res.status !== 200) {
+        throw new Error("Error! " + res.status)
+    }
     if (parseMethod === 'json'){
         return res.json() as Promise<T>
     } else {

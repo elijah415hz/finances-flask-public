@@ -5,6 +5,8 @@ import Login from './pages/Login'
 import API from './utils/API'
 import { testDatabase } from './utils/db'
 import './App.css';
+import CustomizedSnackbar from './components/SnackBar'
+import { alertStateType } from './interfaces/Interfaces'
 
 // import Auth from './utils/Auth'
 
@@ -14,9 +16,10 @@ interface Auth {
   token: string
 }
 
-interface AuthState {
+interface ContextState {
   Auth: Auth,
-  setAuth: React.Dispatch<{ type: string; payload?: { user: string; token: string; } | undefined; }>
+  setAuth: React.Dispatch<{ type: string; payload?: { user: string; token: string; } | undefined; }>,
+  setAlertState: React.Dispatch<React.SetStateAction<alertStateType>>
 }
 
 const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
@@ -27,20 +30,21 @@ const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
 }): JSX.Element => (
     <Route {...rest} render={props => (
       loggedIn
-        ? <Component {...props}/>
+        ? <Component {...props} />
         : <Redirect to='/login' />
     )
     } />
 
   )
 
-export const AuthContext = React.createContext<AuthState>({
+export const AuthContext = React.createContext<ContextState>({
   Auth: {
     loggedIn: false,
     user: "",
     token: ""
   },
-  setAuth: (): void => { }
+  setAuth: (): void => { },
+  setAlertState: (): void => {}
 })
 
 
@@ -76,6 +80,12 @@ export default function App() {
     token: ""
   })
 
+  const [alertState, setAlertState] = useState<alertStateType>({
+    severity: undefined,
+    message: "",
+    open: false,
+  })
+
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -87,20 +97,20 @@ export default function App() {
           if (err.message === "Unauthorized") {
             setAuth({ type: 'LOGOUT' })
           } else {
-            setAuth({ type: 'LOGIN', payload: { user: user || "", token: token || ""} })
+            setAuth({ type: 'LOGIN', payload: { user: user || "", token: token || "" } })
           }
         })
     }
   }, [])
 
- 
+
   useEffect(() => {
     testDatabase()
   })
 
   return (
     <AuthContext.Provider
-      value={{ Auth, setAuth }}
+      value={{ Auth, setAuth, setAlertState }}
     >
 
       <Router>
@@ -114,6 +124,10 @@ export default function App() {
           <Login />
         </Route>
       </Router>
+      <CustomizedSnackbar
+        state={alertState}
+        setState={setAlertState}
+      />
     </AuthContext.Provider>
   )
 }

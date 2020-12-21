@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import type { incomeFormType, categoryType } from '../interfaces/Interfaces'
+import type { incomeFormType } from '../interfaces/Interfaces'
 import { 
     Button,
     FormControl, 
@@ -18,13 +18,15 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { saveRecord } from '../utils/db';
+import CustomizedSnackbar from './SnackBar'
+
 
 
 export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string },
     hideForms: Function
 }) {
-    const { Auth, setAuth } = React.useContext(AuthContext)
+    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
     const initialFormState = {
         date: new Date(Date.now()),
@@ -44,6 +46,10 @@ export default function AddRecordsForm(props: {
         { name: "Gift", id: 11 },
     ]
 
+    // State for snackbars
+    const [showSuccess, setShowSuccess] = useState<boolean>(false)
+    const [showOfflineWarning, setShowOfflineWarning] = useState<boolean>(false)
+
     function handleFormChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>): void {
         let name = event.target.name as keyof typeof formState
         setFormState({ ...formState, [name]: event.target.value })
@@ -58,15 +64,25 @@ export default function AddRecordsForm(props: {
         let formStateConvertedDate: any = { ...formState }
         try {
             formStateConvertedDate.date = formStateConvertedDate.date?.toLocaleDateString("en-US")
-            let response = await API.postIncome(Auth.token, formStateConvertedDate)
-            setFormState(initialFormState)
-            console.log(response)
+            await API.postIncome(Auth.token, formStateConvertedDate)
+            setAlertState({
+                severity: "success",
+                message: "Record Saved!",
+                open: true
+            })        
         } catch (err) {
+            console.error(err.message)
             saveRecord('income', formStateConvertedDate)
-            console.error(err)
+            setAlertState({
+                severity: "warning",
+                message: "Record Saved Locally",
+                open: true
+            })            
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
+        } finally {
+            setFormState(initialFormState)
         }
     }
 
@@ -138,6 +154,18 @@ export default function AddRecordsForm(props: {
                     }}
                 >Close</Button>
             </form>
+            {/* <CustomizedSnackbar
+                severity="success"
+                message="Record Saved"
+                open={showSuccess}
+                setOpen={setShowSuccess} 
+                />
+            <CustomizedSnackbar
+                severity="warning"
+                message="Record Saved Locally"
+                open={showOfflineWarning}
+                setOpen={setShowOfflineWarning} 
+                /> */}
         </div>
     )
 }

@@ -2,23 +2,21 @@ import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from './Alert'
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import { alertStateType } from '../interfaces/Interfaces';
 
 
 const useStyles = makeStyles((theme: Theme) => ({
     snackbar: {
-        minWidth: '4000px'
+        width: '100%',
+        '& > * + *': {
+            marginTop: theme.spacing(2),
+        },
     },
 }));
 
-export default function CustomizedSnackbar({
-    severity,
-    message,
-    open,
-    setOpen }: {
-        severity: "success" | "info" | "warning" | "error" | undefined,
-        message: string,
-        open: boolean,
-        setOpen: React.Dispatch<React.SetStateAction<boolean>>
+export default function CustomizedSnackbar({ state, setState }: {
+    state: alertStateType,
+    setState: React.Dispatch<React.SetStateAction<alertStateType>>
     }) {
 
     const classes = useStyles();
@@ -27,17 +25,21 @@ export default function CustomizedSnackbar({
         if (reason === 'clickaway') {
             return;
         }
-
-        setOpen(false);
+        setState({ ...state, open: false });
     };
 
     return (
-        // <div className={classes.root}>
-            <Snackbar open={open} className={classes.snackbar} autoHideDuration={3000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity={severity}>
-                    {message}
+        <div className={classes.snackbar}>
+            <Snackbar
+                open={state.open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+
+            >
+                <Alert onClose={handleClose} severity={state.severity}>
+                    {state.message}
                 </Alert>
             </Snackbar>
-        // </div>
+        </div>
     );
 }

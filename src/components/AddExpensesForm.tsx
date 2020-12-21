@@ -3,15 +3,15 @@ import API from '../utils/API'
 import { saveRecord } from '../utils/db'
 import { AuthContext } from '../App'
 import type { expensesFormType, categoryType } from '../interfaces/Interfaces'
-import { 
-    Button, 
-    FormControl, 
-    InputLabel, 
-    MenuItem, 
-    Select, 
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
     TextField,
     InputAdornment
- } from '@material-ui/core';
+} from '@material-ui/core';
 // import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import {
@@ -27,7 +27,7 @@ export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string },
     hideForms: Function
 }) {
-    const { Auth, setAuth } = React.useContext(AuthContext)
+    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
     const initialFormState = {
         Date: new Date(Date.now()),
@@ -47,10 +47,7 @@ export default function AddRecordsForm(props: {
         name: "",
         id: NaN,
     })
-
-    const [showSuccess, setShowSuccess] = useState<boolean>(false)
-    const [showOfflineWarning, setShowOfflineWarning] = useState<boolean>(false)
-
+  
     // Hardcoding categories because the database is a mess...
     const categories = [
         {
@@ -226,14 +223,22 @@ export default function AddRecordsForm(props: {
         formStateConvertedDate.Date = formStateConvertedDate.Date?.toLocaleDateString("en-US")
         try {
             await API.postExpenses(Auth.token, formStateConvertedDate)
-            setShowSuccess(true)
+            setAlertState({
+                severity: "success",
+                message: "Record Saved!",
+                open: true
+            })
         } catch (err) {
-            saveRecord('expenses', formStateConvertedDate)
             console.error(err.message)
+            saveRecord('expenses', formStateConvertedDate)
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
-            setShowOfflineWarning(true)
+            setAlertState({
+                severity: "warning",
+                message: "Record Saved Locally",
+                open: true
+            })        
         } finally {
             setFormState(initialFormState)
             setCurrentCategory({
@@ -278,8 +283,8 @@ export default function AddRecordsForm(props: {
                     type="number"
                     InputProps={{
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                      }}
-                    inputProps={{step:"0.01"}}
+                    }}
+                    inputProps={{ step: "0.01" }}
                 />
                 <FormControl
                     className={props.classes.formControl}>
@@ -354,16 +359,18 @@ export default function AddRecordsForm(props: {
                     }
                 >Close</Button>
             </form>
-            <CustomizedSnackbar 
-            severity="success" 
-            message="Record Saved" 
-            open={showSuccess}
-            setOpen={setShowSuccess}/>
-            <CustomizedSnackbar 
-            severity="warning" 
-            message="Record Saved Locally" 
-            open={showOfflineWarning}
-            setOpen={setShowOfflineWarning}/>
+            {/* <CustomizedSnackbar
+                severity="success"
+                message="Record Saved"
+                open={showSuccess}
+                setOpen={setShowSuccess} 
+                />
+            <CustomizedSnackbar
+                severity="warning"
+                message="Record Saved Locally"
+                open={showOfflineWarning}
+                setOpen={setShowOfflineWarning} 
+                /> */}
         </div>
     )
 }

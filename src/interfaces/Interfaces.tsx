@@ -39,11 +39,11 @@ interface incomeFormType {
 }
 
 interface categoryType {
-    name: string, 
-    id: number, 
+    name: string,
+    id: number,
     narrowCategories?: {
         name: string, id: number
-    }[], 
+    }[],
     person?: boolean
 }
 
@@ -53,7 +53,7 @@ interface dataListStateType {
 }
 
 interface allDataListsType {
-    source: dataListStateType[], 
+    source: dataListStateType[],
     person_earner: dataListStateType[],
     narrow_category: dataListStateType[],
     broad_category: dataListStateType[],
@@ -61,19 +61,27 @@ interface allDataListsType {
 }
 
 interface tableType {
-    schema: { 
-        fields: [] 
-    }, 
+    schema: {
+        fields: []
+    },
     data: tableDataEntry[]
+}
+
+interface alertStateType {
+    severity: "success" | "info" | "warning" | "error" | undefined,
+    message: string,
+    open: boolean,
 }
 
 export type {
     tableDataEntry,
-    dataListStateType, 
+    dataListStateType,
     allDataListsType,
     formStateType,
-    InputName, 
+    InputName,
     tableType,
     expensesFormType,
     incomeFormType,
-    categoryType}
+    categoryType,
+    alertStateType
+}

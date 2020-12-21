@@ -18,7 +18,6 @@ import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
-import CustomizedSnackbar from './SnackBar'
 
 
 
@@ -229,16 +228,24 @@ export default function AddRecordsForm(props: {
                 open: true
             })
         } catch (err) {
-            console.error(err.message)
-            saveRecord('expenses', formStateConvertedDate)
-            if (err.message === "Unauthorized") {
-                setAuth({ type: 'LOGOUT' })
+            if (err.message === "Error! 500") {
+                setAlertState({
+                    severity: "error",
+                    message: "Server Error! Check your inputs",
+                    open: true
+                })
+                return
+            } else {
+                saveRecord('expenses', formStateConvertedDate)
+                if (err.message === "Unauthorized") {
+                    setAuth({ type: 'LOGOUT' })
+                }
+                setAlertState({
+                    severity: "warning",
+                    message: "Record Saved Locally",
+                    open: true
+                })        
             }
-            setAlertState({
-                severity: "warning",
-                message: "Record Saved Locally",
-                open: true
-            })        
         } finally {
             setFormState(initialFormState)
             setCurrentCategory({

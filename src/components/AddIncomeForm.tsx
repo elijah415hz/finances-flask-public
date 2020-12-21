@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
 import type { incomeFormType } from '../interfaces/Interfaces'
-import { 
+import {
     Button,
-    FormControl, 
-    InputLabel, 
-    MenuItem, 
-    Select, 
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
     TextField,
     InputAdornment
 } from '@material-ui/core';
@@ -18,7 +18,6 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { saveRecord } from '../utils/db';
-import CustomizedSnackbar from './SnackBar'
 
 
 
@@ -46,10 +45,6 @@ export default function AddRecordsForm(props: {
         { name: "Gift", id: 11 },
     ]
 
-    // State for snackbars
-    const [showSuccess, setShowSuccess] = useState<boolean>(false)
-    const [showOfflineWarning, setShowOfflineWarning] = useState<boolean>(false)
-
     function handleFormChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>): void {
         let name = event.target.name as keyof typeof formState
         setFormState({ ...formState, [name]: event.target.value })
@@ -69,17 +64,25 @@ export default function AddRecordsForm(props: {
                 severity: "success",
                 message: "Record Saved!",
                 open: true
-            })        
+            })
         } catch (err) {
-            console.error(err.message)
-            saveRecord('income', formStateConvertedDate)
-            setAlertState({
-                severity: "warning",
-                message: "Record Saved Locally",
-                open: true
-            })            
-            if (err.message === "Unauthorized") {
-                setAuth({ type: 'LOGOUT' })
+            if (err.message === "Error! 500") {
+                setAlertState({
+                    severity: "error",
+                    message: "Server Error! Check your inputs",
+                    open: true
+                })
+                return
+            } else {
+                saveRecord('income', formStateConvertedDate)
+                setAlertState({
+                    severity: "warning",
+                    message: "Record Saved Locally",
+                    open: true
+                })
+                if (err.message === "Unauthorized") {
+                    setAuth({ type: 'LOGOUT' })
+                }
             }
         } finally {
             setFormState(initialFormState)
@@ -121,8 +124,8 @@ export default function AddRecordsForm(props: {
                     type="number"
                     InputProps={{
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                      }}
-                    inputProps={{step:"0.01"}}
+                    }}
+                    inputProps={{ step: "0.01" }}
                 />
                 <FormControl className={props.classes.formControl}>
                     <InputLabel htmlFor="earner_id">Person</InputLabel>

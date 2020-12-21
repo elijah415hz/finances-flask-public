@@ -46,7 +46,7 @@ export default function AddRecordsForm(props: {
         name: "",
         id: NaN,
     })
-  
+
     // Hardcoding categories because the database is a mess...
     const categories = [
         {
@@ -252,7 +252,7 @@ export default function AddRecordsForm(props: {
                     severity: "warning",
                     message: "Record Saved Locally",
                     open: true
-                })        
+                })
             }
         } finally {
             setFormState(initialFormState)
@@ -264,7 +264,8 @@ export default function AddRecordsForm(props: {
     }
 
     return (
-        <div className={props.classes.root}>
+        <div>
+            <h2 className={props.classes.root}>Log Expense</h2>
             <form className={props.classes.root} onSubmit={handleFormSubmit}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <KeyboardDatePicker

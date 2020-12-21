@@ -18,6 +18,7 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { saveRecord } from '../utils/db';
+import classes from '*.module.css';
 
 
 
@@ -98,7 +99,8 @@ export default function AddRecordsForm(props: {
     }
 
     return (
-        <div className={props.classes.root}>
+        <div>
+            <h2 className={props.classes.root}>Log Income</h2>
             <form className={props.classes.root} onSubmit={handleFormSubmit}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <KeyboardDatePicker

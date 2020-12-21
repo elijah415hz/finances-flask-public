@@ -309,7 +309,7 @@ function Home() {
             backdrop: {
                 zIndex: theme.zIndex.drawer + 1,
                 color: '#fff',
-              },
+            },
         })
     );
     const classes = useStyles();
@@ -351,7 +351,7 @@ function Home() {
                 >Logout
                 </Button>
                 <Container className={classes.root}>
-                    <h1 style={{ textAlign: 'center' }}>Finances!</h1>
+                    <h1 style={{ textAlign: 'center' }}>Blarvis Finances</h1>
                 </Container>
                 {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
@@ -408,69 +408,71 @@ function Home() {
                             ) : null
                         ) : null
                     ) : (
-                            <form onSubmit={handleFormSubmit} className={classes.root}>
-                                <FormControl variant="outlined" className={classes.formControl}>
-                                    <InputLabel htmlFor="form">Report</InputLabel>
-                                    <Select
-                                        name="form"
-                                        label="Report"
-                                        labelId="form"
-                                        value={formState.form}
-                                        onChange={handleFormChange}>
-                                        <MenuItem value="income">Income</MenuItem>
-                                        <MenuItem value="expenses">Expenses</MenuItem>
-                                        <MenuItem value="pivot">Pivot Table</MenuItem>
-                                    </Select>
-                                </FormControl>
-                                <TextField
-                                    onChange={handleFormChange}
-                                    value={formState.year}
-                                    label="Year"
-                                    name="year"
-                                    type="number"
-                                    variant="outlined"
-                                />
-                                <FormControl variant="outlined" className={classes.formControl}>
-                                    <InputLabel htmlFor="month2">Month</InputLabel>
-                                    <Select
+                            <div>
+                                <h2 className={classes.root}>Generate Report</h2>
+                                <form onSubmit={handleFormSubmit} className={classes.root}>
+                                    <FormControl variant="outlined" className={classes.formControl}>
+                                        <InputLabel htmlFor="form">Report</InputLabel>
+                                        <Select
+                                            name="form"
+                                            label="Report"
+                                            labelId="form"
+                                            value={formState.form}
+                                            onChange={handleFormChange}>
+                                            <MenuItem value="income">Income</MenuItem>
+                                            <MenuItem value="expenses">Expenses</MenuItem>
+                                            <MenuItem value="pivot">Pivot Table</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <TextField
                                         onChange={handleFormChange}
-                                        value={formState.month}
-                                        name="month"
-                                        labelId="month2"
-                                        label="Month"
+                                        value={formState.year}
+                                        label="Year"
+                                        name="year"
+                                        type="number"
+                                        variant="outlined"
+                                    />
+                                    <FormControl variant="outlined" className={classes.formControl}>
+                                        <InputLabel htmlFor="month2">Month</InputLabel>
+                                        <Select
+                                            onChange={handleFormChange}
+                                            value={formState.month}
+                                            name="month"
+                                            labelId="month2"
+                                            label="Month"
+                                        >
+                                            <MenuItem value={1}>January</MenuItem>
+                                            <MenuItem value={2}>February</MenuItem>
+                                            <MenuItem value={3}>March</MenuItem>
+                                            <MenuItem value={4}>April</MenuItem>
+                                            <MenuItem value={5}>May</MenuItem>
+                                            <MenuItem value={6}>June</MenuItem>
+                                            <MenuItem value={7}>July</MenuItem>
+                                            <MenuItem value={8}>August</MenuItem>
+                                            <MenuItem value={9}>September</MenuItem>
+                                            <MenuItem value={10}>October</MenuItem>
+                                            <MenuItem value={11}>November</MenuItem>
+                                            <MenuItem value={12}>December</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        color="primary"
                                     >
-                                        <MenuItem value={1}>January</MenuItem>
-                                        <MenuItem value={2}>February</MenuItem>
-                                        <MenuItem value={3}>March</MenuItem>
-                                        <MenuItem value={4}>April</MenuItem>
-                                        <MenuItem value={5}>May</MenuItem>
-                                        <MenuItem value={6}>June</MenuItem>
-                                        <MenuItem value={7}>July</MenuItem>
-                                        <MenuItem value={8}>August</MenuItem>
-                                        <MenuItem value={9}>September</MenuItem>
-                                        <MenuItem value={10}>October</MenuItem>
-                                        <MenuItem value={11}>November</MenuItem>
-                                        <MenuItem value={12}>December</MenuItem>
-                                    </Select>
-                                </FormControl>
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    color="primary"
-                                >
-                                    View
+                                        View
                         </Button>
-                                <Button
-                                    type="button"
-                                    variant="contained"
-                                    color="secondary"
-                                    onClick={() => {
-                                        hideForms()
-                                    }
-                                    }
-                                >Close</Button>
-                            </form>
-
+                                    <Button
+                                        type="button"
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={() => {
+                                            hideForms()
+                                        }
+                                        }
+                                    >Close</Button>
+                                </form>
+                            </div>
                         )}
                 </Container>
             </header >
@@ -506,7 +508,7 @@ function Home() {
                 ) : null}
             </div>
             <Backdrop className={classes.backdrop} open={openBackdrop}>
-                <CircularProgress color="inherit" />
+                <CircularProgress disableShrink color="inherit" />
             </Backdrop>
         </div >
     );

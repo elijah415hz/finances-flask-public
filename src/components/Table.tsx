@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import InputRow from './InputRow'
 import StaticRow from './StaticRow'
 import type { tableDataEntry, allDataListsType } from "../interfaces/Interfaces"
@@ -32,13 +32,22 @@ export default function ReportTable(props:
         form?: string
     }) {
 
+    const myRef = React.createRef<HTMLTableElement>()
+    const executeScroll = () => {
+        if (myRef.current) {
+            myRef.current.scrollIntoView({behavior: 'smooth'})
+        }
+    }
+
+    useEffect(() => {
+        executeScroll()
+    }, [])
     const StyledTableCell = withStyles((theme: Theme) =>
         createStyles({
             head: {
                 backgroundColor: theme.palette.primary.main,
                 color: theme.palette.common.white,
             },
-
         }),
     )(TableCell);
 
@@ -52,7 +61,7 @@ export default function ReportTable(props:
     const classes = useStyles();
     return (
         <TableContainer component={Paper}>
-            <Table className={classes.table}>
+            <Table className={classes.table} ref={myRef}>
                 <TableHead>
                     <TableRow>
                         {props.state.schema.fields

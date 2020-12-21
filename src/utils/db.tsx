@@ -1,4 +1,4 @@
-import { openDB, DBSchema, IDBPDatabase } from 'idb'
+import { openDB, deleteDB, DBSchema, IDBPDatabase } from 'idb'
 import { expensesFormType, incomeFormType } from '../interfaces/Interfaces';
 import API from './API';
 
@@ -43,6 +43,16 @@ export async function testDatabase() {
 
 export async function saveRecord(table: 'income' | 'expenses', record: expensesFormType | incomeFormType) {
   await db.put(table, record);
+}
+
+export async function emptyDatabase() {
+  try {
+    await db.clear('expenses')
+    await db.clear('income')
+    return "pendingFinances cleared!"
+  } catch (err) {
+    return err
+  }
 }
 
 async function checkDatabase() {

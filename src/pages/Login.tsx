@@ -3,33 +3,31 @@ import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
 import { AuthContext } from '../App'
 import { Button, TextField } from '@material-ui/core';
-import {makeStyles, createStyles, Theme} from '@material-ui/core/styles'
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme: Theme) =>
-createStyles({
-    root: {
-        display: 'flex',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-        '& > *': {
-            margin: theme.spacing(1),
-            [theme.breakpoints.down('xs')]: {
-                width: '100%',
-            },
+    createStyles({
+        root: {
+            display: 'flex',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            '& > *': {
+                margin: theme.spacing(1),
+                [theme.breakpoints.down('xs')]: {
+                    width: '100%',
+                },
+            }
         }
-    }
-})
+    })
 );
 
 export default function Login() {
-    const { Auth, setAuth } = React.useContext(AuthContext)
+    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
     const [loginFormState, setLoginFormState] = useState({
         username: "",
         password: "",
     });
-
-    const [failure, setFailure] = useState(false)
 
     const inputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -42,16 +40,17 @@ export default function Login() {
     const formSubmit = async (event: React.SyntheticEvent) => {
         event.preventDefault();
         try {
-            API.login(loginFormState).then(newToken => {
-                console.log("Login Token: " + newToken.token)
+            await API.login(loginFormState).then(newToken => {
                 setAuth({ type: 'LOGIN', payload: { user: loginFormState.username, token: newToken.token } })
             })
         } catch (err) {
-            console.log(err)
-            setFailure(true)
+            console.error(err)
+            setAlertState({
+                severity: "error",
+                message: "Incorrect username or password",
+                open: true
+            })
         }
-
-
     }
 
     const classes = useStyles()
@@ -61,15 +60,12 @@ export default function Login() {
         return <Redirect to='/' />
     }
 
-   
+
 
     return (
         <>
-            <div className="Login" style={{textAlign: 'center'}}>
-                    <h4>Login</h4>
-                    <div className="Response">
-                        {failure ? <p>Incorrect username or password</p> : null}
-                    </div>
+            <div className="Login" style={{ textAlign: 'center' }}>
+                <h4>Login</h4>
                 <form className={classes.root} onSubmit={formSubmit}>
                     <TextField
                         onChange={inputChange}

@@ -218,6 +218,14 @@ export default function AddRecordsForm(props: {
 
     async function handleFormSubmit(event: React.SyntheticEvent): Promise<any> {
         event.preventDefault()
+        if (!formState.Date || !formState.Amount || !formState.broad_category_id || !formState.vendor) {
+            setAlertState({
+                severity: "error",
+                message: "Please fill out all fields",
+                open: true
+            })
+            return
+        }
         let formStateConvertedDate: any = { ...formState }
         formStateConvertedDate.Date = formStateConvertedDate.Date?.toLocaleDateString("en-US")
         try {
@@ -231,7 +239,7 @@ export default function AddRecordsForm(props: {
             if (err.message === "Error! 500") {
                 setAlertState({
                     severity: "error",
-                    message: "Server Error! Check your inputs",
+                    message: "Server Error! Contact Eli",
                     open: true
                 })
                 return

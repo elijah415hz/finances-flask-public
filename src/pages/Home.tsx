@@ -6,10 +6,22 @@ import API from '../utils/API'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
 import type { tableDataEntry, dataListStateType, allDataListsType, formStateType, InputName } from '../interfaces/Interfaces'
-import { AppBar, Button, Container, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
+import {
+    AppBar,
+    Button,
+    Container,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+    Backdrop,
+    CircularProgress
+} from '@material-ui/core';
+import { emptyDatabase } from '../utils/db';
 
 function Home() {
-    const { Auth, setAuth } = React.useContext(AuthContext)
+    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
     const [formState, setFormState] = useState<formStateType>(
         {
             form: "expenses",
@@ -76,6 +88,9 @@ function Home() {
     const [showAddIncomeForm, setShowAddIncomeForm] = useState<boolean>(false)
     const [showReportsForm, setShowReportsForm] = useState<boolean>(false)
 
+    const [openBackdrop, setOpenBackdrop] = React.useState(false);
+
+
     function hideForms(): void {
         setShowAddExpensesForm(false)
         setShowAddIncomeForm(false)
@@ -107,7 +122,9 @@ function Home() {
         try {
             event.preventDefault()
             let route = formState.form
+            setOpenBackdrop(true)
             let response = await API[route](Auth.token, formState)
+            setOpenBackdrop(false)
             // Formatting the dates the hard way because javascript doesn't support strftime...
             if (route !== 'pivot') {
                 response.data = response.data.map(formatDates)
@@ -127,6 +144,12 @@ function Home() {
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
+            setOpenBackdrop(false)
+            setAlertState({
+                severity: "error",
+                message: "Error Fetching Data",
+                open: true
+            })
         }
     }
 
@@ -282,7 +305,11 @@ function Home() {
                 color: 'white',
                 textAlign: 'center',
                 position: 'sticky'
-            }
+            },
+            backdrop: {
+                zIndex: theme.zIndex.drawer + 1,
+                color: '#fff',
+              },
         })
     );
     const classes = useStyles();
@@ -316,7 +343,11 @@ function Home() {
                     variant="contained"
                     color="primary"
                     className={classes.logoutBtn}
-                    onClick={() => setAuth({ type: 'LOGOUT' })}
+                    onClick={async () => {
+                        setAuth({ type: 'LOGOUT' })
+                        let res = await emptyDatabase()
+                        console.log(res)
+                    }}
                 >Logout
                 </Button>
                 <Container className={classes.root}>
@@ -474,6 +505,9 @@ function Home() {
                     />
                 ) : null}
             </div>
+            <Backdrop className={classes.backdrop} open={openBackdrop}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </div >
     );
 }

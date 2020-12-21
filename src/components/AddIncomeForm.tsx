@@ -56,6 +56,14 @@ export default function AddRecordsForm(props: {
 
     async function handleFormSubmit(event: React.SyntheticEvent): Promise<any> {
         event.preventDefault()
+        if (!formState.date || !formState.amount || !formState.earner_id || !formState.source) {
+            setAlertState({
+                severity: "error",
+                message: "Please fill out all fields",
+                open: true
+            })
+            return
+        }
         let formStateConvertedDate: any = { ...formState }
         try {
             formStateConvertedDate.date = formStateConvertedDate.date?.toLocaleDateString("en-US")
@@ -69,7 +77,7 @@ export default function AddRecordsForm(props: {
             if (err.message === "Error! 500") {
                 setAlertState({
                     severity: "error",
-                    message: "Server Error! Check your inputs",
+                    message: "Server Error! Contact Eli",
                     open: true
                 })
                 return
@@ -157,18 +165,6 @@ export default function AddRecordsForm(props: {
                     }}
                 >Close</Button>
             </form>
-            {/* <CustomizedSnackbar
-                severity="success"
-                message="Record Saved"
-                open={showSuccess}
-                setOpen={setShowSuccess} 
-                />
-            <CustomizedSnackbar
-                severity="warning"
-                message="Record Saved Locally"
-                open={showOfflineWarning}
-                setOpen={setShowOfflineWarning} 
-                /> */}
         </div>
     )
 }

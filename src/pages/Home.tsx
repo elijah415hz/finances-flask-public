@@ -23,7 +23,8 @@ import {
     TextField,
     Backdrop,
     CircularProgress,
-    Card
+    Card,
+    Dialog
 } from '@material-ui/core';
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
@@ -94,17 +95,9 @@ function Home() {
         vendor: []
     })
 
-    // Flag to set display of expense form
-    const [showAddExpensesForm, setShowAddExpensesForm] = useState<boolean>(false)
-    const [showAddIncomeForm, setShowAddIncomeForm] = useState<boolean>(false)
-
+    // Loading Backdrop
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
-
-    function hideForms(): void {
-        setShowAddExpensesForm(false)
-        setShowAddIncomeForm(false)
-    }
 
     function formatDates(entry: tableDataEntry): tableDataEntry {
         if (!entry.Date) {
@@ -335,6 +328,9 @@ function Home() {
             },
             dialog: {
                 width: '100%'
+            },
+            datePicker: {
+                width: '50%'
             }
         })
     );
@@ -348,7 +344,7 @@ function Home() {
 
     const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
 
-    const handleClose = () => {
+    const handleSpeedDialClose = () => {
         setSpeedDialOpen(false);
     };
 
@@ -357,17 +353,22 @@ function Home() {
     };
 
     function handleExpensesOpen(): void {
-        setShowAddExpensesForm(true)
-        setShowAddIncomeForm(false)
+        setAddExpensesOpen(true)
         setSpeedDialOpen(false)
     }
-
+    
     function handleIncomeOpen(): void {
-        setShowAddExpensesForm(false)
-        setShowAddIncomeForm(true)
+        setAddIncomeOpen(true)
         setSpeedDialOpen(false)
     }
 
+    // Controls for Dialogs
+    const [addExpensesOpen, setAddExpensesOpen] = useState(false)
+    const [addIncomeOpen, setAddIncomeOpen] = useState(false)
+    function handleClose() {
+        setAddExpensesOpen(false)
+        setAddIncomeOpen(false)
+    }
 
     // Control display of Offline banner
     const [offline, setOffline] = useState<boolean>(false)
@@ -406,20 +407,18 @@ function Home() {
                 >Logout
                 </Button>
                 <Container className={classes.root}>
-                    <h1 style={{ textAlign: 'center' }}>Blarvis Finances</h1>
+                    <h1 style={{ textAlign: 'center' }}>{Auth.user} Finances</h1>
                 </Container>
                 {Auth.token ?
                     <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
                     : null
                 }
-                <Container className={classes.root}>
-                    {!showAddExpensesForm ? null : (
-                        <AddExpensesForm classes={classes} hideForms={hideForms} />
-                    )}
-                    {!showAddIncomeForm ? null : (
-                        <AddIncomeForm classes={classes} hideForms={hideForms} />
-                    )}
-                </Container>
+                <Dialog onClose={handleClose} open={addExpensesOpen} maxWidth='xl'>
+                    <AddExpensesForm classes={classes} handleClose={handleClose} />
+                </Dialog>
+                <Dialog onClose={handleClose} open={addIncomeOpen} maxWidth='xl'>
+                    <AddIncomeForm classes={classes} handleClose={handleClose} />
+                </Dialog>
                 <Container className={classes.root}>
                     <Card variant="outlined">
                         <h2 className={classes.root}>Reports</h2>
@@ -510,26 +509,26 @@ function Home() {
                     />
                 ) : null}
             </div>
-                <SpeedDial
-                    ariaLabel="SpeedDial example"
-                    className={classes.speedDial}
-                    // hidden={hidden}
-                    icon={<SpeedDialIcon />}
-                    onClose={handleClose}
-                    onOpen={handleOpen}
-                    open={speedDialOpen}
-                    onMouseLeave={() => { }}
-                >
-                    {actions.map((action) => (
-                        <SpeedDialAction
-                            key={action.name}
-                            icon={action.icon}
-                            tooltipTitle={action.name}
-                            tooltipOpen
-                            onClick={action.action}
-                        />
-                    ))}
-                </SpeedDial>
+            <SpeedDial
+                ariaLabel="SpeedDial example"
+                className={classes.speedDial}
+                // hidden={hidden}
+                icon={<SpeedDialIcon />}
+                onClose={handleSpeedDialClose}
+                onOpen={handleOpen}
+                open={speedDialOpen}
+                onMouseLeave={() => { }}
+            >
+                {actions.map((action) => (
+                    <SpeedDialAction
+                        key={action.name}
+                        icon={action.icon}
+                        tooltipTitle={action.name}
+                        tooltipOpen
+                        onClick={action.action}
+                    />
+                ))}
+            </SpeedDial>
             <Backdrop className={classes.backdrop} open={openBackdrop}>
                 <CircularProgress disableShrink color="inherit" />
             </Backdrop>

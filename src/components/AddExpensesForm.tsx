@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import API from '../utils/API'
 import { saveRecord } from '../utils/db'
 import { AuthContext } from '../App'
@@ -11,10 +11,7 @@ import {
     Select,
     TextField,
     InputAdornment,
-    Card,
-    CardContent,
     Typography,
-    Dialog,
     DialogContent
 } from '@material-ui/core';
 // import 'date-fns';
@@ -28,8 +25,8 @@ import {
 
 
 export default function AddRecordsForm(props: {
-    classes: { root: string, formControl: string },
-    hideForms: Function
+    classes: { root: string, formControl: string},
+    handleClose: Function
 }) {
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
@@ -267,25 +264,15 @@ export default function AddRecordsForm(props: {
             })
         }
     }
-    
-    const [open, setOpen] = React.useState(false);
-
-    useEffect(() => {
-        setOpen(true);
-    }) 
-  
-    const handleClose = () => {
-      setOpen(false);
-    };
-
+ 
     return (
-        <Dialog onClose={handleClose} open={open} maxWidth='xl'>
             <DialogContent>
             <Typography variant="h5" component="h5" className={props.classes.root}>Log Expense</Typography>
             <form className={props.classes.root} onSubmit={handleFormSubmit}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <KeyboardDatePicker
                         disableToolbar
+                        fullWidth
                         variant="inline"
                         format="MM/dd/yyyy"
                         margin="normal"
@@ -297,6 +284,8 @@ export default function AddRecordsForm(props: {
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
                         }}
+                        PopoverProps={{PaperProps: {style: {width: '100%'}}}}
+                        
                         />
                 </MuiPickersUtilsProvider>
                 <TextField
@@ -386,12 +375,11 @@ export default function AddRecordsForm(props: {
                     color="secondary"
                     onClick={() => {
                         setFormState(initialFormState)
-                        props.hideForms()
+                        props.handleClose()
                     }
                 }
                 >Close</Button>
             </form>
                 </DialogContent>
-        </Dialog>
     )
 }

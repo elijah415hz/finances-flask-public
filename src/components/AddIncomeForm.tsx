@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
 import type { incomeFormType } from '../interfaces/Interfaces'
@@ -11,7 +11,6 @@ import {
     TextField,
     InputAdornment,
     Typography,
-    Dialog,
     DialogContent
 } from '@material-ui/core';
 // import 'date-fns';
@@ -25,7 +24,7 @@ import { saveRecord } from '../utils/db';
 
 export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string, dialog: string },
-    hideForms: Function
+    handleClose: Function
 }) {
 
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
@@ -101,18 +100,7 @@ export default function AddRecordsForm(props: {
         }
     }
 
-    const [open, setOpen] = React.useState(false);
-
-    useEffect(() => {
-        setOpen(true);
-    }) 
-  
-    const handleClose = () => {
-      setOpen(false);
-    };
-
     return (
-        <Dialog onClose={handleClose} open={open} maxWidth='xl'>
             <DialogContent>
                 <Typography variant="h5" component="h5" className={props.classes.root}>Log Income</Typography>
                 <form className={props.classes.root} onSubmit={handleFormSubmit}>
@@ -177,11 +165,10 @@ export default function AddRecordsForm(props: {
                         color="secondary"
                         onClick={() => {
                             setFormState(initialFormState)
-                            props.hideForms()
+                            props.handleClose()
                         }}
                     >Close</Button>
                 </form>
             </DialogContent>
-        </Dialog>
     )
 }

@@ -329,14 +329,9 @@ function Home() {
                 color: '#fff',
             },
             speedDial: {
-                position: 'absolute',
+                position: 'fixed',
                 bottom: theme.spacing(2),
                 right: theme.spacing(2),
-            },
-            speedDialWrapper: {
-                position: 'relative',
-                marginTop: theme.spacing(3),
-                height: 380,
             },
             dialog: {
                 width: '100%'
@@ -427,7 +422,7 @@ function Home() {
                 </Container>
                 <Container className={classes.root}>
                     <Card variant="outlined">
-                        <h2 className={classes.root}>Get Report</h2>
+                        <h2 className={classes.root}>Reports</h2>
                         <form onSubmit={handleFormSubmit} className={classes.root}>
                             <FormControl variant="outlined" className={classes.formControl}>
                                 <InputLabel htmlFor="form">Report</InputLabel>
@@ -515,26 +510,26 @@ function Home() {
                     />
                 ) : null}
             </div>
-            <SpeedDial
-                ariaLabel="SpeedDial example"
-                className={classes.speedDial}
-                // hidden={hidden}
-                icon={<SpeedDialIcon />}
-                onClose={handleClose}
-                onOpen={handleOpen}
-                open={speedDialOpen}
-                onMouseLeave={() => { }}
-            >
-                {actions.map((action) => (
-                    <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipTitle={action.name}
-                        tooltipOpen
-                        onClick={action.action}
-                    />
-                ))}
-            </SpeedDial>
+                <SpeedDial
+                    ariaLabel="SpeedDial example"
+                    className={classes.speedDial}
+                    // hidden={hidden}
+                    icon={<SpeedDialIcon />}
+                    onClose={handleClose}
+                    onOpen={handleOpen}
+                    open={speedDialOpen}
+                    onMouseLeave={() => { }}
+                >
+                    {actions.map((action) => (
+                        <SpeedDialAction
+                            key={action.name}
+                            icon={action.icon}
+                            tooltipTitle={action.name}
+                            tooltipOpen
+                            onClick={action.action}
+                        />
+                    ))}
+                </SpeedDial>
             <Backdrop className={classes.backdrop} open={openBackdrop}>
                 <CircularProgress disableShrink color="inherit" />
             </Backdrop>

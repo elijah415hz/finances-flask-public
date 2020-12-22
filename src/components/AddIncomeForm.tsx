@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
 import type { incomeFormType } from '../interfaces/Interfaces'
@@ -9,7 +9,10 @@ import {
     MenuItem,
     Select,
     TextField,
-    InputAdornment
+    InputAdornment,
+    Typography,
+    Dialog,
+    DialogContent
 } from '@material-ui/core';
 // import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -18,14 +21,13 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { saveRecord } from '../utils/db';
-import classes from '*.module.css';
-
 
 
 export default function AddRecordsForm(props: {
-    classes: { root: string, formControl: string },
+    classes: { root: string, formControl: string, dialog: string },
     hideForms: Function
 }) {
+
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
     const initialFormState = {
@@ -38,6 +40,7 @@ export default function AddRecordsForm(props: {
     // Form control state
     const [formState, setFormState] = useState<incomeFormType>(initialFormState)
 
+    // Hard coded Ids
     const earners = [
         { name: "Alexa", id: 3 },
         { name: "Eli", id: 1 },
@@ -98,75 +101,87 @@ export default function AddRecordsForm(props: {
         }
     }
 
-    return (
-        <div>
-            <h2 className={props.classes.root}>Log Income</h2>
-            <form className={props.classes.root} onSubmit={handleFormSubmit}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <KeyboardDatePicker
-                        disableToolbar
-                        variant="inline"
-                        format="MM/dd/yyyy"
-                        margin="normal"
-                        id="date-picker-inline"
-                        name="Date"
-                        label="Date"
-                        value={formState.date}
-                        onChange={handleDateChange}
-                        KeyboardButtonProps={{
-                            'aria-label': 'change date',
-                        }}
-                    />
-                </MuiPickersUtilsProvider>
-                <TextField
-                    onChange={handleFormChange}
-                    value={formState.source}
-                    label="Source"
-                    name="source"
-                    type="string"
-                    InputLabelProps={{ shrink: true }}
-                />
-                <TextField
-                    onChange={handleFormChange}
-                    value={formState.amount}
-                    label="Amount"
-                    name="amount"
-                    type="number"
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                    }}
-                    inputProps={{ step: "0.01" }}
-                />
-                <FormControl className={props.classes.formControl}>
-                    <InputLabel htmlFor="earner_id">Person</InputLabel>
-                    <Select
-                        onChange={handleFormChange}
-                        value={formState.earner_id}
-                        name="earner_id"
-                        labelId="earner_id"
-                        label="Person"
-                    >
-                        {earners.map(i => (
-                            <MenuItem value={i.id}>{i.name}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+    const [open, setOpen] = React.useState(false);
 
-                <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                >Submit</Button>
-                <Button
-                    type="button"
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {
-                        setFormState(initialFormState)
-                        props.hideForms()
-                    }}
-                >Close</Button>
-            </form>
-        </div>
+    useEffect(() => {
+        setOpen(true);
+    }) 
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
+
+    return (
+        <Dialog onClose={handleClose} open={open} maxWidth='xl'>
+            <DialogContent>
+                <Typography variant="h5" component="h5" className={props.classes.root}>Log Income</Typography>
+                <form className={props.classes.root} onSubmit={handleFormSubmit}>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <KeyboardDatePicker
+                            disableToolbar
+                            variant="inline"
+                            format="MM/dd/yyyy"
+                            margin="normal"
+                            id="date-picker-inline"
+                            name="Date"
+                            label="Date"
+                            value={formState.date}
+                            onChange={handleDateChange}
+                            KeyboardButtonProps={{
+                                'aria-label': 'change date',
+                            }}
+                        />
+                    </MuiPickersUtilsProvider>
+                    <TextField
+                        onChange={handleFormChange}
+                        value={formState.source}
+                        label="Source"
+                        name="source"
+                        type="string"
+                        InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                        onChange={handleFormChange}
+                        value={formState.amount}
+                        label="Amount"
+                        name="amount"
+                        type="number"
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                        inputProps={{ step: "0.01" }}
+                    />
+                    <FormControl className={props.classes.formControl}>
+                        <InputLabel htmlFor="earner_id">Person</InputLabel>
+                        <Select
+                            onChange={handleFormChange}
+                            value={formState.earner_id}
+                            name="earner_id"
+                            labelId="earner_id"
+                            label="Person"
+                        >
+                            {earners.map(i => (
+                                <MenuItem value={i.id}>{i.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                    >Submit</Button>
+                    <Button
+                        type="button"
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => {
+                            setFormState(initialFormState)
+                            props.hideForms()
+                        }}
+                    >Close</Button>
+                </form>
+            </DialogContent>
+        </Dialog>
     )
 }

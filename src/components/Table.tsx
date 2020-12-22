@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, createRef} from 'react'
 import InputRow from './InputRow'
 import StaticRow from './StaticRow'
 import type { tableDataEntry, allDataListsType } from "../interfaces/Interfaces"
@@ -32,7 +32,7 @@ export default function ReportTable(props:
         form?: string
     }) {
 
-    const myRef = React.createRef<HTMLTableElement>()
+    const myRef = createRef<HTMLTableElement>()
     const executeScroll = () => {
         if (myRef.current) {
             myRef.current.scrollIntoView({behavior: 'smooth'})

@@ -5,7 +5,13 @@ import AddIncomeForm from '../components/AddIncomeForm'
 import API from '../utils/API'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
-import type { tableDataEntry, dataListStateType, allDataListsType, formStateType, InputName } from '../interfaces/Interfaces'
+import type {
+    tableDataEntry,
+    dataListStateType,
+    allDataListsType,
+    formStateType,
+    InputName
+} from '../interfaces/Interfaces'
 import {
     AppBar,
     Button,
@@ -16,8 +22,13 @@ import {
     Select,
     TextField,
     Backdrop,
-    CircularProgress
+    CircularProgress,
+    Card
 } from '@material-ui/core';
+import SpeedDial from '@material-ui/lab/SpeedDial';
+import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
+import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
+import AddIcon from '@material-ui/icons/Add'
 import { emptyDatabase } from '../utils/db';
 
 function Home() {
@@ -86,7 +97,6 @@ function Home() {
     // Flag to set display of expense form
     const [showAddExpensesForm, setShowAddExpensesForm] = useState<boolean>(false)
     const [showAddIncomeForm, setShowAddIncomeForm] = useState<boolean>(false)
-    const [showReportsForm, setShowReportsForm] = useState<boolean>(false)
 
     const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
@@ -94,7 +104,6 @@ function Home() {
     function hideForms(): void {
         setShowAddExpensesForm(false)
         setShowAddIncomeForm(false)
-        setShowReportsForm(false)
     }
 
     function formatDates(entry: tableDataEntry): tableDataEntry {
@@ -212,24 +221,6 @@ function Home() {
         }
     }
 
-    async function updateExpensesRow(index: number): Promise<void> {
-        try {
-            let res = await API.updateExpenses(Auth.token, expensesTableState.data[index])
-            console.log(res)
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
-    async function updateIncomeRow(index: number): Promise<void> {
-        try {
-            let res = await API.updateIncome(Auth.token, incomeTableState.data[index])
-            console.log(res)
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
     async function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, index: number): Promise<void> {
         try {
             let { name, value } = event.target;
@@ -245,6 +236,33 @@ function Home() {
             setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    async function updateExpensesRow(index: number): Promise<void> {
+        try {
+            await API.updateExpenses(Auth.token, expensesTableState.data[index])
+            setAlertState({
+                severity: "success",
+                message: "Record updated!",
+                open: true
+            })
+        } catch (err) {
+            console.log(err)
+            setAlertState({
+                severity: "error",
+                message: "Error: Failed to save!",
+                open: true
+            })
+        }
+    }
+
+    async function updateIncomeRow(index: number): Promise<void> {
+        try {
+            let res = await API.updateIncome(Auth.token, incomeTableState.data[index])
+            console.log(res)
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -310,9 +328,51 @@ function Home() {
                 zIndex: theme.zIndex.drawer + 1,
                 color: '#fff',
             },
+            speedDial: {
+                position: 'absolute',
+                bottom: theme.spacing(2),
+                right: theme.spacing(2),
+            },
+            speedDialWrapper: {
+                position: 'relative',
+                marginTop: theme.spacing(3),
+                height: 380,
+            },
+            dialog: {
+                width: '100%'
+            }
         })
     );
     const classes = useStyles();
+
+    // SpeedDial actions
+    const actions = [
+        { icon: <AddIcon />, name: 'Expenses', action: handleExpensesOpen, operation: 'product' },
+        { icon: <AddIcon />, name: 'Income', action: handleIncomeOpen, operation: 'tag' }
+    ]
+
+    const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
+
+    const handleClose = () => {
+        setSpeedDialOpen(false);
+    };
+
+    const handleOpen = () => {
+        setSpeedDialOpen(true);
+    };
+
+    function handleExpensesOpen(): void {
+        setShowAddExpensesForm(true)
+        setShowAddIncomeForm(false)
+        setSpeedDialOpen(false)
+    }
+
+    function handleIncomeOpen(): void {
+        setShowAddExpensesForm(false)
+        setShowAddIncomeForm(true)
+        setSpeedDialOpen(false)
+    }
+
 
     // Control display of Offline banner
     const [offline, setOffline] = useState<boolean>(false)
@@ -358,122 +418,70 @@ function Home() {
                     : null
                 }
                 <Container className={classes.root}>
-                    {!showAddExpensesForm ? (
-                        !showAddIncomeForm ? (
-                            !showReportsForm ? (
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.root}
-                                    onClick={() => {
-                                        setShowAddExpensesForm(true)
-                                    }}>
-                                    Log Expense
-                                </Button>
-                            ) : null
-                        ) : null
-                    ) : (
-                            <AddExpensesForm classes={classes} hideForms={hideForms} />
-                        )}
-                    {!showAddIncomeForm ? (
-                        !showAddExpensesForm ? (
-                            !showReportsForm ? (
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.root}
-                                    onClick={() => {
-                                        setShowAddIncomeForm(true)
-                                    }}>
-                                    Log Income
-                                </Button>
-                            ) : null
-                        ) : null
-                    ) : (
-                            <AddIncomeForm classes={classes} hideForms={hideForms} />
-                        )}
-                    {!showReportsForm ? (
-                        !showAddIncomeForm ? (
-                            !showAddExpensesForm ? (
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    className={classes.root}
-                                    onClick={() => {
-                                        setShowReportsForm(true)
-                                    }}>
-                                    View Reports
-                                </Button>
-                            ) : null
-                        ) : null
-                    ) : (
-                            <div>
-                                <h2 className={classes.root}>Generate Report</h2>
-                                <form onSubmit={handleFormSubmit} className={classes.root}>
-                                    <FormControl variant="outlined" className={classes.formControl}>
-                                        <InputLabel htmlFor="form">Report</InputLabel>
-                                        <Select
-                                            name="form"
-                                            label="Report"
-                                            labelId="form"
-                                            value={formState.form}
-                                            onChange={handleFormChange}>
-                                            <MenuItem value="income">Income</MenuItem>
-                                            <MenuItem value="expenses">Expenses</MenuItem>
-                                            <MenuItem value="pivot">Pivot Table</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                    <TextField
-                                        onChange={handleFormChange}
-                                        value={formState.year}
-                                        label="Year"
-                                        name="year"
-                                        type="number"
-                                        variant="outlined"
-                                    />
-                                    <FormControl variant="outlined" className={classes.formControl}>
-                                        <InputLabel htmlFor="month2">Month</InputLabel>
-                                        <Select
-                                            onChange={handleFormChange}
-                                            value={formState.month}
-                                            name="month"
-                                            labelId="month2"
-                                            label="Month"
-                                        >
-                                            <MenuItem value={1}>January</MenuItem>
-                                            <MenuItem value={2}>February</MenuItem>
-                                            <MenuItem value={3}>March</MenuItem>
-                                            <MenuItem value={4}>April</MenuItem>
-                                            <MenuItem value={5}>May</MenuItem>
-                                            <MenuItem value={6}>June</MenuItem>
-                                            <MenuItem value={7}>July</MenuItem>
-                                            <MenuItem value={8}>August</MenuItem>
-                                            <MenuItem value={9}>September</MenuItem>
-                                            <MenuItem value={10}>October</MenuItem>
-                                            <MenuItem value={11}>November</MenuItem>
-                                            <MenuItem value={12}>December</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                    >
-                                        View
+                    {!showAddExpensesForm ? null : (
+                        <AddExpensesForm classes={classes} hideForms={hideForms} />
+                    )}
+                    {!showAddIncomeForm ? null : (
+                        <AddIncomeForm classes={classes} hideForms={hideForms} />
+                    )}
+                </Container>
+                <Container className={classes.root}>
+                    <Card variant="outlined">
+                        <h2 className={classes.root}>Get Report</h2>
+                        <form onSubmit={handleFormSubmit} className={classes.root}>
+                            <FormControl variant="outlined" className={classes.formControl}>
+                                <InputLabel htmlFor="form">Report</InputLabel>
+                                <Select
+                                    name="form"
+                                    label="Report"
+                                    labelId="form"
+                                    value={formState.form}
+                                    onChange={handleFormChange}>
+                                    <MenuItem value="income">Income</MenuItem>
+                                    <MenuItem value="expenses">Expenses</MenuItem>
+                                    <MenuItem value="pivot">Pivot Table</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                onChange={handleFormChange}
+                                value={formState.year}
+                                label="Year"
+                                name="year"
+                                type="number"
+                                variant="outlined"
+                            />
+                            <FormControl variant="outlined" className={classes.formControl}>
+                                <InputLabel htmlFor="month2">Month</InputLabel>
+                                <Select
+                                    onChange={handleFormChange}
+                                    value={formState.month}
+                                    name="month"
+                                    labelId="month2"
+                                    label="Month"
+                                >
+                                    <MenuItem value={1}>January</MenuItem>
+                                    <MenuItem value={2}>February</MenuItem>
+                                    <MenuItem value={3}>March</MenuItem>
+                                    <MenuItem value={4}>April</MenuItem>
+                                    <MenuItem value={5}>May</MenuItem>
+                                    <MenuItem value={6}>June</MenuItem>
+                                    <MenuItem value={7}>July</MenuItem>
+                                    <MenuItem value={8}>August</MenuItem>
+                                    <MenuItem value={9}>September</MenuItem>
+                                    <MenuItem value={10}>October</MenuItem>
+                                    <MenuItem value={11}>November</MenuItem>
+                                    <MenuItem value={12}>December</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                            >
+                                View
                         </Button>
-                                    <Button
-                                        type="button"
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={() => {
-                                            hideForms()
-                                        }
-                                        }
-                                    >Close</Button>
-                                </form>
-                            </div>
-                        )}
+                        </form>
+                    </Card>
                 </Container>
             </header >
             <div className="body">
@@ -507,6 +515,26 @@ function Home() {
                     />
                 ) : null}
             </div>
+            <SpeedDial
+                ariaLabel="SpeedDial example"
+                className={classes.speedDial}
+                // hidden={hidden}
+                icon={<SpeedDialIcon />}
+                onClose={handleClose}
+                onOpen={handleOpen}
+                open={speedDialOpen}
+                onMouseLeave={() => { }}
+            >
+                {actions.map((action) => (
+                    <SpeedDialAction
+                        key={action.name}
+                        icon={action.icon}
+                        tooltipTitle={action.name}
+                        tooltipOpen
+                        onClick={action.action}
+                    />
+                ))}
+            </SpeedDial>
             <Backdrop className={classes.backdrop} open={openBackdrop}>
                 <CircularProgress disableShrink color="inherit" />
             </Backdrop>

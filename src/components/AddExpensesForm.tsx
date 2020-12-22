@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import API from '../utils/API'
 import { saveRecord } from '../utils/db'
 import { AuthContext } from '../App'
@@ -10,7 +10,12 @@ import {
     MenuItem,
     Select,
     TextField,
-    InputAdornment
+    InputAdornment,
+    Card,
+    CardContent,
+    Typography,
+    Dialog,
+    DialogContent
 } from '@material-ui/core';
 // import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -262,10 +267,21 @@ export default function AddRecordsForm(props: {
             })
         }
     }
+    
+    const [open, setOpen] = React.useState(false);
+
+    useEffect(() => {
+        setOpen(true);
+    }) 
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
 
     return (
-        <div>
-            <h2 className={props.classes.root}>Log Expense</h2>
+        <Dialog onClose={handleClose} open={open} maxWidth='xl'>
+            <DialogContent>
+            <Typography variant="h5" component="h5" className={props.classes.root}>Log Expense</Typography>
             <form className={props.classes.root} onSubmit={handleFormSubmit}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <KeyboardDatePicker
@@ -281,7 +297,7 @@ export default function AddRecordsForm(props: {
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
                         }}
-                    />
+                        />
                 </MuiPickersUtilsProvider>
                 <TextField
                     onChange={handleFormChange}
@@ -290,7 +306,7 @@ export default function AddRecordsForm(props: {
                     name="vendor"
                     type="string"
                     InputLabelProps={{ shrink: true }}
-                />
+                    />
                 <TextField
                     onChange={handleFormChange}
                     value={formState.Amount}
@@ -301,7 +317,7 @@ export default function AddRecordsForm(props: {
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                     }}
                     inputProps={{ step: "0.01" }}
-                />
+                    />
                 <FormControl
                     className={props.classes.formControl}>
                     <InputLabel htmlFor="broad_category">Broad Category</InputLabel>
@@ -311,10 +327,10 @@ export default function AddRecordsForm(props: {
                         name="broad_category_id"
                         labelId="broad_category"
                         label="Broad Category"
-                    >
+                        >
                         {categories.map(i => (
                             <MenuItem value={i.id}>{i.name}</MenuItem>
-                        ))}
+                            ))}
                     </Select>
                 </FormControl>
                 {currentCategory.narrowCategories ? (
@@ -326,7 +342,7 @@ export default function AddRecordsForm(props: {
                             name="narrow_category_id"
                             labelId="narrow_category"
                             label="Narrow Category"
-                        >
+                            >
                             {/* Get the list of narrow categories corresponding to the selected broad category */}
                             {currentCategory.narrowCategories?.map(i => (
                                 <MenuItem value={i.id}>{i.name}</MenuItem>
@@ -335,7 +351,7 @@ export default function AddRecordsForm(props: {
                     </FormControl>
                 ) : null}
                 {currentCategory.person ? (
-
+                    
                     <FormControl className={props.classes.formControl}>
                         <InputLabel htmlFor="person_id">Person</InputLabel>
                         <Select
@@ -344,10 +360,10 @@ export default function AddRecordsForm(props: {
                             name="person_id"
                             labelId="person_id"
                             label="Person"
-                        >
+                            >
                             {persons.map(i => (
                                 <MenuItem value={i.id}>{i.name}</MenuItem>
-                            ))}
+                                ))}
                         </Select>
                     </FormControl>
                 ) : null}
@@ -358,12 +374,12 @@ export default function AddRecordsForm(props: {
                     name="notes"
                     type="string"
                     InputLabelProps={{ shrink: true }}
-                />
+                    />
                 <Button
                     type="submit"
                     variant="contained"
                     color="primary"
-                >Submit</Button>
+                    >Submit</Button>
                 <Button
                     type="button"
                     variant="contained"
@@ -372,21 +388,10 @@ export default function AddRecordsForm(props: {
                         setFormState(initialFormState)
                         props.hideForms()
                     }
-                    }
+                }
                 >Close</Button>
             </form>
-            {/* <CustomizedSnackbar
-                severity="success"
-                message="Record Saved"
-                open={showSuccess}
-                setOpen={setShowSuccess} 
-                />
-            <CustomizedSnackbar
-                severity="warning"
-                message="Record Saved Locally"
-                open={showOfflineWarning}
-                setOpen={setShowOfflineWarning} 
-                /> */}
-        </div>
+                </DialogContent>
+        </Dialog>
     )
 }

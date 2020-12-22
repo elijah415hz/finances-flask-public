@@ -3,7 +3,7 @@ import { dataListStateType, tableDataEntry, allDataListsType } from '../interfac
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import { IconButton, TableCell, TableRow } from '@material-ui/core'
-import { withStyles, makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { withStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 
 const StyledTableCell = withStyles((theme: Theme) =>

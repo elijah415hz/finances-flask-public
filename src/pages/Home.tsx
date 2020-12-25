@@ -24,7 +24,8 @@ import {
     Backdrop,
     CircularProgress,
     Card,
-    Dialog
+    Dialog,
+    Box
 } from '@material-ui/core';
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
@@ -278,7 +279,6 @@ function Home() {
         }
     }
 
-
     // Create classes to use for styling
     const useStyles = makeStyles((theme: Theme) =>
         createStyles({
@@ -330,7 +330,9 @@ function Home() {
                 width: '100%'
             },
             datePicker: {
-                width: '50%'
+                [theme.breakpoints.down('sm')]: {
+                    marginLeft: '-10px'
+                },
             }
         })
     );
@@ -356,7 +358,7 @@ function Home() {
         setAddExpensesOpen(true)
         setSpeedDialOpen(false)
     }
-    
+
     function handleIncomeOpen(): void {
         setAddIncomeOpen(true)
         setSpeedDialOpen(false)
@@ -388,13 +390,13 @@ function Home() {
 
 
     return (
-        <div className="Home">
+        <Box component='div' className="Home">
             {offline ? (
                 <AppBar className={classes.offline} position='sticky'>
                     Offline
                 </AppBar>
             ) : null}
-            <header className="header">
+            <Box component='header' className="header">
                 <Button
                     variant="contained"
                     color="primary"
@@ -409,10 +411,9 @@ function Home() {
                 <Container className={classes.root}>
                     <h1 style={{ textAlign: 'center' }}>{Auth.user} Finances</h1>
                 </Container>
-                {Auth.token ?
-                    <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
-                    : null
-                }
+
+                <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
+
                 <Dialog onClose={handleClose} open={addExpensesOpen} maxWidth='xl'>
                     <AddExpensesForm classes={classes} handleClose={handleClose} />
                 </Dialog>
@@ -477,7 +478,7 @@ function Home() {
                         </form>
                     </Card>
                 </Container>
-            </header >
+            </Box >
             <div className="body">
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (
                     <ReportTable
@@ -532,7 +533,7 @@ function Home() {
             <Backdrop className={classes.backdrop} open={openBackdrop}>
                 <CircularProgress disableShrink color="inherit" />
             </Backdrop>
-        </div >
+        </Box >
     );
 }
 

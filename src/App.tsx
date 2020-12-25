@@ -7,21 +7,93 @@ import { testDatabase } from './utils/db'
 import './App.css';
 import CustomizedSnackbar from './components/SnackBar'
 import { alertStateType } from './interfaces/Interfaces'
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { green, blueGrey, red } from '@material-ui/core/colors'
 
-// import Auth from './utils/Auth'
+import { MuiPickersOverrides } from '@material-ui/pickers/typings/overrides';
+import { CssBaseline, ThemeOptions } from '@material-ui/core'
+
+// Types to allow for theme customization
+type overridesNameToClassKey = {
+  [P in keyof MuiPickersOverrides]: keyof MuiPickersOverrides[P];
+};
+
+type CustomType = {
+  MuiPickersBasePicker: {
+    pickerView: {
+      maxWidth?: string;
+    };
+  };
+};
+
+declare module '@material-ui/core/styles/overrides' {
+  interface ComponentNameToClassKey extends overridesNameToClassKey { }
+  export interface ComponentNameToClassKey extends CustomType { }
+};
+
+// Instantiating default theme to use breakpoints
+const defaultTheme = createMuiTheme();
+
+// Theme factory
+function createMyTheme(options: ThemeOptions) {
+  return createMuiTheme({
+    overrides: {
+      MuiPickersBasePicker: {
+        container: {
+          backgroundColor: blueGrey[900],
+          [defaultTheme.breakpoints.down("xs")]: {
+          marginLeft: '-10px',
+          }
+        },
+      },
+      MuiCard: {
+        root: {
+          backgroundColor: blueGrey[900]
+        }
+      },
+      MuiDialogContent: {
+        root: {
+          backgroundColor: blueGrey[900]
+        }
+      },
+      MuiPickersCalendarHeader: {
+        iconButton: {
+          backgroundColor: blueGrey[900]
+        }
+      }
+    },
+    ...options
+  })
+};
+
+const theme = createMyTheme({
+  palette: {
+    type: 'dark',
+    background: {
+      default: blueGrey[900]
+    },
+    primary: {
+      main: green[900]
+    },
+    secondary: {
+      main: red[900]
+    }
+  },
+});
 
 interface Auth {
   loggedIn: boolean,
   user: string,
   token: string
-}
+};
 
 interface ContextState {
   Auth: Auth,
   setAuth: React.Dispatch<{ type: string; payload?: { user: string; token: string; } | undefined; }>,
   setAlertState: React.Dispatch<React.SetStateAction<alertStateType>>
-}
+};
 
+// Check if user is logged in before returning protected component/page
 const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
   path: string,
   loggedIn: boolean,
@@ -44,7 +116,7 @@ export const AuthContext = React.createContext<ContextState>({
     token: ""
   },
   setAuth: (): void => { },
-  setAlertState: (): void => {}
+  setAlertState: (): void => { }
 })
 
 
@@ -109,25 +181,28 @@ export default function App() {
   })
 
   return (
-    <AuthContext.Provider
-      value={{ Auth, setAuth, setAlertState }}
-    >
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthContext.Provider
+        value={{ Auth, setAuth, setAlertState }}
+      >
 
-      <Router>
-        <ProtectedRoute path="/"
-          loggedIn={Auth.loggedIn}
-          setLoggedIn={setAuth}
-          // offline={offline}
-          component={Home}
+        <Router>
+          <ProtectedRoute path="/"
+            loggedIn={Auth.loggedIn}
+            setLoggedIn={setAuth}
+            // offline={offline}
+            component={Home}
+          />
+          <Route exact path="/login">
+            <Login />
+          </Route>
+        </Router>
+        <CustomizedSnackbar
+          state={alertState}
+          setState={setAlertState}
         />
-        <Route exact path="/login">
-          <Login />
-        </Route>
-      </Router>
-      <CustomizedSnackbar
-        state={alertState}
-        setState={setAlertState}
-      />
-    </AuthContext.Provider>
+      </AuthContext.Provider>
+    </ThemeProvider>
   )
 }

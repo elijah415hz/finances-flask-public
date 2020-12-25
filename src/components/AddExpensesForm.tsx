@@ -283,9 +283,7 @@ export default function AddRecordsForm(props: {
                         onChange={handleDateChange}
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
-                        }}
-                        PopoverProps={{PaperProps: {style: {width: '100%'}}}}
-                        
+                        }}                        
                         />
                 </MuiPickersUtilsProvider>
                 <TextField

@@ -70,7 +70,7 @@ const theme = createMyTheme({
   palette: {
     type: 'dark',
     background: {
-      default: blueGrey[900]
+      default: blueGrey[900],
     },
     primary: {
       main: green[900]

@@ -2,36 +2,41 @@ import React, { useState, useEffect } from 'react'
 import { dataListStateType, tableDataEntry, allDataListsType } from '../interfaces/Interfaces'
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
-import { IconButton, TableCell, TableRow } from '@material-ui/core'
+import { IconButton, TableCell, TableRow, TextField, InputAdornment } from '@material-ui/core'
 import { withStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { blueGrey } from '@material-ui/core/colors';
 
 
 const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 14,
-      padding: 0,
-      maxWidth: '10ch',
-    },
-  }),
+    createStyles({
+        head: {
+            backgroundColor: theme.palette.common.black,
+            color: theme.palette.common.white,
+            padding: '20px'
+        },
+        body: {
+            fontSize: 14,
+            padding: 0,
+            maxWidth: '10ch',
+        },
+    }),
 )(TableCell);
 
 const StyledTableRow = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-      },
-      '& input': {
-          backgroundColor: 'inherit',
-          paddingLeft: 0,
-      }
-    },
-  }),
+    createStyles({
+        root: {
+            '&:nth-of-type(odd)': {
+                backgroundColor: theme.palette.background.default,
+            },
+            '&:nth-of-type(even)': {
+                backgroundColor: blueGrey[800],
+            },
+            '& input': {
+                backgroundColor: 'inherit',
+                paddingLeft: 0,
+            }
+        },
+    }),
 )(TableRow);
 
 export default function InputRow(props:
@@ -77,21 +82,28 @@ export default function InputRow(props:
                 .filter(column => !column.name.includes("id"))
                 .map(column => {
                     return (
-                        <StyledTableCell 
-                            
+                        <StyledTableCell
+
                         >
-                            {column.name === 'Amount' ? <span>$</span> : null}
-                            <input
+                            <TextField
                                 name={column.name}
-                                onBlur={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                onBlur={(e: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => {
                                     props.handleChange(e, props.i)
                                 }}
                                 onChange={handleInputRowChange}
                                 className="tableInput"
                                 value={state[column.name as keyof tableDataEntry] || ""}
-                                list={column.name}
-                                style={{width: '80%'}}
-                                // style={{width: `${(state[column.name as keyof tableDataEntry]?.toString().length || 12) + 3.5}ch`}}
+                                inputProps={{
+                                    list: column.name
+                                }}
+                                InputProps={
+                                     {
+                                    startAdornment: <InputAdornment position="start">{column.name === 'Amount' ? "$" : null}</InputAdornment>,
+                                    disableUnderline: true
+                                }
+                            }
+                                style={{ width: '80%' }}
+                            // style={{width: `${(state[column.name as keyof tableDataEntry]?.toString().length || 12) + 3.5}ch`}}
                             />
                             {column.name === 'Source' && props.dataLists?.source ? (
                                 makeDataList(props.dataLists?.source, column.name)

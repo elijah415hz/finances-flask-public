@@ -9,11 +9,6 @@ import { blueGrey } from '@material-ui/core/colors';
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
-        head: {
-            backgroundColor: theme.palette.common.black,
-            color: theme.palette.common.white,
-            padding: '20px'
-        },
         body: {
             fontSize: 14,
             padding: 0,

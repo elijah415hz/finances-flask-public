@@ -47,6 +47,8 @@ export default function ReportTable(props:
             head: {
                 backgroundColor: theme.palette.primary.main,
                 color: theme.palette.common.white,
+                padding: 10,
+                fontSize: 16
             },
         }),
     )(TableCell);
@@ -73,8 +75,12 @@ export default function ReportTable(props:
                                     </StyledTableCell>
                                 )
                             })}
+                        {props.form === "pivot" ? null : (
+                        <>
                         <StyledTableCell><span>Save</span></StyledTableCell>
                         <StyledTableCell><span>Delete</span></StyledTableCell>
+                        </>
+                        )}
                     </TableRow>
                 </TableHead>
                 <TableBody className="tableBody">

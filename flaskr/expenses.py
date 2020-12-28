@@ -127,7 +127,7 @@ def api_pivot(year, month):
     else:
         year_month = year + "-" + month    
         month = datetime.strptime(year_month, '%Y-%m')
-        start_date = month.date()
+        start_date = (month - timedelta(days=1)).date()
         end_date = (month + relativedelta(months=+1)).date()
         sql = "SELECT Date, v.name AS Vendor, Amount, b.name AS Broad_category, n.name AS Narrow_category, p.name AS Person, Notes FROM expenses e \
                     LEFT JOIN vendor v ON v.id=e.vendor_id \

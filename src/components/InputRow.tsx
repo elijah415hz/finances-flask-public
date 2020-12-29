@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { dataListStateType, tableDataEntry, allDataListsType } from '../interfaces/Interfaces'
+import { DataListStateType, TableDataEntry, AllDataListsType } from '../interfaces/Interfaces'
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import { IconButton, TableCell, TableRow, TextField, InputAdornment } from '@material-ui/core'
@@ -36,21 +36,21 @@ const StyledTableRow = withStyles((theme: Theme) =>
 
 export default function InputRow(props:
     {
-        entry: tableDataEntry,
+        entry: TableDataEntry,
         i: number,
         fields: { name: string }[],
-        dataLists?: allDataListsType
+        dataLists?: AllDataListsType
         handleChange: Function,
         handleUpdate: Function,
         deleteEntry: Function
     }) {
 
-    const [state, setState] = useState<tableDataEntry>({ Amount: "" })
+    const [state, setState] = useState<TableDataEntry>({ Amount: "" })
 
-    function makeDataList(propsState: dataListStateType[], id: string) {
+    function makeDataList(propsState: DataListStateType[], id: string) {
         return (
             <datalist id={id}>
-                {propsState.map((entry: dataListStateType) => {
+                {propsState.map((entry: DataListStateType) => {
                     return (
                         <option
                             value={entry.name}
@@ -87,7 +87,7 @@ export default function InputRow(props:
                                 }}
                                 onChange={handleInputRowChange}
                                 className="tableInput"
-                                value={state[column.name as keyof tableDataEntry] || ""}
+                                value={state[column.name as keyof TableDataEntry] || ""}
                                 inputProps={{
                                     list: column.name
                                 }}
@@ -98,7 +98,7 @@ export default function InputRow(props:
                                 }
                             }
                                 style={{ width: '80%' }}
-                            // style={{width: `${(state[column.name as keyof tableDataEntry]?.toString().length || 12) + 3.5}ch`}}
+                            // style={{width: `${(state[column.name as keyof TableDataEntry]?.toString().length || 12) + 3.5}ch`}}
                             />
                             {column.name === 'Source' && props.dataLists?.source ? (
                                 makeDataList(props.dataLists?.source, column.name)

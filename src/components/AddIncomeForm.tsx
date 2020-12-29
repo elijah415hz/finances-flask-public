@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import type { incomeFormType } from '../interfaces/Interfaces'
+import type { IncomeFormType } from '../interfaces/Interfaces'
 import {
     Button,
     FormControl,
@@ -24,7 +24,8 @@ import { saveRecord } from '../utils/db';
 
 export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string, dialog: string },
-    handleClose: Function
+    handleClose: Function,
+    setOpenBackdrop: Function
 }) {
 
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
@@ -37,7 +38,7 @@ export default function AddRecordsForm(props: {
     }
 
     // Form control state
-    const [formState, setFormState] = useState<incomeFormType>(initialFormState)
+    const [formState, setFormState] = useState<IncomeFormType>(initialFormState)
 
     // Hard coded Ids
     const earners = [
@@ -70,13 +71,16 @@ export default function AddRecordsForm(props: {
         let formStateConvertedDate: any = { ...formState }
         try {
             formStateConvertedDate.date = formStateConvertedDate.date?.toLocaleDateString("en-US")
+            props.setOpenBackdrop(true)
             await API.postIncome(Auth.token, formStateConvertedDate)
+            props.setOpenBackdrop(false)
             setAlertState({
                 severity: "success",
                 message: "Record Saved!",
                 open: true
             })
         } catch (err) {
+            props.setOpenBackdrop(false)
             if (err.message === "Error! 500") {
                 setAlertState({
                     severity: "error",

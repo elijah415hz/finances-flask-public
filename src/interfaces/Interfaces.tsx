@@ -1,4 +1,4 @@
-interface formStateType {
+interface FormStateType {
     form: "expenses" | "income" | "pivot",
     year: number,
     month: number
@@ -6,7 +6,7 @@ interface formStateType {
 
 type InputName = "Person" | "Source" | "Broad_category" | "Narrow_category" | "Vendor"
 
-interface tableDataEntry {
+interface TableDataEntry {
     Amount: string,
     Date?: string,
     Source?: string,
@@ -21,7 +21,7 @@ interface tableDataEntry {
     entry_id?: number
 }
 
-interface expensesFormType {
+interface ExpensesFormType {
     Date: Date | null,
     Amount: number,
     person_id: number,
@@ -31,14 +31,14 @@ interface expensesFormType {
     notes: string
 }
 
-interface incomeFormType {
+interface IncomeFormType {
     date: Date | null,
     amount: number,
     earner_id: number,
     source: string,
 }
 
-interface categoryType {
+interface CategoryType {
     name: string,
     id: number,
     narrowCategories?: {
@@ -47,41 +47,55 @@ interface categoryType {
     person?: boolean
 }
 
-interface dataListStateType {
+interface DataListStateType {
     id: number,
     name: string
 }
 
-interface allDataListsType {
-    source: dataListStateType[],
-    person_earner: dataListStateType[],
-    narrow_category: dataListStateType[],
-    broad_category: dataListStateType[],
-    vendor: dataListStateType[]
+interface AllDataListsType {
+    source: DataListStateType[],
+    person_earner: DataListStateType[],
+    narrow_category: DataListStateType[],
+    broad_category: DataListStateType[],
+    vendor: DataListStateType[]
 }
 
-interface tableType {
+interface TableType {
     schema: {
         fields: []
     },
-    data: tableDataEntry[]
+    data: TableDataEntry[]
 }
 
-interface alertStateType {
+interface AlertStateType {
     severity: "success" | "info" | "warning" | "error" | undefined,
     message: string,
     open: boolean,
 }
 
+interface Auth {
+    loggedIn: boolean,
+    user: string,
+    token: string
+  };
+  
+  interface ContextState {
+    Auth: Auth,
+    setAuth: React.Dispatch<{ type: string; payload?: { user: string; token: string; } | undefined; }>,
+    setAlertState: React.Dispatch<React.SetStateAction<AlertStateType>>
+  };
+
 export type {
-    tableDataEntry,
-    dataListStateType,
-    allDataListsType,
-    formStateType,
+    TableDataEntry,
+    DataListStateType,
+    AllDataListsType,
+    FormStateType,
     InputName,
-    tableType,
-    expensesFormType,
-    incomeFormType,
-    categoryType,
-    alertStateType
+    TableType,
+    ExpensesFormType,
+    IncomeFormType,
+    CategoryType,
+    AlertStateType,
+    Auth,
+    ContextState
 }

@@ -1,9 +1,9 @@
 import React from 'react'
-import type {tableDataEntry} from '../interfaces/Interfaces'
+import type {TableDataEntry} from '../interfaces/Interfaces'
 
 export default function StaticRow(props:
     {
-        entry: tableDataEntry,
+        entry: TableDataEntry,
         i: number,
         fields: { name: string }[],
     }) {
@@ -19,7 +19,7 @@ export default function StaticRow(props:
                                 {column.name === 'Amount' ? <span>$</span> : null}
                                 <span
                                     className="tableInput"
-                                >{props.entry[column.name as keyof tableDataEntry] || ""}
+                                >{props.entry[column.name as keyof TableDataEntry] || ""}
                                 </span>
 
                             </td>

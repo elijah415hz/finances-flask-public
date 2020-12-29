@@ -1,8 +1,87 @@
 import React from 'react'
+import {
+    Container,
+    Card,
+    FormControl,
+    InputLabel,
+    Select,
+    TextField,
+    MenuItem,
+    Button
+} from '@material-ui/core'
+import {formStateType} from '../interfaces/Interfaces'
 
-export default function Form() {
+export default function Form({
+    classes, 
+    handleFormSubmit, 
+    handleFormChange, 
+    formState }: {
+    classes: {
+        root: string, 
+        formControl: string
+    },
+    handleFormSubmit: (event: React.FormEvent<HTMLFormElement>) => void,
+    handleFormChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }> | React.ChangeEvent<HTMLSelectElement>)=> void,
+    formState: formStateType
+}) {
     return (
-        <>
-        </>
+        <Container className={classes.root}>
+                    <Card variant="outlined">
+                        <h2 className={classes.root}>Reports</h2>
+                        <form onSubmit={handleFormSubmit} className={classes.root}>
+                            <FormControl variant="outlined" className={classes.formControl}>
+                                <InputLabel htmlFor="form">Report</InputLabel>
+                                <Select
+                                    name="form"
+                                    label="Report"
+                                    labelId="form"
+                                    value={formState.form}
+                                    onChange={handleFormChange}>
+                                    <MenuItem value="income">Income</MenuItem>
+                                    <MenuItem value="expenses">Expenses</MenuItem>
+                                    <MenuItem value="pivot">Pivot Table</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                onChange={handleFormChange}
+                                value={formState.year}
+                                label="Year"
+                                name="year"
+                                type="number"
+                                variant="outlined"
+                            />
+                            <FormControl variant="outlined" className={classes.formControl}>
+                                <InputLabel htmlFor="month2">Month</InputLabel>
+                                <Select
+                                    onChange={handleFormChange}
+                                    value={formState.month}
+                                    name="month"
+                                    labelId="month2"
+                                    label="Month"
+                                >
+                                    <MenuItem value={1}>January</MenuItem>
+                                    <MenuItem value={2}>February</MenuItem>
+                                    <MenuItem value={3}>March</MenuItem>
+                                    <MenuItem value={4}>April</MenuItem>
+                                    <MenuItem value={5}>May</MenuItem>
+                                    <MenuItem value={6}>June</MenuItem>
+                                    <MenuItem value={7}>July</MenuItem>
+                                    <MenuItem value={8}>August</MenuItem>
+                                    <MenuItem value={9}>September</MenuItem>
+                                    <MenuItem value={10}>October</MenuItem>
+                                    <MenuItem value={11}>November</MenuItem>
+                                    <MenuItem value={12}>December</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                            >
+                                View
+                        </Button>
+                        </form>
+                    </Card>
+                </Container>
     )
 }

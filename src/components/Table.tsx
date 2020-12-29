@@ -10,9 +10,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import { makeStyles, createStyles, withStyles, lighten, Theme } from '@material-ui/core/styles';
-
-
+import { makeStyles, createStyles, withStyles, Theme } from '@material-ui/core/styles';
 
 export default function ReportTable(props:
     {
@@ -32,17 +30,7 @@ export default function ReportTable(props:
         form?: string
     }) {
 
-    const myRef = createRef<HTMLTableElement>()
-    const executeScroll = () => {
-        if (myRef.current) {
-            myRef.current.scrollIntoView({behavior: 'smooth'})
-        }
-    }
-
-    useEffect(() => {
-        executeScroll()
-    }, [])
-    const StyledTableCell = withStyles((theme: Theme) =>
+        const StyledTableCell = withStyles((theme: Theme) =>
         createStyles({
             head: {
                 backgroundColor: theme.palette.primary.main,
@@ -51,16 +39,28 @@ export default function ReportTable(props:
                 fontSize: 16
             },
         }),
-    )(TableCell);
+        )(TableCell);
 
-    const useStyles = makeStyles((theme: Theme) =>
+        const useStyles = makeStyles((theme: Theme) =>
         createStyles({
             table: {
                 minWidth: 650,
             },
         })
-    );
-    const classes = useStyles();
+        );
+        const classes = useStyles();
+
+        // Component scrolls into view on mount
+        const myRef = createRef<HTMLTableElement>()
+        const executeScroll = () => {
+            if (myRef.current) {
+                myRef.current.scrollIntoView({behavior: 'smooth'})
+            }
+        }
+    
+        useEffect(() => {
+            executeScroll()
+        }, [])
     return (
         <TableContainer component={Paper}>
             <Table className={classes.table} ref={myRef}>
@@ -75,23 +75,12 @@ export default function ReportTable(props:
                                     </StyledTableCell>
                                 )
                             })}
-                        {props.form === "pivot" ? null : (
-                        <>
                         <StyledTableCell><span>Save</span></StyledTableCell>
                         <StyledTableCell><span>Delete</span></StyledTableCell>
-                        </>
-                        )}
                     </TableRow>
                 </TableHead>
                 <TableBody className="tableBody">
-                    {(props.state.data).map((entry: tableDataEntry, i: number) => {
-                        return props.form === "pivot" ?
-                            <StaticRow
-                                entry={entry}
-                                i={i}
-                                key={entry.entry_id || entry.id}
-                                fields={props.state.schema.fields}
-                            /> :
+                    {(props.state.data).map((entry: tableDataEntry, i: number) => (
                             <InputRow
                                 entry={entry}
                                 i={i}
@@ -102,9 +91,8 @@ export default function ReportTable(props:
                                 dataLists={props.dataLists}
                                 deleteEntry={props.deleteEntry}
                             />
-                    })}
+                    ))}
                 </TableBody>
-
             </Table>
         </TableContainer>
     )

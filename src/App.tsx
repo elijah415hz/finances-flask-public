@@ -6,7 +6,7 @@ import API from './utils/API'
 import { testDatabase } from './utils/db'
 import './App.css';
 import CustomizedSnackbar from './components/SnackBar'
-import { alertStateType } from './interfaces/Interfaces'
+import { AlertStateType, Auth, ContextState } from './interfaces/Interfaces'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { green, blueGrey, red } from '@material-ui/core/colors'
 
@@ -81,17 +81,7 @@ const theme = createMyTheme({
   },
 });
 
-interface Auth {
-  loggedIn: boolean,
-  user: string,
-  token: string
-};
 
-interface ContextState {
-  Auth: Auth,
-  setAuth: React.Dispatch<{ type: string; payload?: { user: string; token: string; } | undefined; }>,
-  setAlertState: React.Dispatch<React.SetStateAction<alertStateType>>
-};
 
 // Check if user is logged in before returning protected component/page
 const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
@@ -152,7 +142,7 @@ export default function App() {
     token: ""
   })
 
-  const [alertState, setAlertState] = useState<alertStateType>({
+  const [alertState, setAlertState] = useState<AlertStateType>({
     severity: undefined,
     message: "",
     open: false,

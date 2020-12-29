@@ -36,7 +36,7 @@ def wallchart():
     df_wallchart = pd.merge(INC_wallchart, EXP_wallchart, on='Date')
     df_wallchart.rename(columns={'Amount_x': 'Income', 'Amount_y': 'Expenses'}, inplace=True)
     fig = Figure()
-    fig.set_facecolor("#263238")
+    # fig.set_facecolor("#263238")
     ax = fig.subplots()
     df_wallchart.plot.line(figsize=(13, 4), color=['blue', 'red'], grid=True, ax=ax)
     buffer = BytesIO()

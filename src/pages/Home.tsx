@@ -6,24 +6,18 @@ import API from '../utils/API'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
 import type {
-    tableDataEntry,
-    dataListStateType,
-    allDataListsType,
-    formStateType,
+    TableDataEntry,
+    DataListStateType,
+    AllDataListsType,
+    FormStateType,
     InputName
 } from '../interfaces/Interfaces'
 import {
     AppBar,
     Button,
     Container,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
     Backdrop,
     CircularProgress,
-    Card,
     Dialog,
     Box
 } from '@material-ui/core';
@@ -32,10 +26,14 @@ import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import AddIcon from '@material-ui/icons/Add'
 import { emptyDatabase } from '../utils/db';
+import PivotTable from '../components/PivotTable';
+import Form from '../components/Form';
 
 function Home() {
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
-    const [formState, setFormState] = useState<formStateType>(
+
+    // Form control state
+    const [formState, setFormState] = useState<FormStateType>(
         {
             form: "expenses",
             year: new Date(Date.now()).getUTCFullYear(),
@@ -43,7 +41,7 @@ function Home() {
         }
     )
 
-    const [incomeTableState, setIncomeTableState] = useState<{ schema: { fields: [] }, data: tableDataEntry[] }>(
+    const [incomeTableState, setIncomeTableState] = useState<{ schema: { fields: [] }, data: TableDataEntry[] }>(
         {
             schema: { fields: [] },
             data: [{
@@ -58,7 +56,7 @@ function Home() {
         }
     )
 
-    const [expensesTableState, setExpensesTableState] = useState<{ schema: { fields: [] }, data: tableDataEntry[] }>(
+    const [expensesTableState, setExpensesTableState] = useState<{ schema: { fields: [] }, data: TableDataEntry[] }>(
         {
             schema: { fields: [] },
             data: [{
@@ -75,20 +73,10 @@ function Home() {
         }
 
     )
-    const [pivotTableState, setPivotTableState] = useState<{ schema: { fields: [] }, data: tableDataEntry[] }>(
-        {
-            schema: { fields: [] },
-            data: [{
-                Amount: "",
-                Broad_category: "",
-                Narrow_category: ""
-            }]
-        }
-    )
+
 
     // State for datalists
-
-    const [dataListsState, setDataListsState] = useState<allDataListsType>({
+    const [dataListsState, setDataListsState] = useState<AllDataListsType>({
         source: [],
         person_earner: [],
         narrow_category: [],
@@ -96,11 +84,11 @@ function Home() {
         vendor: []
     })
 
-    // Loading Backdrop
-    const [openBackdrop, setOpenBackdrop] = React.useState(false);
+    // Loading Backdrop display state
+    const [openBackdrop, setOpenBackdrop] = useState(false);
 
-
-    function formatDates(entry: tableDataEntry): tableDataEntry {
+    // Converts dates to human-readable format
+    function formatDates(entry: TableDataEntry): TableDataEntry {
         if (!entry.Date) {
             return entry
         } else {
@@ -116,6 +104,7 @@ function Home() {
         }
     }
 
+    // Form control
     function handleFormChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }> | React.ChangeEvent<HTMLSelectElement>): void {
         let name = event.target.name as keyof typeof formState
         setFormState({ ...formState, [name]: event.target.value })
@@ -140,7 +129,7 @@ function Home() {
                     setIncomeTableState(response)
                     break;
                 case "pivot":
-                    setPivotTableState(response)
+                    setExpensesTableState(response)
                     break;
             }
         } catch (err) {
@@ -156,6 +145,7 @@ function Home() {
         }
     }
 
+    // Helper function for assigning an id to a TableDataEntry if user input matches an existing record
     function assignId(
         name: InputName,
         value: string) {
@@ -185,7 +175,7 @@ function Home() {
                 id = 'vendor_id';
                 break;
         }
-        let dataListItem = state.filter((i: dataListStateType) => i.name === value)[0]
+        let dataListItem = state.filter((i: DataListStateType) => i.name === value)[0]
         if (dataListItem) {
             return { id: id, dataListItem: dataListItem }
         } else {
@@ -193,11 +183,12 @@ function Home() {
         }
     }
 
+    // Keep global state synced with InputRow state
     async function handleExpensesChange(event: React.ChangeEvent<HTMLInputElement>, index: number): Promise<void> {
         try {
             let { name, value } = event.target;
-            let newExpensesTableStateData: tableDataEntry[] = [...expensesTableState.data]
-            let updatedRow: tableDataEntry = { ...newExpensesTableStateData[index], [name]: value }
+            let newExpensesTableStateData: TableDataEntry[] = [...expensesTableState.data]
+            let updatedRow: TableDataEntry = { ...newExpensesTableStateData[index], [name]: value }
             if (name === "Person" || name === "Broad_category" || name === "Narrow_category" || name === "Vendor") {
                 let { id, dataListItem } = assignId(name as InputName, value)
                 if (id && dataListItem) {
@@ -215,11 +206,12 @@ function Home() {
         }
     }
 
+    // Keep global state synced with InputRow state
     async function handleIncomeChange(event: React.ChangeEvent<HTMLInputElement>, index: number): Promise<void> {
         try {
             let { name, value } = event.target;
-            let newIncomeTableStateData: tableDataEntry[] = [...incomeTableState.data]
-            let updatedRow: tableDataEntry = { ...newIncomeTableStateData[index], [name]: value }
+            let newIncomeTableStateData: TableDataEntry[] = [...incomeTableState.data]
+            let updatedRow: TableDataEntry = { ...newIncomeTableStateData[index], [name]: value }
             if (name === "Person" || name === "Source") {
                 let { id, dataListItem } = assignId(name as InputName, value)
                 if (id && dataListItem) {
@@ -233,6 +225,7 @@ function Home() {
         }
     }
 
+    // Update an row altered by the user
     async function updateExpensesRow(index: number): Promise<void> {
         try {
             await API.updateExpenses(Auth.token, expensesTableState.data[index])
@@ -251,15 +244,25 @@ function Home() {
         }
     }
 
+    // Update an row altered by the user
     async function updateIncomeRow(index: number): Promise<void> {
         try {
-            let res = await API.updateIncome(Auth.token, incomeTableState.data[index])
-            console.log(res)
+            await API.updateIncome(Auth.token, incomeTableState.data[index])
+            setAlertState({
+                severity: "success",
+                message: "Record updated!",
+                open: true
+            })
         } catch (err) {
-            console.log(err)
+            setAlertState({
+                severity: "error",
+                message: "Error: Failed to save!",
+                open: true
+            })
         }
     }
 
+    // Delete a row from the database
     async function deleteEntry(id: number | undefined) {
         try {
             if (formState.form === "expenses") {
@@ -318,7 +321,7 @@ function Home() {
                 position: 'sticky'
             },
             backdrop: {
-                zIndex: theme.zIndex.drawer + 1,
+                zIndex: 1301, // To be in front of Dialog at 1300
                 color: '#fff',
             },
             speedDial: {
@@ -327,7 +330,7 @@ function Home() {
                 right: theme.spacing(2),
             },
             dialog: {
-                width: '100%'
+                width: '100%',
             },
             datePicker: {
                 [theme.breakpoints.down('sm')]: {
@@ -338,13 +341,13 @@ function Home() {
     );
     const classes = useStyles();
 
-    // SpeedDial actions
+    // SpeedDial controls
+    const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
+
     const actions = [
         { icon: <AddIcon />, name: 'Expenses', action: handleExpensesOpen, operation: 'product' },
         { icon: <AddIcon />, name: 'Income', action: handleIncomeOpen, operation: 'tag' }
     ]
-
-    const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
 
     const handleSpeedDialClose = () => {
         setSpeedDialOpen(false);
@@ -414,70 +417,12 @@ function Home() {
 
                 <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
 
-                <Dialog onClose={handleClose} open={addExpensesOpen} maxWidth='xl'>
-                    <AddExpensesForm classes={classes} handleClose={handleClose} />
-                </Dialog>
-                <Dialog onClose={handleClose} open={addIncomeOpen} maxWidth='xl'>
-                    <AddIncomeForm classes={classes} handleClose={handleClose} />
-                </Dialog>
-                <Container className={classes.root}>
-                    <Card variant="outlined">
-                        <h2 className={classes.root}>Reports</h2>
-                        <form onSubmit={handleFormSubmit} className={classes.root}>
-                            <FormControl variant="outlined" className={classes.formControl}>
-                                <InputLabel htmlFor="form">Report</InputLabel>
-                                <Select
-                                    name="form"
-                                    label="Report"
-                                    labelId="form"
-                                    value={formState.form}
-                                    onChange={handleFormChange}>
-                                    <MenuItem value="income">Income</MenuItem>
-                                    <MenuItem value="expenses">Expenses</MenuItem>
-                                    <MenuItem value="pivot">Pivot Table</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <TextField
-                                onChange={handleFormChange}
-                                value={formState.year}
-                                label="Year"
-                                name="year"
-                                type="number"
-                                variant="outlined"
-                            />
-                            <FormControl variant="outlined" className={classes.formControl}>
-                                <InputLabel htmlFor="month2">Month</InputLabel>
-                                <Select
-                                    onChange={handleFormChange}
-                                    value={formState.month}
-                                    name="month"
-                                    labelId="month2"
-                                    label="Month"
-                                >
-                                    <MenuItem value={1}>January</MenuItem>
-                                    <MenuItem value={2}>February</MenuItem>
-                                    <MenuItem value={3}>March</MenuItem>
-                                    <MenuItem value={4}>April</MenuItem>
-                                    <MenuItem value={5}>May</MenuItem>
-                                    <MenuItem value={6}>June</MenuItem>
-                                    <MenuItem value={7}>July</MenuItem>
-                                    <MenuItem value={8}>August</MenuItem>
-                                    <MenuItem value={9}>September</MenuItem>
-                                    <MenuItem value={10}>October</MenuItem>
-                                    <MenuItem value={11}>November</MenuItem>
-                                    <MenuItem value={12}>December</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                color="primary"
-                            >
-                                View
-                        </Button>
-                        </form>
-                    </Card>
-                </Container>
+                <Form
+                    classes={classes}
+                    handleFormSubmit={handleFormSubmit}
+                    handleFormChange={handleFormChange}
+                    formState={formState}
+                />
             </Box >
             <div className="body">
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (
@@ -500,16 +445,24 @@ function Home() {
                         form={formState.form}
                     />
                 ) : null}
-                {formState.form === "pivot" && pivotTableState ? (
-                    <ReportTable
-                        state={pivotTableState}
-                        deleteEntry={() => null}
-                        handleUpdate={() => null}
-                        handleChange={() => null}
-                        form={formState.form}
-                    />
+                {formState.form === "pivot" && expensesTableState.data[0]?.entry_id ? (
+                    <PivotTable state={expensesTableState} />
                 ) : null}
             </div>
+            <Dialog onClose={handleClose} open={addExpensesOpen} maxWidth='xl'>
+                <AddExpensesForm 
+                classes={classes} 
+                handleClose={handleClose}
+                setOpenBackdrop={setOpenBackdrop}
+                />
+            </Dialog>
+            <Dialog onClose={handleClose} open={addIncomeOpen} maxWidth='xl'>
+                <AddIncomeForm 
+                classes={classes} 
+                handleClose={handleClose}
+                setOpenBackdrop={setOpenBackdrop}
+                />
+            </Dialog>
             <SpeedDial
                 ariaLabel="SpeedDial example"
                 className={classes.speedDial}

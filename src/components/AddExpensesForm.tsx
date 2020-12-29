@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import API from '../utils/API'
 import { saveRecord } from '../utils/db'
 import { AuthContext } from '../App'
-import type { expensesFormType, categoryType } from '../interfaces/Interfaces'
+import type { ExpensesFormType, CategoryType } from '../interfaces/Interfaces'
 import {
     Button,
     FormControl,
@@ -26,7 +26,8 @@ import {
 
 export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string},
-    handleClose: Function
+    handleClose: Function,
+    setOpenBackdrop: Function
 }) {
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
@@ -41,10 +42,10 @@ export default function AddRecordsForm(props: {
     }
 
     // Form control state
-    const [formState, setFormState] = useState<expensesFormType>(initialFormState)
+    const [formState, setFormState] = useState<ExpensesFormType>(initialFormState)
 
     // State to hold category info
-    const [currentCategory, setCurrentCategory] = useState<categoryType>({
+    const [currentCategory, setCurrentCategory] = useState<CategoryType>({
         name: "",
         id: NaN,
     })
@@ -231,13 +232,16 @@ export default function AddRecordsForm(props: {
         let formStateConvertedDate: any = { ...formState }
         formStateConvertedDate.Date = formStateConvertedDate.Date?.toLocaleDateString("en-US")
         try {
+            props.setOpenBackdrop(true)
             await API.postExpenses(Auth.token, formStateConvertedDate)
+            props.setOpenBackdrop(false)
             setAlertState({
                 severity: "success",
                 message: "Record Saved!",
                 open: true
             })
         } catch (err) {
+            props.setOpenBackdrop(false)
             if (err.message === "Error! 500") {
                 setAlertState({
                     severity: "error",

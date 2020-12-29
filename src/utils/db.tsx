@@ -1,5 +1,5 @@
-import { openDB, deleteDB, DBSchema, IDBPDatabase } from 'idb'
-import { expensesFormType, incomeFormType } from '../interfaces/Interfaces';
+import { openDB, DBSchema, IDBPDatabase } from 'idb'
+import { ExpensesFormType, IncomeFormType } from '../interfaces/Interfaces';
 import API from './API';
 
 interface financesDB extends DBSchema {
@@ -41,7 +41,7 @@ export async function testDatabase() {
   }
 }
 
-export async function saveRecord(table: 'income' | 'expenses', record: expensesFormType | incomeFormType) {
+export async function saveRecord(table: 'income' | 'expenses', record: ExpensesFormType | IncomeFormType) {
   await db.put(table, record);
 }
 

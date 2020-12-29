@@ -113,7 +113,7 @@ const API = {
         }).then(res=>checkStatus<string>(res, 'text'))
     },
     pivot: function (token: string | null, yearMonthObj: formStateType): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
-        return fetch(`/api/expenses/pivot/${yearMonthObj.year}/${yearMonthObj.month}`, {
+        return fetch(`/api/expenses/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }

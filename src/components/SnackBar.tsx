@@ -2,7 +2,7 @@ import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from './Alert'
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { alertStateType } from '../interfaces/Interfaces';
+import { AlertStateType } from '../interfaces/Interfaces';
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -15,8 +15,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export default function CustomizedSnackbar({ state, setState }: {
-    state: alertStateType,
-    setState: React.Dispatch<React.SetStateAction<alertStateType>>
+    state: AlertStateType,
+    setState: React.Dispatch<React.SetStateAction<AlertStateType>>
     }) {
 
     const classes = useStyles();

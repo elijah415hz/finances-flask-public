@@ -1,10 +1,10 @@
 import type {
-    allDataListsType, 
-    formStateType, 
-    tableDataEntry, 
-    tableType,
-    expensesFormType,
-    incomeFormType} from '../interfaces/Interfaces'
+    AllDataListsType, 
+    FormStateType, 
+    TableDataEntry, 
+    TableType,
+    ExpensesFormType,
+    IncomeFormType} from '../interfaces/Interfaces'
 
 
 function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
@@ -22,14 +22,14 @@ function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
 }
 
 const API = {
-    expenses: function (token: string | null, yearMonthObj: formStateType): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
+    expenses: function (token: string | null, yearMonthObj: FormStateType): Promise<{schema: { fields: [] }, data: TableDataEntry[]}> {
         return fetch(`/api/expenses/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        }).then(res=>checkStatus<tableType>(res, 'json'))
+        }).then(res=>checkStatus<TableType>(res, 'json'))
     },
-    postExpenses: function (token: string | null, data:expensesFormType): Promise<Response | string> {
+    postExpenses: function (token: string | null, data:ExpensesFormType): Promise<Response | string> {
         return fetch(`/api/expenses/`, {
             method: 'POST',
             headers: {
@@ -39,7 +39,7 @@ const API = {
             body: JSON.stringify(data)
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    postBatchExpenses: function (token: string | null, data:expensesFormType[]): Promise<Response | string> {
+    postBatchExpenses: function (token: string | null, data:ExpensesFormType[]): Promise<Response | string> {
         return fetch(`/api/expenses/batch`, {
             method: 'POST',
             headers: {
@@ -49,7 +49,7 @@ const API = {
             body: JSON.stringify(data)
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    postIncome: function (token: string | null, data:incomeFormType): Promise<Response | string> {
+    postIncome: function (token: string | null, data:IncomeFormType): Promise<Response | string> {
         return fetch(`/api/income/`, {
             method: 'POST',
             headers: {
@@ -59,7 +59,7 @@ const API = {
             body: JSON.stringify(data)
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    postBatchIncome: function (token: string | null, data:incomeFormType[]): Promise<Response | string> {
+    postBatchIncome: function (token: string | null, data:IncomeFormType[]): Promise<Response | string> {
         return fetch(`/api/income/batch`, {
             method: 'POST',
             headers: {
@@ -77,7 +77,7 @@ const API = {
             }
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    updateExpenses: function (token: string | null, data: tableDataEntry): Promise<Response | string> {
+    updateExpenses: function (token: string | null, data: TableDataEntry): Promise<Response | string> {
         return fetch(`/api/expenses/${data.entry_id}`, {
             method: 'PUT',
             headers: {
@@ -87,14 +87,14 @@ const API = {
             body: JSON.stringify(data)
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    income: function (token: string | null, yearMonthObj: formStateType): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
+    income: function (token: string | null, yearMonthObj: FormStateType): Promise<{schema: { fields: [] }, data: TableDataEntry[]}> {
         return fetch(`/api/income/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        }).then(res=>checkStatus<tableType>(res, 'json'))
+        }).then(res=>checkStatus<TableType>(res, 'json'))
     },
-    updateIncome: function (token: string | null, data: tableDataEntry): Promise<Response | string> {
+    updateIncome: function (token: string | null, data: TableDataEntry): Promise<Response | string> {
         return fetch(`/api/income/${data.id}`, {
             method: 'PUT',
             headers: {
@@ -112,19 +112,19 @@ const API = {
             }
         }).then(res=>checkStatus<string>(res, 'text'))
     },
-    pivot: function (token: string | null, yearMonthObj: formStateType): Promise<{schema: { fields: [] }, data: tableDataEntry[]}> {
+    pivot: function (token: string | null, yearMonthObj: FormStateType): Promise<{schema: { fields: [] }, data: TableDataEntry[]}> {
         return fetch(`/api/expenses/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        }).then(res=>checkStatus<tableType>(res, 'json'))
+        }).then(res=>checkStatus<TableType>(res, 'json'))
     },
-    dataList: function (token: string | null): Promise<allDataListsType> {
+    dataList: function (token: string | null): Promise<AllDataListsType> {
         return fetch(`/api/datalists`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        }).then(res => checkStatus<allDataListsType>(res, 'json'))
+        }).then(res => checkStatus<AllDataListsType>(res, 'json'))
     },
     login: function (data: { username: string, password: string }): Promise<{ token: string }> {
         return fetch('/auth/login', {

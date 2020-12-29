@@ -9,7 +9,7 @@ import {
     MenuItem,
     Button
 } from '@material-ui/core'
-import {formStateType} from '../interfaces/Interfaces'
+import {FormStateType} from '../interfaces/Interfaces'
 
 export default function Form({
     classes, 
@@ -22,7 +22,7 @@ export default function Form({
     },
     handleFormSubmit: (event: React.FormEvent<HTMLFormElement>) => void,
     handleFormChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }> | React.ChangeEvent<HTMLSelectElement>)=> void,
-    formState: formStateType
+    formState: FormStateType
 }) {
     return (
         <Container className={classes.root}>

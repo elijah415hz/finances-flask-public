@@ -1,7 +1,6 @@
 import React, {useEffect, createRef} from 'react'
 import InputRow from './InputRow'
-import StaticRow from './StaticRow'
-import type { tableDataEntry, allDataListsType } from "../interfaces/Interfaces"
+import type { TableDataEntry, AllDataListsType } from "../interfaces/Interfaces"
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -20,10 +19,10 @@ export default function ReportTable(props:
             {
                 fields: { name: string }[]
             },
-            data: tableDataEntry[]
+            data: TableDataEntry[]
 
         },
-        dataLists?: allDataListsType
+        dataLists?: AllDataListsType
         handleChange: Function,
         handleUpdate: Function,
         deleteEntry: Function,
@@ -80,7 +79,7 @@ export default function ReportTable(props:
                     </TableRow>
                 </TableHead>
                 <TableBody className="tableBody">
-                    {(props.state.data).map((entry: tableDataEntry, i: number) => (
+                    {(props.state.data).map((entry: TableDataEntry, i: number) => (
                             <InputRow
                                 entry={entry}
                                 i={i}

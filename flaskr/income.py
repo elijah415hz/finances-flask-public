@@ -11,23 +11,24 @@ bp = Blueprint('income', __name__, url_prefix='/api/income')
 # Get Income by Month
 @bp.route("/<year>/<month>")
 def api_income(year, month):
-    validToken = checkAuth(request)
-    if not validToken:
+    valid_token = checkAuth(request)
+    if not valid_token:
         return Response("Nice Try!", status=401)
     else:
         year_month = year + "-" + month
         month = datetime.strptime(year_month, '%Y-%m')
         start_date = (month - timedelta(days=1)).date()
         end_date = (month + relativedelta(months=+1)).date()
-        sql = "SELECT i.id, i.source_id, i.earner_id as person_id, Date, Amount, s.name AS Source, p.name AS Person\
+        sql = "SELECT i.id, i.source_id, i.earner_id as person_id, Date, amount, s.name AS Source, p.name AS Person\
                     FROM income i\
+                    WHERE user_id=%s\
                     LEFT JOIN source s ON s.id=i.source_id\
                     LEFT JOIN person_earner p ON p.id=i.earner_id\
                     WHERE date > %s AND date < %s\
                     ORDER BY date;"
-        INC_report = pd.read_sql(sql, con=engine, params=[start_date, end_date], parse_dates=['Date'])
+        INC_report = pd.read_sql(sql, con=engine, params=[valid_token['id'], start_date, end_date], parse_dates=['Date'])
         INC_report.set_index('Date', inplace=True)
-        INC_report['Amount'] = INC_report['Amount'].apply(format_numbers)
+        INC_report['amount'] = INC_report['amount'].apply(format_numbers)
         return INC_report.to_json(orient="table")
 
 # Used by post_income and post_batch_income
@@ -36,24 +37,25 @@ def insert_income(json):
     amount = json['amount'] or None
     earner_id = json['earner_id'] or  None
     source = json['source'] or None
+    user_id = json['user_id']
     
     with engine.connect() as con:
-        insert_source_sql = "INSERT IGNORE INTO source(name) VALUES(%s)"
+        insert_source_sql = "INSERT IGNORE INTO sources(name) VALUES(%s)"
         con.execute(insert_source_sql, [source])
-        source_id = con.execute("SELECT id FROM source WHERE name=%s", [source]).fetchone()[0]
-        sql = "INSERT INTO income(date, amount, source_id, earner_id)\
-                VALUES(DATE(%s), %s, %s, %s)"     
-        con.execute(sql, [date, amount, source_id, earner_id])
+        source_id = con.execute("SELECT id FROM sources WHERE name=%s", [source]).fetchone()[0]
+        sql = "INSERT INTO income(date, amount, source_id, earner_id, user_id)\
+                VALUES(DATE(%s), %s, %s, %s, %s)"     
+        con.execute(sql, [date, amount, source_id, earner_id, user_id])
 
 # Create Income Record
 @bp.route("/", methods=["POST"])
 def post_income():
     json = request.get_json()
-    validToken = checkAuth(request)
-    print("JSON: ", json)
-    if not validToken:
+    valid_token = checkAuth(request)
+    if not valid_token:
         return Response("Nice Try!", status=401)
     else:
+        json['user_id'] = valid_token['id']
         insert_income(json)
         return Response('Record Inserted!', status=200)
 
@@ -61,12 +63,13 @@ def post_income():
 @bp.route("/batch", methods=["POST"])
 def post_batch_income():
     json = request.get_json()
-    validToken = checkAuth(request)
+    valid_token = checkAuth(request)
     print("JSON: ", json)
-    if not validToken:
+    if not valid_token:
         return Response("Nice Try!", status=401)
     else:
         for row in json:
+            json['user_id'] = valid_token['id']
             insert_income(row)
         return Response('Records Inserted!', status=200)
 
@@ -74,16 +77,16 @@ def post_batch_income():
 # Edit income
 @bp.route("/<int:id>", methods=['PUT'])
 def update_income(id):  
-    validToken = checkAuth(request)
-    if not validToken:
+    valid_token = checkAuth(request)
+    if not valid_token:
         return Response("Nice Try!", status=401)
     else:
         json = request.get_json()
         # Parse dates
         date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
         # Convert any null values
-        if json['Amount']:
-            amount = json['Amount']
+        if json['amount']:
+            amount = json['amount']
         else :
             amount = 0
         if json['person_id']:
@@ -101,16 +104,16 @@ def update_income(id):
             earner_id=%s, \
             source_id=%s \
             WHERE id=%s;"
-        executed = engine.connect().execute(sql, [date, amount, person, source, id])
+        engine.connect().execute(sql, [date, amount, person, source, id])
         return Response(f'id: {id} Updated', status=200)
 
 @bp.route("/<int:id>", methods=['DELETE'])
 def delete_income(id):
-    validToken = checkAuth(request)
-    if not validToken:
+    valid_token = checkAuth(request)
+    if not valid_token:
         return Response("Nice Try!", status=401)
     else:
         sql = "DELETE FROM income WHERE id=%s;"
-        executed = engine.connect().execute(sql, [id])
+        engine.connect().execute(sql, [id])
         return Response(f'id: {id} Deleted', status=200)
     

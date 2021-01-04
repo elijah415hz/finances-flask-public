@@ -4,26 +4,26 @@ interface FormStateType {
     month: number
 }
 
-type InputName = "Person" | "Source" | "Broad_category" | "Narrow_category" | "Vendor"
+type InputName = "person" | "broad_category" | "narrow_category"
 
 interface TableDataEntry {
-    Amount: string,
-    Date?: string,
-    Source?: string,
-    Person?: string,
+    amount: string,
+    date?: string,
+    source?: string,
+    person?: string,
     id?: number,
     source_id?: number,
-    earner_id?: number,
-    Vendor?: string,
-    Broad_category?: string,
-    Narrow_category?: string,
-    Notes?: string,
+    person_id?: number,
+    vendor?: string,
+    broad_category?: string,
+    narrow_category?: string,
+    notes?: string,
     entry_id?: number
 }
 
 interface ExpensesFormType {
-    Date: Date | null,
-    Amount: number,
+    date: Date | null,
+    amount: number,
     person_id: number,
     broad_category_id: number,
     narrow_category_id: number,
@@ -34,8 +34,14 @@ interface ExpensesFormType {
 interface IncomeFormType {
     date: Date | null,
     amount: number,
-    earner_id: number,
+    person_id: number,
     source: string,
+}
+
+interface EditFormType {
+    person?: string,
+    broad_category?: string,
+    narrow_category?: string
 }
 
 interface CategoryType {
@@ -49,15 +55,15 @@ interface CategoryType {
 
 interface DataListStateType {
     id: number,
-    name: string
+    name: string,
+    person?: boolean,
+    broad_category_id?: number
 }
 
 interface AllDataListsType {
-    source: DataListStateType[],
-    person_earner: DataListStateType[],
-    narrow_category: DataListStateType[],
-    broad_category: DataListStateType[],
-    vendor: DataListStateType[]
+    persons: DataListStateType[],
+    narrow_categories: DataListStateType[],
+    broad_categories: DataListStateType[],
 }
 
 interface TableType {
@@ -97,5 +103,6 @@ export type {
     CategoryType,
     AlertStateType,
     Auth,
-    ContextState
+    ContextState,
+    EditFormType
 }

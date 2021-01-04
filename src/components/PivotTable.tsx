@@ -67,31 +67,31 @@ export default function PivotTable(props: {
     }
 
     const pivotState = props.state.data.reduce((a, b) => {
-        if (b.Broad_category) {
-            if (a[b.Broad_category]) {
-                a[b.Broad_category].total += parseFloat(b.Amount);
+        if (b.broad_category) {
+            if (a[b.broad_category]) {
+                a[b.broad_category].total += parseFloat(b.amount);
             } else {
-                a[b.Broad_category] = { total: parseFloat(b.Amount), narrow_categories: {} };
+                a[b.broad_category] = { total: parseFloat(b.amount), narrow_categories: {} };
             }
-            if (b.Narrow_category) {
-                if (a[b.Broad_category].narrow_categories[b.Narrow_category]) {
-                    a[b.Broad_category].narrow_categories[b.Narrow_category].total += parseFloat(b.Amount);
+            if (b.narrow_category) {
+                if (a[b.broad_category].narrow_categories[b.narrow_category]) {
+                    a[b.broad_category].narrow_categories[b.narrow_category].total += parseFloat(b.amount);
                 } else {
-                    a[b.Broad_category].narrow_categories[b.Narrow_category] = {total: parseFloat(b.Amount), persons: {}}   ;
+                    a[b.broad_category].narrow_categories[b.narrow_category] = {total: parseFloat(b.amount), persons: {}}   ;
                 }
-                if (b.Person) {
-                    if (a[b.Broad_category].narrow_categories[b.Narrow_category].persons[b.Person]) {
-                        a[b.Broad_category].narrow_categories[b.Narrow_category].persons[b.Person] += parseFloat(b.Amount);
+                if (b.person) {
+                    if (a[b.broad_category].narrow_categories[b.narrow_category].persons[b.person]) {
+                        a[b.broad_category].narrow_categories[b.narrow_category].persons[b.person] += parseFloat(b.amount);
                     } else {
-                        a[b.Broad_category].narrow_categories[b.Narrow_category].persons[b.Person] = parseFloat(b.Amount);
+                        a[b.broad_category].narrow_categories[b.narrow_category].persons[b.person] = parseFloat(b.amount);
                     }
                 }
-            } else if (b.Person) {
-                if (a[b.Broad_category].narrow_categories["--"]?.persons[b.Person]) {
-                    a[b.Broad_category].narrow_categories["--"].persons[b.Person] += parseFloat(b.Amount);
-                    a[b.Broad_category].narrow_categories["--"].total += parseFloat(b.Amount);
+            } else if (b.person) {
+                if (a[b.broad_category].narrow_categories["--"]?.persons[b.person]) {
+                    a[b.broad_category].narrow_categories["--"].persons[b.person] += parseFloat(b.amount);
+                    a[b.broad_category].narrow_categories["--"].total += parseFloat(b.amount);
                 } else {
-                a[b.Broad_category].narrow_categories = {...a[b.Broad_category].narrow_categories, "--": {persons: {[b.Person]: parseFloat(b.Amount)}, total: parseFloat(b.Amount)}}
+                a[b.broad_category].narrow_categories = {...a[b.broad_category].narrow_categories, "--": {persons: {[b.person]: parseFloat(b.amount)}, total: parseFloat(b.amount)}}
                 }
             }
         }
@@ -116,10 +116,10 @@ export default function PivotTable(props: {
                             Narrow Category
                         </StyledTableCell>
                         <StyledTableCell>
-                            Person
+                            person
                         </StyledTableCell>
                         <StyledTableCell>
-                            Amount
+                            amount
                         </StyledTableCell>
                     </TableRow>
                 </TableHead>

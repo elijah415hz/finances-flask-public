@@ -9,7 +9,6 @@ bp = Blueprint('datalists', __name__, url_prefix='/api')
 @bp.route("/datalists")
 def get_datalist():
     valid_token = checkAuth(request)
-    print("datalist token:", valid_token)
     if not valid_token:
         return Response("Nice Try!", status=401)
     else:

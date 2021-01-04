@@ -45,7 +45,7 @@ export default function InputRow(props:
         deleteEntry: Function
     }) {
 
-    const [state, setState] = useState<TableDataEntry>({ Amount: "" })
+    const [state, setState] = useState<TableDataEntry>({ amount: "" })
 
     function makeDataList(propsState: DataListStateType[], id: string) {
         return (
@@ -100,21 +100,21 @@ export default function InputRow(props:
                                 style={{ width: '80%' }}
                             // style={{width: `${(state[column.name as keyof TableDataEntry]?.toString().length || 12) + 3.5}ch`}}
                             />
-                            {column.name === 'Source' && props.dataLists?.source ? (
+                            {/* {column.name === 'Source' && props.dataLists?.source ? (
                                 makeDataList(props.dataLists?.source, column.name)
+                            ) : null} */}
+                            {column.name === 'Person' && props.dataLists?.persons ? (
+                                makeDataList(props.dataLists?.persons, column.name)
                             ) : null}
-                            {column.name === 'Person' && props.dataLists?.person_earner ? (
-                                makeDataList(props.dataLists?.person_earner, column.name)
+                            {column.name === 'Narrow_category' && props.dataLists?.narrow_categories ? (
+                                makeDataList(props.dataLists?.narrow_categories, column.name)
                             ) : null}
-                            {column.name === 'Narrow_category' && props.dataLists?.narrow_category ? (
-                                makeDataList(props.dataLists?.narrow_category, column.name)
+                            {column.name === 'Broad_category' && props.dataLists?.broad_categories ? (
+                                makeDataList(props.dataLists?.broad_categories, column.name)
                             ) : null}
-                            {column.name === 'Broad_category' && props.dataLists?.broad_category ? (
-                                makeDataList(props.dataLists?.broad_category, column.name)
-                            ) : null}
-                            {column.name === 'Vendor' && props.dataLists?.vendor ? (
-                                makeDataList(props.dataLists?.vendor, column.name)
-                            ) : null}
+                            {/* {column.name === 'Vendor' && props.dataLists?.vendors ? (
+                                makeDataList(props.dataLists?.vendors, column.name)
+                            ) : null} */}
                         </StyledTableCell>
                     )
                 })}

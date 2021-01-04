@@ -22,13 +22,12 @@ def api_expenses(year, month):
         month = datetime.strptime(year_month, '%Y-%m')
         start_date = (month - timedelta(days=1)).date()
         end_date = (month + relativedelta(months=+1)).date()
-        sql = "SELECT id, person_id, broad_category_id, narrow_category_id, vendor_id, date, v.name AS vendor, amount, b.name AS broad_category, n.name AS narrow_category, p.name AS person, notes FROM expenses e \
-                    WHERE user_id=%s \
+        sql = "SELECT e.id, e.person_id, e.broad_category_id, e.narrow_category_id, e.vendor_id, e.date, v.name AS vendor, e.amount, b.name AS broad_category, n.name AS narrow_category, p.name AS person, notes FROM expenses e \
                     LEFT JOIN vendors v ON v.id=e.vendor_id \
                     LEFT JOIN broad_categories b ON b.id=e.broad_category_id \
                     LEFT JOIN persons p ON p.id=e.person_id \
                     LEFT JOIN narrow_categories n ON n.id=e.narrow_category_id \
-                    WHERE date > %s AND date < %s \
+                    WHERE e.user_id=%s AND date > %s AND date < %s \
                     ORDER BY date;"
         EXP_report = pd.read_sql(sql, con=engine, params=[valid_token['id'], start_date, end_date], parse_dates=['date'])
         EXP_report.set_index('date', inplace=True)
@@ -37,7 +36,7 @@ def api_expenses(year, month):
 
 # Used by post_expense and post_expenses_batch
 def insert_expense(json):
-    date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+    date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
     amount = json['amount'] or None
     person = json['person_id'] or  None
     b_cat = json['broad_category_id'] or None
@@ -47,11 +46,11 @@ def insert_expense(json):
     user_id = json['user_id']
     
     with engine.connect() as con:
-        insert_vendor_sql = "INSERT IGNORE INTO vendors(name) VALUES(%s)"
-        con.execute(insert_vendor_sql, [vendor])
-        vendor_id = con.execute("SELECT id FROM vendor WHERE name=%s", [vendor]).fetchone()[0]
+        insert_vendor_sql = "INSERT IGNORE INTO vendors(name, user_id) VALUES(%s, %s)"
+        con.execute(insert_vendor_sql, [vendor, user_id])
+        vendor_id = con.execute("SELECT id FROM vendors WHERE name=%s", [vendor]).fetchone()[0]
         sql = "INSERT INTO expenses(date, vendor_id, amount, broad_category_id, narrow_category_id, person_id, notes, user_id)\
-                VALUES(DATE(%s), %s, %s, %s, %s, %s, %s)"     
+                VALUES(DATE(%s), %s, %s, %s, %s, %s, %s, %s)"     
         con.execute(sql, [date, vendor_id, amount, b_cat, n_cat, person, notes, user_id])
 
 # Create Expense
@@ -90,7 +89,7 @@ def update_expenses(id):
     else:  
         json = request.get_json()
         # Parse dates
-        date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+        date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
         # Convert any null values
         amount = json['amount'] or None
         person = json['person_id'] or  None
@@ -131,14 +130,14 @@ def api_pivot(year, month):
         month = datetime.strptime(year_month, '%Y-%m')
         start_date = (month - timedelta(days=1)).date()
         end_date = (month + relativedelta(months=+1)).date()
-        sql = "SELECT date, v.name AS vendor, amount, b.name AS broad_category, n.name AS narrow_category, p.name AS Person, Notes FROM expenses e \
+        sql = "SELECT date, v.name AS vendor, amount, b.name AS broad_category, n.name AS narrow_category, p.name AS Person, notes FROM expenses e \
                     LEFT JOIN vendors v ON v.id=e.vendor_id \
                     LEFT JOIN broad_categories b ON b.id=e.broad_category_id \
                     LEFT JOIN persons p ON p.id=e.person_id \
                     LEFT JOIN narrow_categories n ON n.id=e.narrow_category_id \
-            WHERE date > %s AND date < %s;"
+            WHERE user_id=%s AND date > %s AND date < %s;"
 
-        EXP_dataframe = pd.read_sql(sql, con=engine, params=[start_date, end_date], parse_dates=['date'])
+        EXP_dataframe = pd.read_sql(sql, con=engine, params=[valid_token['id'], start_date, end_date], parse_dates=['date'])
         EXP_dataframe['broad_category'] = EXP_dataframe['broad_category'].str.replace('_', ' ')
         EXP_dataframe['narrow_category'] = EXP_dataframe['narrow_category'].str.replace('_', ' ')
         PT_report = pd.pivot_table(EXP_dataframe, values='amount', index=['broad_category', 'narrow_category'], aggfunc=np.sum)

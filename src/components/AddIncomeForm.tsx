@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import type { IncomeFormType } from '../interfaces/Interfaces'
+import type { IncomeFormType, AllDataListsType } from '../interfaces/Interfaces'
 import {
     Button,
     FormControl,
@@ -25,6 +25,7 @@ import { saveRecord } from '../utils/db';
 export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string, dialog: string },
     handleClose: Function,
+    categories: AllDataListsType,
     setOpenBackdrop: Function
 }) {
 
@@ -33,34 +34,26 @@ export default function AddRecordsForm(props: {
     const initialFormState = {
         date: new Date(Date.now()),
         amount: NaN,
-        earner_id: NaN,
+        person_id: NaN,
         source: "",
     }
 
     // Form control state
     const [formState, setFormState] = useState<IncomeFormType>(initialFormState)
 
-    // Hard coded Ids
-    const earners = [
-        { name: "Alexa", id: 3 },
-        { name: "Eli", id: 1 },
-        { name: "Rent", id: 8 },
-        { name: "Sales", id: 10 },
-        { name: "Gift", id: 11 },
-    ]
-
+    
     function handleFormChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>): void {
         let name = event.target.name as keyof typeof formState
         setFormState({ ...formState, [name]: event.target.value })
     }
-
+    
     function handleDateChange(date: Date | null) {
         setFormState({ ...formState, date: date });
     };
-
+    
     async function handleFormSubmit(event: React.SyntheticEvent): Promise<any> {
         event.preventDefault()
-        if (!formState.date || !formState.amount || !formState.earner_id || !formState.source) {
+        if (!formState.date || !formState.amount || !formState.person_id || !formState.source) {
             setAlertState({
                 severity: "error",
                 message: "Please fill out all fields",
@@ -84,7 +77,7 @@ export default function AddRecordsForm(props: {
             if (err.message === "Error! 500") {
                 setAlertState({
                     severity: "error",
-                    message: "Server Error! Contact Eli",
+                    message: "Server Error!",
                     open: true
                 })
                 return
@@ -103,7 +96,7 @@ export default function AddRecordsForm(props: {
             setFormState(initialFormState)
         }
     }
-
+    
     return (
             <DialogContent>
                 <Typography variant="h5" component="h5" className={props.classes.root}>Log Income</Typography>
@@ -144,15 +137,15 @@ export default function AddRecordsForm(props: {
                         inputProps={{ step: "0.01" }}
                     />
                     <FormControl className={props.classes.formControl}>
-                        <InputLabel htmlFor="earner_id">Person</InputLabel>
+                        <InputLabel htmlFor="person_id">Person</InputLabel>
                         <Select
                             onChange={handleFormChange}
-                            value={formState.earner_id}
-                            name="earner_id"
-                            labelId="earner_id"
+                            value={formState.person_id}
+                            name="person_id"
+                            labelId="person_id"
                             label="Person"
                         >
-                            {earners.map(i => (
+                            {props.categories.persons.map(i => (
                                 <MenuItem value={i.id}>{i.name}</MenuItem>
                             ))}
                         </Select>

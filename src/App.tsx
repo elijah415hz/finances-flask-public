@@ -8,7 +8,7 @@ import './App.css';
 import CustomizedSnackbar from './components/SnackBar'
 import { AlertStateType, Auth, ContextState } from './interfaces/Interfaces'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { green, blueGrey, red } from '@material-ui/core/colors'
+import { green, blueGrey, red, purple } from '@material-ui/core/colors'
 
 import { MuiPickersOverrides } from '@material-ui/pickers/typings/overrides';
 import { CssBaseline, ThemeOptions } from '@material-ui/core'
@@ -76,7 +76,7 @@ const theme = createMyTheme({
       main: green[900]
     },
     secondary: {
-      main: red[900]
+      main: purple[800]
     }
   },
 });

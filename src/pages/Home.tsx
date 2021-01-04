@@ -25,9 +25,11 @@ import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import AddIcon from '@material-ui/icons/Add'
-import { emptyDatabase } from '../utils/db';
+import { emptyDatabase, saveCategories, loadCategories } from '../utils/db';
 import PivotTable from '../components/PivotTable';
 import Form from '../components/Form';
+import WallChart from '../components/Chart'
+import Edit from '../components/Edit';
 
 function Home() {
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
@@ -45,13 +47,13 @@ function Home() {
         {
             schema: { fields: [] },
             data: [{
-                Amount: "",
-                Date: "",
-                Source: "",
-                Person: "",
+                amount: "",
+                date: "",
+                source: "",
+                person: "",
                 id: NaN,
                 source_id: NaN,
-                earner_id: NaN
+                person_id: NaN
             }]
         }
     )
@@ -60,14 +62,14 @@ function Home() {
         {
             schema: { fields: [] },
             data: [{
-                Amount: "",
-                Date: "",
-                Source: "",
-                Vendor: "",
-                Broad_category: "",
-                Narrow_category: "",
-                Person: "",
-                Notes: "",
+                amount: "",
+                date: "",
+                source: "",
+                vendor: "",
+                broad_category: "",
+                narrow_category: "",
+                person: "",
+                notes: "",
                 entry_id: NaN
             }]
         }
@@ -76,12 +78,10 @@ function Home() {
 
 
     // State for datalists
-    const [dataListsState, setDataListsState] = useState<AllDataListsType>({
-        source: [],
-        person_earner: [],
-        narrow_category: [],
-        broad_category: [],
-        vendor: []
+    const [categoriesState, setCategoriesState] = useState<AllDataListsType>({
+        persons: [],
+        narrow_categories: [],
+        broad_categories: [],
     })
 
     // Loading Backdrop display state
@@ -89,17 +89,17 @@ function Home() {
 
     // Converts dates to human-readable format
     function formatDates(entry: TableDataEntry): TableDataEntry {
-        if (!entry.Date) {
+        if (!entry.date) {
             return entry
         } else {
-            let date = new Date(entry.Date);
+            let date = new Date(entry.date);
             let year = date.getUTCFullYear();
             let month = (1 + date.getUTCMonth()).toString();
             month = month.length > 1 ? month : '0' + month;
             let day = date.getUTCDate().toString();
             day = day.length > 1 ? day : '0' + day;
             let dateString = month + '/' + day + '/' + year;
-            entry.Date = dateString
+            entry.date = dateString
             return entry
         }
     }
@@ -154,25 +154,17 @@ function Home() {
         let id;
 
         switch (name) {
-            case "Person":
-                state = dataListsState.person_earner;
+            case "person":
+                state = categoriesState.persons;
                 id = 'person_id';
                 break;
-            case "Source":
-                state = dataListsState.source;
-                id = 'source_id';
-                break;
-            case "Broad_category":
-                state = dataListsState.broad_category;
+            case "broad_category":
+                state = categoriesState.broad_categories;
                 id = 'broad_category_id';
                 break;
-            case "Narrow_category":
-                state = dataListsState.narrow_category;
+            case "narrow_category":
+                state = categoriesState.narrow_categories;
                 id = 'narrow_category_id';
-                break;
-            case "Vendor":
-                state = dataListsState.vendor;
-                id = 'vendor_id';
                 break;
         }
         let dataListItem = state.filter((i: DataListStateType) => i.name === value)[0]
@@ -189,7 +181,7 @@ function Home() {
             let { name, value } = event.target;
             let newExpensesTableStateData: TableDataEntry[] = [...expensesTableState.data]
             let updatedRow: TableDataEntry = { ...newExpensesTableStateData[index], [name]: value }
-            if (name === "Person" || name === "Broad_category" || name === "Narrow_category" || name === "Vendor") {
+            if (name === "person" || name === "broad_category" || name === "narrow_category" || name === "vendor") {
                 let { id, dataListItem } = assignId(name as InputName, value)
                 if (id && dataListItem) {
                     updatedRow = { ...updatedRow, [id]: dataListItem.id }
@@ -212,7 +204,7 @@ function Home() {
             let { name, value } = event.target;
             let newIncomeTableStateData: TableDataEntry[] = [...incomeTableState.data]
             let updatedRow: TableDataEntry = { ...newIncomeTableStateData[index], [name]: value }
-            if (name === "Person" || name === "Source") {
+            if (name === "person" || name === "source") {
                 let { id, dataListItem } = assignId(name as InputName, value)
                 if (id && dataListItem) {
                     updatedRow = { ...updatedRow, [id]: dataListItem.id }
@@ -287,7 +279,7 @@ function Home() {
         createStyles({
             formControl: {
                 margin: theme.spacing(1),
-                minWidth: '7em'
+                minWidth: '10em'
             },
             selectEmpty: {
                 marginTop: theme.spacing(2),
@@ -312,7 +304,10 @@ function Home() {
             logoutBtn: {
                 float: 'right',
                 margin: '1em',
-
+            },
+            editBtn: {
+                float: 'left',
+                margin: '1em',
             },
             offline: {
                 backgroundColor: 'red',
@@ -370,9 +365,11 @@ function Home() {
     // Controls for Dialogs
     const [addExpensesOpen, setAddExpensesOpen] = useState(false)
     const [addIncomeOpen, setAddIncomeOpen] = useState(false)
+    const [editOpen, setEditOpen] = useState(false)
     function handleClose() {
         setAddExpensesOpen(false)
         setAddIncomeOpen(false)
+        setEditOpen(false)
     }
 
     // Control display of Offline banner
@@ -381,15 +378,22 @@ function Home() {
     window.addEventListener("online", () => setOffline(false))
 
     useEffect(() => {
-        async function getDataLists(): Promise<void> {
-            let datalists = await API.dataList(Auth.token)
-            setDataListsState(datalists)
+        async function getCategories(): Promise<void> {
+            try {
+                let categories = await API.getCategories(Auth.token)
+                setCategoriesState(categories)
+                saveCategories(categories)
+            } catch (err) {
+                let categories = await loadCategories()
+                setCategoriesState(categories)
+            }
         }
-        getDataLists()
+        getCategories()
         if (!navigator.onLine) {
             setOffline(true)
         }
-    }, [])
+        // API.wallchart(Auth.token).then(res=>console.log(res))
+        }, [])
 
 
     return (
@@ -400,6 +404,13 @@ function Home() {
                 </AppBar>
             ) : null}
             <Box component='header' className="header">
+                <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.editBtn}
+                    onClick={()=>setEditOpen(true)}
+                >Edit
+                </Button>
                 <Button
                     variant="contained"
                     color="primary"
@@ -415,8 +426,8 @@ function Home() {
                     <h1 style={{ textAlign: 'center' }}>{Auth.user} Finances</h1>
                 </Container>
 
-                <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} />
-
+                {/* <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} /> */}
+                    <WallChart/>
                 <Form
                     classes={classes}
                     handleFormSubmit={handleFormSubmit}
@@ -428,7 +439,7 @@ function Home() {
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (
                     <ReportTable
                         state={incomeTableState}
-                        dataLists={dataListsState}
+                        dataLists={categoriesState}
                         handleChange={handleIncomeChange}
                         handleUpdate={updateIncomeRow}
                         deleteEntry={deleteEntry}
@@ -438,7 +449,7 @@ function Home() {
                 {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
                     <ReportTable
                         state={expensesTableState}
-                        dataLists={dataListsState}
+                        dataLists={categoriesState}
                         handleChange={handleExpensesChange}
                         handleUpdate={updateExpensesRow}
                         deleteEntry={deleteEntry}
@@ -449,10 +460,18 @@ function Home() {
                     <PivotTable state={expensesTableState} />
                 ) : null}
             </div>
+            <Dialog onClose={handleClose} open={editOpen} maxWidth='xl'>
+                <Edit 
+                    classes={classes} 
+                    handleClose={handleClose}
+                    setOpenBackdrop={setOpenBackdrop}
+                    />
+            </Dialog>
             <Dialog onClose={handleClose} open={addExpensesOpen} maxWidth='xl'>
                 <AddExpensesForm 
                 classes={classes} 
                 handleClose={handleClose}
+                categories={categoriesState}
                 setOpenBackdrop={setOpenBackdrop}
                 />
             </Dialog>
@@ -460,6 +479,7 @@ function Home() {
                 <AddIncomeForm 
                 classes={classes} 
                 handleClose={handleClose}
+                categories={categoriesState}
                 setOpenBackdrop={setOpenBackdrop}
                 />
             </Dialog>

@@ -19,15 +19,14 @@ def api_income(year, month):
         month = datetime.strptime(year_month, '%Y-%m')
         start_date = (month - timedelta(days=1)).date()
         end_date = (month + relativedelta(months=+1)).date()
-        sql = "SELECT i.id, i.source_id, i.earner_id as person_id, Date, amount, s.name AS Source, p.name AS Person\
+        sql = "SELECT i.id, i.source_id, i.person_id as person_id, date, amount, s.name AS source, p.name AS person\
                     FROM income i\
-                    WHERE user_id=%s\
-                    LEFT JOIN source s ON s.id=i.source_id\
-                    LEFT JOIN person_earner p ON p.id=i.earner_id\
-                    WHERE date > %s AND date < %s\
+                    LEFT JOIN sources s ON s.id=i.source_id\
+                    LEFT JOIN persons p ON p.id=i.person_id\
+                    WHERE i.user_id=%s AND date > %s AND date < %s\
                     ORDER BY date;"
-        INC_report = pd.read_sql(sql, con=engine, params=[valid_token['id'], start_date, end_date], parse_dates=['Date'])
-        INC_report.set_index('Date', inplace=True)
+        INC_report = pd.read_sql(sql, con=engine, params=[valid_token['id'], start_date, end_date], parse_dates=['date'])
+        INC_report.set_index('date', inplace=True)
         INC_report['amount'] = INC_report['amount'].apply(format_numbers)
         return INC_report.to_json(orient="table")
 
@@ -35,17 +34,17 @@ def api_income(year, month):
 def insert_income(json):
     date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
     amount = json['amount'] or None
-    earner_id = json['earner_id'] or  None
+    person_id = json['person_id'] or  None
     source = json['source'] or None
     user_id = json['user_id']
     
     with engine.connect() as con:
-        insert_source_sql = "INSERT IGNORE INTO sources(name) VALUES(%s)"
-        con.execute(insert_source_sql, [source])
+        insert_source_sql = "INSERT IGNORE INTO sources(name, user_id) VALUES(%s, %s)"
+        con.execute(insert_source_sql, [source, user_id])
         source_id = con.execute("SELECT id FROM sources WHERE name=%s", [source]).fetchone()[0]
-        sql = "INSERT INTO income(date, amount, source_id, earner_id, user_id)\
+        sql = "INSERT INTO income(date, amount, source_id, person_id, user_id)\
                 VALUES(DATE(%s), %s, %s, %s, %s)"     
-        con.execute(sql, [date, amount, source_id, earner_id, user_id])
+        con.execute(sql, [date, amount, source_id, person_id, user_id])
 
 # Create Income Record
 @bp.route("/", methods=["POST"])

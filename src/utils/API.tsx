@@ -4,12 +4,16 @@ import type {
     TableDataEntry, 
     TableType,
     ExpensesFormType,
-    IncomeFormType} from '../interfaces/Interfaces'
+    IncomeFormType,
+    EditFormType} from '../interfaces/Interfaces'
 
 
 function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
     if (res.status === 401) {
         throw new Error("Unauthorized")
+    }
+    if (res.status === 404) {
+        throw new Error("No Data")
     }
     if (res.status !== 200) {
         throw new Error("Error! " + res.status)
@@ -22,6 +26,23 @@ function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
 }
 
 const API = {
+    addCategories: function (token: string | null, data: EditFormType): Promise<Response | string> {
+        return fetch(`/api/categories/`, {
+            method: 'POST',
+            headers: {
+                "authorization": `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res=>checkStatus<string>(res, 'text'))
+    },
+    getCategories: function (token: string | null): Promise<AllDataListsType> {
+        return fetch(`/api/categories/`, {
+            headers: {
+                "authorization": `Bearer ${token}`,
+            },
+        }).then(res=>checkStatus<AllDataListsType>(res, 'json'))
+    },
     expenses: function (token: string | null, yearMonthObj: FormStateType): Promise<{schema: { fields: [] }, data: TableDataEntry[]}> {
         return fetch(`/api/expenses/${yearMonthObj.year}/${yearMonthObj.month}`, {
             headers: {
@@ -119,6 +140,14 @@ const API = {
             }
         }).then(res=>checkStatus<TableType>(res, 'json'))
     },
+    wallchart: function (token: string | null): Promise<{schema: { fields: [] }, data: TableDataEntry[]}> {
+        return fetch(`/wallchart`, {
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        }).then(res=>checkStatus<TableType>(res, 'json'))
+    },
+
     dataList: function (token: string | null): Promise<AllDataListsType> {
         return fetch(`/api/datalists`, {
             headers: {

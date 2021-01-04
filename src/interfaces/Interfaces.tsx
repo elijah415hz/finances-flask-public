@@ -41,15 +41,14 @@ interface IncomeFormType {
 interface EditFormType {
     person?: string,
     broad_category?: string,
-    narrow_category?: string
+    narrow_category?: string,
+    has_person?: boolean,
+    broad_category_id?: number
 }
 
 interface CategoryType {
     name: string,
     id: number,
-    narrowCategories?: {
-        name: string, id: number
-    }[],
     person?: boolean
 }
 

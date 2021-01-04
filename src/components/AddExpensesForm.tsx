@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import API from '../utils/API'
 import { saveRecord } from '../utils/db'
 import { AuthContext } from '../App'
-import type { ExpensesFormType, CategoryType, AllDataListsType } from '../interfaces/Interfaces'
+import { ExpensesFormType, CategoryType, AllDataListsType, DataListStateType } from '../interfaces/Interfaces'
 import {
     Button,
     FormControl,
@@ -46,17 +46,21 @@ export default function AddRecordsForm(props: {
     const [formState, setFormState] = useState<ExpensesFormType>(initialFormState)
 
     // State to hold category info
-    const [currentCategory, setCurrentCategory] = useState<CategoryType>({
+    const [currentBroadCategory, setCurrentBroadCategory] = useState<DataListStateType>({
         name: "",
         id: NaN,
     })
+
+    const [currentNarrowCategories, setCurrentNarrowCategories] = useState<DataListStateType[]>([])
 
     function handleFormChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>): void {
         let name = event.target.name as keyof typeof formState
         setFormState({ ...formState, [name]: event.target.value })
         if (name === 'broad_category_id') {
-            // let category = categories.filter(i => i.id === event.target.value)[0]
-            // setCurrentCategory(category)
+            let category = props.categories.broad_categories.filter(i => i.id === event.target.value)[0]
+            setCurrentBroadCategory(category)
+            let narrowCategories = props.categories.narrow_categories.filter(i => i.broad_category_id === category.id)
+            setCurrentNarrowCategories(narrowCategories)
         }
     }
 
@@ -107,7 +111,7 @@ export default function AddRecordsForm(props: {
             }
         } finally {
             setFormState(initialFormState)
-            setCurrentCategory({
+            setCurrentBroadCategory({
                 name: "",
                 id: NaN
             })
@@ -146,7 +150,7 @@ export default function AddRecordsForm(props: {
                 <TextField
                     onChange={handleFormChange}
                     value={formState.amount}
-                    label="amount"
+                    label="Amount"
                     name="amount"
                     type="number"
                     InputProps={{
@@ -169,7 +173,7 @@ export default function AddRecordsForm(props: {
                             ))}
                     </Select>
                 </FormControl>
-                {currentCategory.narrowCategories ? (
+                {currentNarrowCategories.length > 0 ? (
                     <FormControl className={props.classes.formControl}>
                         <InputLabel htmlFor="narrow_category">Narrow Category</InputLabel>
                         <Select
@@ -180,13 +184,13 @@ export default function AddRecordsForm(props: {
                             label="Narrow Category"
                             >
                             {/* Get the list of narrow categories corresponding to the selected broad category */}
-                            {currentCategory.narrowCategories?.map(i => (
+                            {currentNarrowCategories?.map(i => (
                                 <MenuItem value={i.id}>{i.name}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
                 ) : null}
-                {currentCategory.person ? (
+                {currentBroadCategory.person ? (
                     
                     <FormControl className={props.classes.formControl}>
                         <InputLabel htmlFor="person_id">Person</InputLabel>

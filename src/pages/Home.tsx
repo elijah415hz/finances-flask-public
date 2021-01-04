@@ -464,6 +464,7 @@ function Home() {
                 <Edit 
                     classes={classes} 
                     handleClose={handleClose}
+                    categories={categoriesState}
                     setOpenBackdrop={setOpenBackdrop}
                     />
             </Dialog>

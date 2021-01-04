@@ -90,6 +90,30 @@ interface Auth {
     setAlertState: React.Dispatch<React.SetStateAction<AlertStateType>>
   };
 
+interface WallChartData {
+    labels: string[], 
+    expenses: number[], 
+    income: number[]
+}
+
+interface ChartJSDataType {
+    labels: string[],
+    datasets: [
+        {
+            label: string,
+            data: number[],
+            fill: boolean,
+            borderColor: string
+        },
+        {
+            label: string,
+            data: number[],
+            fill: boolean,
+            borderColor: string
+        }
+    ]
+}
+
 export type {
     TableDataEntry,
     DataListStateType,
@@ -103,5 +127,7 @@ export type {
     AlertStateType,
     Auth,
     ContextState,
-    EditFormType
+    EditFormType,
+    WallChartData,
+    ChartJSDataType
 }

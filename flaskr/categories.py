@@ -14,11 +14,9 @@ def get_categories():
         return Response("Nice Try!", status=401)
     else:
         data_lists = [
-            # "sources",
             "persons",
             "narrow_categories",
             "broad_categories",
-            # "vendors"
         ]
 
         response = {}
@@ -27,7 +25,6 @@ def get_categories():
             dataframe = pd.read_sql(sql, con=engine, params=[valid_token['id']])
             data_dict = dataframe.to_dict(orient="records")
             response[dl] = data_dict
-        print("Categories: ", response)
         return response
 
 # Post persons and categories to customize user categories

@@ -446,7 +446,7 @@ function Home() {
                         form={formState.form}
                     />
                 ) : null}
-                {formState.form === "expenses" && expensesTableState.data[0]?.entry_id ? (
+                {formState.form === "expenses" && expensesTableState.data[0]?.id ? (
                     <ReportTable
                         state={expensesTableState}
                         dataLists={categoriesState}
@@ -456,7 +456,7 @@ function Home() {
                         form={formState.form}
                     />
                 ) : null}
-                {formState.form === "pivot" && expensesTableState.data[0]?.entry_id ? (
+                {formState.form === "pivot" && expensesTableState.data[0]?.id ? (
                     <PivotTable state={expensesTableState} />
                 ) : null}
             </div>

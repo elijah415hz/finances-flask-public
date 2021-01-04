@@ -5,7 +5,8 @@ import type {
     TableType,
     ExpensesFormType,
     IncomeFormType,
-    EditFormType} from '../interfaces/Interfaces'
+    EditFormType,
+    WallChartData} from '../interfaces/Interfaces'
 
 
 function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
@@ -140,12 +141,12 @@ const API = {
             }
         }).then(res=>checkStatus<TableType>(res, 'json'))
     },
-    wallchart: function (token: string | null): Promise<{schema: { fields: [] }, data: TableDataEntry[]}> {
+    wallchart: function (token: string | null): Promise<WallChartData> {
         return fetch(`/wallchart`, {
             headers: {
                 "authorization": `Bearer ${token}`
             }
-        }).then(res=>checkStatus<TableType>(res, 'json'))
+        }).then(res=>checkStatus<WallChartData>(res, 'json'))
     },
 
     dataList: function (token: string | null): Promise<AllDataListsType> {

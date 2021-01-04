@@ -29,9 +29,11 @@ def api_expenses(year, month):
                     LEFT JOIN narrow_categories n ON n.id=e.narrow_category_id \
                     WHERE e.user_id=%s AND date > %s AND date < %s \
                     ORDER BY date;"
+        print("ID:", valid_token['id'])
         EXP_report = pd.read_sql(sql, con=engine, params=[valid_token['id'], start_date, end_date], parse_dates=['date'])
         EXP_report.set_index('date', inplace=True)
         EXP_report['amount'] = EXP_report['amount'].apply(format_numbers)
+        print(EXP_report)
         return EXP_report.to_json(orient="table")
 
 # Used by post_expense and post_expenses_batch

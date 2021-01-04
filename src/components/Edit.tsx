@@ -49,6 +49,7 @@ export default function Edit(props: {
     async function handleFormSubmit(event: React.SyntheticEvent, form: 'person' | 'narrow_category' | 'broad_category'): Promise<any> {
         event.preventDefault()
         try {
+            props.setOpenBackdrop(true)
             let data
             switch (form) {
                 case 'person':
@@ -68,18 +69,33 @@ export default function Edit(props: {
                     }
                     break;
             }
-            let response = await API.addCategories(Auth.token, data)
-            console.log(response)
+            await API.addCategories(Auth.token, data)
+            setAlertState({
+                severity: "success",
+                message: "Category Added!",
+                open: true
+            })
         } catch (err) {
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
+            } else {
+                if (err.message === "Error! 500") {
+                    setAlertState({
+                        severity: "error",
+                        message: "Server Error!",
+                        open: true
+                    })
+                    return
+                }
             }
+        } finally {
+            props.setOpenBackdrop(false)
         }
     }
 
     return (
         <DialogContent>
-            <Typography variant="h5" component="h5" className={props.classes.root}>Add an Earner</Typography>
+            <Typography variant="h5" component="h5" className={props.classes.root}>Add a Person</Typography>
             <form className={props.classes.root} onSubmit={(e: React.SyntheticEvent) => handleFormSubmit(e, 'person')}>
                 <TextField
                     onChange={handleFormChange}
@@ -94,6 +110,7 @@ export default function Edit(props: {
                     color="primary"
                 >Submit</Button>
             </form>
+            <Typography variant="h5" component="h5" className={props.classes.root}>Add a Broad Category</Typography>
             <form className={props.classes.root} onSubmit={(e: React.SyntheticEvent) => handleFormSubmit(e, 'broad_category')}>
                 <TextField
                     onChange={handleFormChange}
@@ -108,7 +125,7 @@ export default function Edit(props: {
                     name="has_person"
                     inputProps={{ 'aria-label': 'primary checkbox' }}
                 />}
-                label="Person"
+                    label="Person"
                 />
                 <Button
                     type="submit"
@@ -116,6 +133,7 @@ export default function Edit(props: {
                     color="primary"
                 >Submit</Button>
             </form>
+            <Typography variant="h5" component="h5" className={props.classes.root}>Add a Narrow Category</Typography>
             <form className={props.classes.root} onSubmit={(e: React.SyntheticEvent) => handleFormSubmit(e, 'narrow_category')}>
                 <FormControl
                     className={props.classes.formControl}>
@@ -132,7 +150,7 @@ export default function Edit(props: {
                         ))}
                     </Select>
                 </FormControl>
-                             <TextField
+                <TextField
                     onChange={handleFormChange}
                     value={formState.narrow_category}
                     label="Narrow Category"

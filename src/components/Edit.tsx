@@ -134,7 +134,7 @@ export default function Edit(props: {
                     type="submit"
                     variant="contained"
                     color="primary"
-                >Submit</Button>
+                >Add</Button>
             </form>
             <Typography variant="h5" component="h5" className={props.classes.root}>Add a Broad Category</Typography>
             <form className={props.classes.root} onSubmit={(e: React.SyntheticEvent) => handleFormSubmit(e, 'broad_category')}>
@@ -157,7 +157,7 @@ export default function Edit(props: {
                     type="submit"
                     variant="contained"
                     color="primary"
-                >Submit</Button>
+                >Add</Button>
             </form>
             <Typography variant="h5" component="h5" className={props.classes.root}>Add a Narrow Category</Typography>
             <form className={props.classes.root} onSubmit={(e: React.SyntheticEvent) => handleFormSubmit(e, 'narrow_category')}>
@@ -186,7 +186,7 @@ export default function Edit(props: {
                     type="submit"
                     variant="contained"
                     color="primary"
-                >Submit</Button>
+                >Add</Button>
             </form>
             <div className={props.classes.root}>
                 <Button

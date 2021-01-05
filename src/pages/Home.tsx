@@ -310,7 +310,7 @@ function Home() {
                 margin: '1em',
             },
             offline: {
-                backgroundColor: 'red',
+                backgroundColor: theme.palette.secondary.main,
                 color: 'white',
                 textAlign: 'center',
                 position: 'sticky'

@@ -50,25 +50,34 @@ export default function Edit(props: {
         event.preventDefault()
         props.setOpenBackdrop(true)
         let data
-        switch (form) {
-            case 'person':
-                data = { person: formState.person }
-                break;
-            case 'broad_category':
-                data = {
-                    broad_category: formState.broad_category,
-                    has_person: formState.has_person
-                }
-                break;
-            case 'narrow_category':
-                data = {
-                    narrow_category: formState.narrow_category,
-                    broad_category_id: formState.broad_category_id,
-                    has_person: formState.has_person
-                }
-                break;
-        }
         try {
+            switch (form) {
+                case 'person':
+                    data = { person: formState.person }
+                    if (!data.person) {
+                        throw new Error("Empty Input")
+                    }
+                    break;
+                case 'broad_category':
+                    data = {
+                        broad_category: formState.broad_category,
+                        has_person: formState.has_person
+                    }
+                    if (!data.broad_category) {
+                        throw new Error("Empty Input")
+                    }
+                    break;
+                case 'narrow_category':
+                    data = {
+                        narrow_category: formState.narrow_category,
+                        broad_category_id: formState.broad_category_id,
+                        has_person: formState.has_person
+                    }
+                    if (!data.narrow_category || !data.broad_category_id) {
+                        throw new Error("Empty Input")
+                    }
+                    break;
+            }
             await API.addCategories(Auth.token, data)
             setAlertState({
                 severity: "success",
@@ -79,22 +88,31 @@ export default function Edit(props: {
             props.setCategories(updatedCategories);
 
         } catch (err) {
-            if (err.message === "Error! 500") {
-                setAlertState({
-                    severity: "error",
-                    message: "Server Error!",
-                    open: true
-                })
-                return
+            switch (err.message) {
+                case "Error! 500":
+                    setAlertState({
+                        severity: "error",
+                        message: "Server Error!",
+                        open: true
+                    })
+                    break;
+                case "Unauthorized":
+                    setAuth({ type: 'LOGOUT' })
+                    break;
+                case "Empty Input":
+                    setAlertState({
+                        severity: "error",
+                        message: "Please fill out all fields",
+                        open: true
+                    })
+                    break;
+                default:
+                    setAlertState({
+                        severity: "error",
+                        message: "You must be connected to the internet to add categories",
+                        open: true
+                    })
             }
-            if (err.message === "Unauthorized") {
-                setAuth({ type: 'LOGOUT' })
-            }
-            setAlertState({
-                severity: "error",
-                message: "You must be connected to the internet to add categories",
-                open: true
-            })
         } finally {
             props.setOpenBackdrop(false)
             setFormState(initialFormState)

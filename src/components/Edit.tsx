@@ -15,11 +15,11 @@ import { AllDataListsType, EditFormType } from '../interfaces/Interfaces'
 import API from '../utils/API'
 import { AuthContext } from '../App'
 
-
 export default function Edit(props: {
     handleClose: Function,
     classes: { root: string, formControl: string },
     categories: AllDataListsType,
+    setCategories: Function,
     setOpenBackdrop: Function
 }) {
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
@@ -48,48 +48,56 @@ export default function Edit(props: {
 
     async function handleFormSubmit(event: React.SyntheticEvent, form: 'person' | 'narrow_category' | 'broad_category'): Promise<any> {
         event.preventDefault()
+        props.setOpenBackdrop(true)
+        let data
+        switch (form) {
+            case 'person':
+                data = { person: formState.person }
+                break;
+            case 'broad_category':
+                data = {
+                    broad_category: formState.broad_category,
+                    has_person: formState.has_person
+                }
+                break;
+            case 'narrow_category':
+                data = {
+                    narrow_category: formState.narrow_category,
+                    broad_category_id: formState.broad_category_id,
+                    has_person: formState.has_person
+                }
+                break;
+        }
         try {
-            props.setOpenBackdrop(true)
-            let data
-            switch (form) {
-                case 'person':
-                    data = { person: formState.person }
-                    break;
-                case 'broad_category':
-                    data = {
-                        broad_category: formState.broad_category,
-                        has_person: formState.has_person
-                    }
-                    break;
-                case 'narrow_category':
-                    data = {
-                        narrow_category: formState.narrow_category,
-                        broad_category_id: formState.broad_category_id,
-                        has_person: formState.has_person
-                    }
-                    break;
-            }
             await API.addCategories(Auth.token, data)
             setAlertState({
                 severity: "success",
                 message: "Category Added!",
                 open: true
             })
+            let updatedCategories = await API.getCategories(Auth.token)
+            props.setCategories(updatedCategories);
+
         } catch (err) {
+            if (err.message === "Error! 500") {
+                setAlertState({
+                    severity: "error",
+                    message: "Server Error!",
+                    open: true
+                })
+                return
+            }
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
-            } else {
-                if (err.message === "Error! 500") {
-                    setAlertState({
-                        severity: "error",
-                        message: "Server Error!",
-                        open: true
-                    })
-                    return
-                }
             }
+            setAlertState({
+                severity: "error",
+                message: "You must be connected to the internet to add categories",
+                open: true
+            })
         } finally {
             props.setOpenBackdrop(false)
+            setFormState(initialFormState)
         }
     }
 
@@ -140,7 +148,6 @@ export default function Edit(props: {
                     <InputLabel htmlFor="broad_category">Broad Category</InputLabel>
                     <Select
                         onChange={handleFormChange}
-                        value={formState.broad_category}
                         name="broad_category_id"
                         labelId="broad_category_id"
                         label="Broad Category"

@@ -464,6 +464,7 @@ function Home() {
                     classes={classes} 
                     handleClose={handleClose}
                     categories={categoriesState}
+                    setCategories={setCategoriesState}
                     setOpenBackdrop={setOpenBackdrop}
                     />
             </Dialog>

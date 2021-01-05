@@ -7,7 +7,9 @@ import { ChartJSDataType } from "../interfaces/Interfaces";
 export default function WallChart({data}: {data: ChartJSDataType}) {
     return (
         <Container>
-            <Line data={data} />
+            <Line data={data} height={400} options={{
+		maintainAspectRatio: false
+	}}/>
         </Container>
     );
 }

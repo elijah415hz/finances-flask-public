@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import API from '../utils/API'
 import { saveRecord } from '../utils/db'
 import { AuthContext } from '../App'
-import { ExpensesFormType, CategoryType, AllDataListsType, DataListStateType } from '../interfaces/Interfaces'
+import { ExpensesFormType, AllDataListsType, DataListStateType } from '../interfaces/Interfaces'
 import {
     Button,
     FormControl,
@@ -22,13 +22,12 @@ import {
 } from '@material-ui/pickers';
 
 
-
-
 export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string},
     handleClose: Function,
     categories: AllDataListsType,
-    setOpenBackdrop: Function
+    setOpenBackdrop: Function,
+    reloadWallChart: Function
 }) {
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
@@ -89,6 +88,7 @@ export default function AddRecordsForm(props: {
                 message: "Record Saved!",
                 open: true
             })
+            props.reloadWallChart()
         } catch (err) {
             props.setOpenBackdrop(false)
             if (err.message === "Error! 500") {

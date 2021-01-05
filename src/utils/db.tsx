@@ -1,5 +1,5 @@
-import { openDB, deleteDB, DBSchema, IDBPDatabase } from 'idb'
-import { AllDataListsType, ExpensesFormType, IncomeFormType, WallChartData } from '../interfaces/Interfaces';
+import { openDB, DBSchema, IDBPDatabase } from 'idb'
+import { AllDataListsType, ExpensesFormType, IncomeFormType, WallChartDataType } from '../interfaces/Interfaces';
 import API from './API';
 
 interface financesDB extends DBSchema {
@@ -103,12 +103,12 @@ export async function loadCategories() {
   return categories
 }
 
-export async function saveWallChartData(data: WallChartData) {
+export async function saveWallChartData(data: WallChartDataType) {
   await db.clear('wallchart');
   db.put('wallchart', data);
 }
 
-export async function loadWallChartData(): Promise<WallChartData> {
+export async function loadWallChartData(): Promise<WallChartDataType> {
   let data = await db.getAll('wallchart');
   return data[0];
 }

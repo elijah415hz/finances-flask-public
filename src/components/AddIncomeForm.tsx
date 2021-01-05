@@ -26,7 +26,8 @@ export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string, dialog: string },
     handleClose: Function,
     categories: AllDataListsType,
-    setOpenBackdrop: Function
+    setOpenBackdrop: Function,
+    reloadWallChart: Function
 }) {
 
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
@@ -72,6 +73,7 @@ export default function AddRecordsForm(props: {
                 message: "Record Saved!",
                 open: true
             })
+            props.reloadWallChart()
         } catch (err) {
             props.setOpenBackdrop(false)
             if (err.message === "Error! 500") {

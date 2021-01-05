@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import ReportTable from '../components/Table';
 import AddExpensesForm from '../components/AddExpensesForm'
 import AddIncomeForm from '../components/AddIncomeForm'
 import API from '../utils/API'
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import { AuthContext } from '../App'
 import type {
     TableDataEntry,
     DataListStateType,
     AllDataListsType,
     FormStateType,
-    InputName
+    InputName,
+    ChartJSDataType,
+    WallChartDataType
 } from '../interfaces/Interfaces'
 import {
     AppBar,
@@ -25,13 +27,22 @@ import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import AddIcon from '@material-ui/icons/Add'
-import { emptyDatabase, saveCategories, loadCategories } from '../utils/db';
+import { 
+    emptyDatabase, 
+    saveCategories, 
+    loadCategories, 
+    saveWallChartData, 
+    loadWallChartData 
+} from '../utils/db';
+
 import PivotTable from '../components/PivotTable';
 import Form from '../components/Form';
 import WallChart from '../components/Chart'
 import Edit from '../components/Edit';
 
 function Home() {
+    const theme = useTheme();
+
     const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
 
     // Form control state
@@ -254,6 +265,64 @@ function Home() {
         }
     }
 
+    // State For WallChart
+    function reducer(state: ChartJSDataType, action: WallChartDataType): ChartJSDataType {
+        if (action.labels.length > 0) {
+            state = {
+                labels: action.labels,
+                datasets: [
+                    {
+                        label: "Income",
+                        data: action.income,
+                        fill: false,
+                        borderColor: theme.palette.primary.main
+                    },
+                    {
+                        label: "Expenses",
+                        data: action.expenses,
+                        fill: false,
+                        borderColor: theme.palette.secondary.main
+                    }
+                ]
+            }
+        }
+        return state
+    }
+
+    const [wallChartData, setWallChartData] = useReducer(reducer, {
+        labels: [],
+        datasets: [
+            {
+                label: "Income",
+                data: [],
+                fill: false,
+                borderColor: theme.palette.primary.main
+            },
+            {
+                label: "Expenses",
+                data: [],
+                fill: false,
+                borderColor: theme.palette.secondary.main
+            }
+        ]
+    })
+
+    // Reload data for Wallchart
+    async function reloadWallChartData(): Promise<void> {
+        console.log("Reloading Wallchart")
+        try {
+            let res = await API.wallchart(Auth.token)
+            setWallChartData(res)
+            saveWallChartData(res)
+        } catch (err) {
+            if (err.message === "No Data") {
+                console.log("No Data!")
+            } else {
+                loadWallChartData().then((data: WallChartDataType) => setWallChartData(data))
+            }
+        }
+    }
+
     // Delete a row from the database
     async function deleteEntry(id: number | undefined) {
         try {
@@ -392,6 +461,7 @@ function Home() {
         if (!navigator.onLine) {
             setOffline(true)
         }
+        reloadWallChartData()
         }, [])
 
 
@@ -424,9 +494,7 @@ function Home() {
                 <Container className={classes.root}>
                     <h1 style={{ textAlign: 'center' }}>{Auth.user} Finances</h1>
                 </Container>
-
-                {/* <img src="/wallchart" alt="Wall Chart" className={classes.wallchart} /> */}
-                    <WallChart/>
+                    <WallChart data={wallChartData}/>
                 <Form
                     classes={classes}
                     handleFormSubmit={handleFormSubmit}
@@ -474,6 +542,7 @@ function Home() {
                 handleClose={handleClose}
                 categories={categoriesState}
                 setOpenBackdrop={setOpenBackdrop}
+                reloadWallChart={reloadWallChartData}
                 />
             </Dialog>
             <Dialog onClose={handleClose} open={addIncomeOpen} maxWidth='xl'>
@@ -482,6 +551,7 @@ function Home() {
                 handleClose={handleClose}
                 categories={categoriesState}
                 setOpenBackdrop={setOpenBackdrop}
+                reloadWallChart={reloadWallChartData}
                 />
             </Dialog>
             <SpeedDial

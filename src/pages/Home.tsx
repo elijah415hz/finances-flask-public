@@ -392,7 +392,6 @@ function Home() {
         if (!navigator.onLine) {
             setOffline(true)
         }
-        // API.wallchart(Auth.token).then(res=>console.log(res))
         }, [])
 
 

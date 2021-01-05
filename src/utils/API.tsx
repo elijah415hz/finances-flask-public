@@ -156,6 +156,15 @@ const API = {
             }
         }).then(res => checkStatus<AllDataListsType>(res, 'json'))
     },
+    signup: function (data: { username: string, password: string }): Promise<Response | string> {
+        return fetch('/auth/signup', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res => checkStatus<string>(res, 'text'))
+    },
     login: function (data: { username: string, password: string }): Promise<{ token: string }> {
         return fetch('/auth/login', {
             method: "POST",

@@ -2,14 +2,16 @@ import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import { Button, TextField } from '@material-ui/core';
+import { Button, TextField, Dialog, Container } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import Signup from '../components/Signup'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
             justifyContent: 'center',
+            textAlign: 'center',
             flexWrap: 'wrap',
             '& > *': {
                 margin: theme.spacing(1),
@@ -17,7 +19,11 @@ const useStyles = makeStyles((theme: Theme) =>
                     width: '100%',
                 },
             }
-        }
+        },
+        signupBtn: {
+            float: 'right',
+            margin: '1em',
+        },
     })
 );
 
@@ -28,6 +34,8 @@ export default function Login() {
         username: "",
         password: "",
     });
+
+    const [signupOpen, setSignupOpen] = useState<boolean>(false)
 
     const inputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -55,6 +63,9 @@ export default function Login() {
 
     const classes = useStyles()
 
+    function handleClose() {
+        setSignupOpen(false)
+    }
 
     if (Auth.loggedIn) {
         return <Redirect to='/' />
@@ -64,7 +75,13 @@ export default function Login() {
 
     return (
         <>
-            <div className="Login" style={{ textAlign: 'center' }}>
+            <Button
+                className={classes.signupBtn}
+                variant="contained"
+                color="primary"
+                onClick={() => setSignupOpen(true)}
+            >Sign Up</Button>
+            <Container className={classes.root}>
                 <h4>Login</h4>
                 <form className={classes.root} onSubmit={formSubmit}>
                     <TextField
@@ -85,7 +102,10 @@ export default function Login() {
                     />
                     <Button variant="contained" color="primary" name="login" type="submit">Login</Button>
                 </form>
-            </div>
+            </Container>
+            <Dialog onClose={handleClose} open={signupOpen} maxWidth='xl'>
+                <Signup handleClose={handleClose}/>
+            </Dialog>
         </>
     );
 }

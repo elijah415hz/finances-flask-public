@@ -1,5 +1,5 @@
 import { openDB, deleteDB, DBSchema, IDBPDatabase } from 'idb'
-import { AllDataListsType, ExpensesFormType, IncomeFormType } from '../interfaces/Interfaces';
+import { AllDataListsType, ExpensesFormType, IncomeFormType, WallChartData } from '../interfaces/Interfaces';
 import API from './API';
 
 interface financesDB extends DBSchema {
@@ -47,20 +47,27 @@ interface financesDB extends DBSchema {
     },
     key: string
   },
+  wallchart: {
+    value: {
+      labels: string[],
+      income: number[],
+      expenses: number[]
+    },
+    key: string
+  },
 }
 
 
 let db: IDBPDatabase<financesDB>;
 export async function testDatabase() {
-  db = await openDB<financesDB>("pendingFinances", 3, {
-    async upgrade(db, oldVersion) {
-      if (oldVersion < 1) {
-        db.createObjectStore('expenses', { autoIncrement: true })
-        db.createObjectStore('income', { autoIncrement: true })
-      }
+  db = await openDB<financesDB>("finances", 1, {
+    async upgrade(db) {
+      db.createObjectStore('expenses', { autoIncrement: true })
+      db.createObjectStore('income', { autoIncrement: true })
       db.createObjectStore('broad_categories', { autoIncrement: true })
       db.createObjectStore('narrow_categories', { autoIncrement: true })
       db.createObjectStore('persons', { autoIncrement: true })
+      db.createObjectStore('wallchart', { autoIncrement: true })
     }
   });
 
@@ -74,7 +81,6 @@ export async function saveRecord(table: 'income' | 'expenses', record: ExpensesF
 }
 
 export async function saveCategories(categories: AllDataListsType) {
-  
   (Object.keys(categories) as Array<keyof AllDataListsType>).map((category: keyof AllDataListsType) => {
     db.clear(category)
     categories[category as keyof AllDataListsType]?.map(c => {
@@ -97,7 +103,17 @@ export async function loadCategories() {
   return categories
 }
 
-export async function emptyDatabase() {
+export async function saveWallChartData(data: WallChartData) {
+  await db.clear('wallchart');
+  db.put('wallchart', data);
+}
+
+export async function loadWallChartData(): Promise<WallChartData> {
+  let data = await db.getAll('wallchart');
+  return data[0];
+}
+
+export async function emptyDatabase(): Promise<string> {
   try {
     await db.clear('expenses')
     await db.clear('income')

@@ -98,20 +98,14 @@ interface WallChartData {
 
 interface ChartJSDataType {
     labels: string[],
-    datasets: [
+    datasets: 
         {
             label: string,
             data: number[],
             fill: boolean,
             borderColor: string
-        },
-        {
-            label: string,
-            data: number[],
-            fill: boolean,
-            borderColor: string
-        }
-    ]
+        }[]
+    
 }
 
 export type {

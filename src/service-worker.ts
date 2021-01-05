@@ -14,6 +14,8 @@ import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate, NetworkFirst } from 'workbox-strategies';
 
+let version = "1.1"
+
 declare const self: ServiceWorkerGlobalScope;
 
 clientsClaim();

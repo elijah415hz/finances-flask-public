@@ -81,7 +81,7 @@ function Home() {
                 narrow_category: "",
                 person: "",
                 notes: "",
-                entry_id: NaN
+                id: NaN
             }]
         }
 
@@ -192,7 +192,7 @@ function Home() {
             let { name, value } = event.target;
             let newExpensesTableStateData: TableDataEntry[] = [...expensesTableState.data]
             let updatedRow: TableDataEntry = { ...newExpensesTableStateData[index], [name]: value }
-            if (name === "person" || name === "broad_category" || name === "narrow_category" || name === "vendor") {
+            if (name === "person" || name === "broad_category" || name === "narrow_category") {
                 let { id, dataListItem } = assignId(name as InputName, value)
                 if (id && dataListItem) {
                     updatedRow = { ...updatedRow, [id]: dataListItem.id }
@@ -215,7 +215,7 @@ function Home() {
             let { name, value } = event.target;
             let newIncomeTableStateData: TableDataEntry[] = [...incomeTableState.data]
             let updatedRow: TableDataEntry = { ...newIncomeTableStateData[index], [name]: value }
-            if (name === "person" || name === "source") {
+            if (name === "person") {
                 let { id, dataListItem } = assignId(name as InputName, value)
                 if (id && dataListItem) {
                     updatedRow = { ...updatedRow, [id]: dataListItem.id }
@@ -328,7 +328,7 @@ function Home() {
         try {
             if (formState.form === "expenses") {
                 await API.deleteExpenses(Auth.token, id);
-                let newExpensesTableStateData = expensesTableState.data.filter(entry => entry.entry_id !== id)
+                let newExpensesTableStateData = expensesTableState.data.filter(entry => entry.id !== id)
                 setExpensesTableState({ ...expensesTableState, data: newExpensesTableStateData })
             } else if (formState.form === "income") {
                 await API.deleteIncome(Auth.token, id);

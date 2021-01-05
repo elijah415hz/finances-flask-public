@@ -98,23 +98,16 @@ export default function InputRow(props:
                                 }
                             }
                                 style={{ width: '80%' }}
-                            // style={{width: `${(state[column.name as keyof TableDataEntry]?.toString().length || 12) + 3.5}ch`}}
                             />
-                            {/* {column.name === 'Source' && props.dataLists?.source ? (
-                                makeDataList(props.dataLists?.source, column.name)
-                            ) : null} */}
-                            {column.name === 'Person' && props.dataLists?.persons ? (
+                            {column.name === 'person' && props.dataLists?.persons ? (
                                 makeDataList(props.dataLists?.persons, column.name)
                             ) : null}
-                            {column.name === 'Narrow_category' && props.dataLists?.narrow_categories ? (
+                            {column.name === 'narrow_category' && props.dataLists?.narrow_categories ? (
                                 makeDataList(props.dataLists?.narrow_categories, column.name)
                             ) : null}
-                            {column.name === 'Broad_category' && props.dataLists?.broad_categories ? (
+                            {column.name === 'broad_category' && props.dataLists?.broad_categories ? (
                                 makeDataList(props.dataLists?.broad_categories, column.name)
                             ) : null}
-                            {/* {column.name === 'Vendor' && props.dataLists?.vendors ? (
-                                makeDataList(props.dataLists?.vendors, column.name)
-                            ) : null} */}
                         </StyledTableCell>
                     )
                 })}
@@ -130,7 +123,7 @@ export default function InputRow(props:
                 <IconButton
                     aria-label="delete"
                     color="secondary"
-                    onClick={() => props.deleteEntry(state.entry_id || state.id)}
+                    onClick={() => props.deleteEntry(state.id)}
                 >
                     <DeleteIcon />
                 </IconButton>

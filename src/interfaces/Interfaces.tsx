@@ -12,13 +12,11 @@ interface TableDataEntry {
     source?: string,
     person?: string,
     id?: number,
-    source_id?: number,
     person_id?: number,
     vendor?: string,
     broad_category?: string,
     narrow_category?: string,
     notes?: string,
-    entry_id?: number
 }
 
 interface ExpensesFormType {

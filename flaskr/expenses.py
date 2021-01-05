@@ -29,11 +29,9 @@ def api_expenses(year, month):
                     LEFT JOIN narrow_categories n ON n.id=e.narrow_category_id \
                     WHERE e.user_id=%s AND date > %s AND date < %s \
                     ORDER BY date;"
-        print("ID:", valid_token['id'])
         EXP_report = pd.read_sql(sql, con=engine, params=[valid_token['id'], start_date, end_date], parse_dates=['date'])
         EXP_report.set_index('date', inplace=True)
         EXP_report['amount'] = EXP_report['amount'].apply(format_numbers)
-        print(EXP_report)
         return EXP_report.to_json(orient="table")
 
 # Used by post_expense and post_expenses_batch
@@ -47,6 +45,7 @@ def insert_expense(json):
     notes = json['notes']
     user_id = json['user_id']
     
+
     with engine.connect() as con:
         insert_vendor_sql = "INSERT IGNORE INTO vendors(name, user_id) VALUES(%s, %s)"
         con.execute(insert_vendor_sql, [vendor, user_id])
@@ -72,7 +71,6 @@ def post_expense():
 def post_batch_expense():
     json = request.get_json()
     valid_token = checkAuth(request)
-    print("JSON: ", json)
     if not valid_token:
         return Response("Nice Try!", status=401)
     else:
@@ -97,16 +95,22 @@ def update_expenses(id):
         person = json['person_id'] or  None
         b_cat = json['broad_category_id'] or None
         n_cat = json['narrow_category_id'] or None
-        vendor = json['vendor_id'] or None
-        notes = json['Notes']
+        vendor = json['vendor'] or ""
+        notes = json['notes']
         
-        sql = "UPDATE expenses \
-            SET date=DATE(%s), vendor_id=%s, \
-            amount=%s, broad_category_id=%s, \
-            narrow_category_id=%s, person_id=%s, \
-            notes=%s\
-            WHERE id=%s;"
-        engine.connect().execute(sql, [date, vendor, amount, b_cat, n_cat, person, notes, id])
+        with engine.connect() as con:
+            insert_vendor_sql = "INSERT IGNORE INTO vendors(name, user_id) VALUES(%s, %s)"
+            con.execute(insert_vendor_sql, [vendor, valid_token['id']])
+            get_vendor_id_sql = "SELECT id FROM vendors WHERE name = %s"
+            vendor_id = con.execute(get_vendor_id_sql, [vendor]).fetchone()[0]
+
+            sql = "UPDATE expenses \
+                SET date=DATE(%s), vendor_id=%s, \
+                amount=%s, broad_category_id=%s, \
+                narrow_category_id=%s, person_id=%s, \
+                notes=%s\
+                WHERE id=%s;"
+            con.execute(sql, [date, vendor_id, amount, b_cat, n_cat, person, notes, id])
         return Response(f'id: {id} Updated', status=200)
 
 # Delete expenses

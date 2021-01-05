@@ -82,28 +82,23 @@ def update_income(id):
     else:
         json = request.get_json()
         # Parse dates
-        date = datetime.strptime(json['Date'], "%m/%d/%Y").strftime("%Y-%m-%d")
+        date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
         # Convert any null values
-        if json['amount']:
-            amount = json['amount']
-        else :
-            amount = 0
-        if json['person_id']:
-            person = json['person_id']
-        else:
-            person = 'NULL'
-        if json['source_id']:
-            source = json['source_id']
-        else:
-            source = 'NULL'
-
-        sql = "UPDATE income \
-            SET date=DATE(%s), \
-            amount=%s, \
-            earner_id=%s, \
-            source_id=%s \
-            WHERE id=%s;"
-        engine.connect().execute(sql, [date, amount, person, source, id])
+        amount = json['amount'] or None
+        person_id = json['person_id'] or  None
+        source = json['source'] or ""
+        
+        with engine.connect() as con:
+            insert_source_sql = "INSERT IGNORE INTO sources(name, user_id) VALUES(%s, %s)"
+            con.execute(insert_source_sql, [source, valid_token['id']])
+            source_id = con.execute("SELECT id FROM sources WHERE name=%s", [source]).fetchone()[0]
+            sql = "UPDATE income \
+                SET date=DATE(%s), \
+                amount=%s, \
+                person_id=%s, \
+                source_id=%s \
+                WHERE id=%s;"
+            con.execute(sql, [date, amount, person_id, source_id, id])
         return Response(f'id: {id} Updated', status=200)
 
 @bp.route("/<int:id>", methods=['DELETE'])

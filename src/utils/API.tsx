@@ -100,7 +100,7 @@ const API = {
         }).then(res=>checkStatus<string>(res, 'text'))
     },
     updateExpenses: function (token: string | null, data: TableDataEntry): Promise<Response | string> {
-        return fetch(`/api/expenses/${data.entry_id}`, {
+        return fetch(`/api/expenses/${data.id}`, {
             method: 'PUT',
             headers: {
                 "authorization": `Bearer ${token}`,

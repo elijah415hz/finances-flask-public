@@ -13,8 +13,3 @@ app.register_blueprint(datalists.bp)
 app.register_blueprint(views.bp)
 app.register_blueprint(categories.bp)
 
-@app.after_request
-def add_headers(r):
-    r.headers['Cache-Control'] = 'public, max-age=0, stale-while-revalidate=604800'
-    return r
-

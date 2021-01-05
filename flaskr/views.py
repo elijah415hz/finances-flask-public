@@ -36,10 +36,12 @@ def wallchart():
         EXP_wallchart = EXP_dataframe.groupby(['date']).sum()
         merged = pd.merge(INC_wallchart, EXP_wallchart, on='date')
         merged.reset_index(inplace=True)
+        print(merged)
         wallchart_data = {}
         # Date column has to be converted from Period to string, then to datetime, then to string again...
         wallchart_data['labels'] = pd.to_datetime(merged['date'].astype(str)).dt.strftime("%b %y").tolist()
         wallchart_data['income'] = INC_wallchart['amount'].tolist()
         wallchart_data['expenses'] = EXP_wallchart['amount'].tolist()
+        print(wallchart_data)
         return jsonify(wallchart_data)
        

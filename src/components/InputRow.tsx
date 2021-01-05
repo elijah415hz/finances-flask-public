@@ -93,7 +93,7 @@ export default function InputRow(props:
                                 }}
                                 InputProps={
                                      {
-                                    startAdornment: <InputAdornment position="start">{column.name === 'Amount' ? "$" : null}</InputAdornment>,
+                                    startAdornment: <InputAdornment position="start">{column.name === 'amount' ? "$" : null}</InputAdornment>,
                                     disableUnderline: true
                                 }
                             }

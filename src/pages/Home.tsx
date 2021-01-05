@@ -63,7 +63,6 @@ function Home() {
                 source: "",
                 person: "",
                 id: NaN,
-                source_id: NaN,
                 person_id: NaN
             }]
         }
@@ -237,6 +236,7 @@ function Home() {
                 message: "Record updated!",
                 open: true
             })
+            reloadWallChartData()
         } catch (err) {
             console.log(err)
             setAlertState({
@@ -256,6 +256,7 @@ function Home() {
                 message: "Record updated!",
                 open: true
             })
+            reloadWallChartData()
         } catch (err) {
             setAlertState({
                 severity: "error",
@@ -312,13 +313,14 @@ function Home() {
         console.log("Reloading Wallchart")
         try {
             let res = await API.wallchart(Auth.token)
+            console.log(res)
             setWallChartData(res)
             saveWallChartData(res)
         } catch (err) {
             if (err.message === "No Data") {
                 console.log("No Data!")
             } else {
-                loadWallChartData().then((data: WallChartDataType) => setWallChartData(data))
+                // loadWallChartData().then((data: WallChartDataType) => setWallChartData(data))
             }
         }
     }
@@ -335,6 +337,7 @@ function Home() {
                 let newIncomeTableStateData = incomeTableState.data.filter(entry => entry.id !== id)
                 setIncomeTableState({ ...incomeTableState, data: newIncomeTableStateData })
             }
+            reloadWallChartData()
         } catch (err) {
             console.error(err)
             if (err === 'Unauthorized') {

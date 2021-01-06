@@ -12,7 +12,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def checkAuth(request):
     try :
         token = request.headers['Authorization'].split(" ")[1].replace('"', '')
-        decoded = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm="HS256")
+        decoded = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
         return decoded
     except jwt.ExpiredSignatureError:
         print("Token has expired!")

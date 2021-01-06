@@ -83,6 +83,7 @@ export default function Login() {
             >Sign Up</Button>
             <Container className={classes.root}>
                 <h4>Login</h4>
+                    </Container>
                 <form className={classes.root} onSubmit={formSubmit}>
                     <TextField
                         onChange={inputChange}
@@ -102,7 +103,6 @@ export default function Login() {
                     />
                     <Button variant="contained" color="primary" name="login" type="submit">Login</Button>
                 </form>
-            </Container>
             <Dialog onClose={handleClose} open={signupOpen} maxWidth='xl'>
                 <Signup handleClose={handleClose}/>
             </Dialog>

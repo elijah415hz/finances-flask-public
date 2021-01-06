@@ -12,7 +12,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def checkAuth(request):
     try :
         token = request.headers['Authorization'].split(" ")[1].replace('"', '')
-        decoded = jwt.decode(token, current_app.config['SECRET_KEY'])
+        decoded = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm="HS256")
         return decoded
     except jwt.ExpiredSignatureError:
         print("Token has expired!")
@@ -52,7 +52,7 @@ def login():
             print("invalid username!")
             return Response("Invalid Username", status=401)
     if bcrypt.checkpw(password, db_password):
-        token = jwt.encode({'username': username, 'id': user_id, 'exp' : datetime.utcnow() + timedelta(days=30)}, current_app.config['SECRET_KEY'])  
+        token = jwt.encode({'username': username, 'id': user_id, 'exp' : datetime.utcnow() + timedelta(days=30)}, current_app.config['SECRET_KEY'], algorithm="HS256")  
         return jsonify({'token' : token}) 
     else:
         return Response("Wrong credentials!", status=401)

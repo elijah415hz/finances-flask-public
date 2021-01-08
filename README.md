@@ -50,4 +50,5 @@ This application is covered by the [MIT license](https://lbesson.mit-license.org
 Stay tuned for these future updates!
 * Generate year end expense and income reports in csv or xlsx format for tax purposes
 * Generate expense and income pie charts to better visualize your finances
+* Create recurring expenses / income
 * Prompt for download on compatible devices 

@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Signup({handleClose}: {handleClose: Function}) {
-    const { setAlertState } = React.useContext(AuthContext)
+    const { setAlertState, setOpenBackdrop } = React.useContext(AuthContext)
 
     const [signupFormState, setSignupFormState] = useState({
         username: "",
@@ -39,6 +39,7 @@ export default function Signup({handleClose}: {handleClose: Function}) {
 
     const formSubmit = async (event: React.SyntheticEvent) => {
         event.preventDefault();
+        setOpenBackdrop(true)
         try {
             await API.signup(signupFormState)
             setAlertState({
@@ -54,6 +55,8 @@ export default function Signup({handleClose}: {handleClose: Function}) {
                 message: "Error Signing Up!",
                 open: true
             })
+        } finally {
+            setOpenBackdrop(false)
         }
     }
 

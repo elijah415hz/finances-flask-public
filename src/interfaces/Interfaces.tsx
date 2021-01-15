@@ -86,6 +86,7 @@ interface Auth {
     Auth: Auth,
     setAuth: React.Dispatch<{ type: string; payload?: { user: string; token: string; } | undefined; }>,
     setAlertState: React.Dispatch<React.SetStateAction<AlertStateType>>
+    setOpenBackdrop: React.Dispatch<React.SetStateAction<boolean>>
   };
 
 interface WallChartDataType {

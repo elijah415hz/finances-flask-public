@@ -18,8 +18,6 @@ import {
     AppBar,
     Button,
     Container,
-    Backdrop,
-    CircularProgress,
     Dialog,
     Box
 } from '@material-ui/core';
@@ -43,7 +41,7 @@ import Edit from '../components/Edit';
 function Home() {
     const theme = useTheme();
 
-    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
+    const { Auth, setAuth, setAlertState, setOpenBackdrop } = React.useContext(AuthContext)
 
     // Form control state
     const [formState, setFormState] = useState<FormStateType>(
@@ -93,9 +91,6 @@ function Home() {
         narrow_categories: [],
         broad_categories: [],
     })
-
-    // Loading Backdrop display state
-    const [openBackdrop, setOpenBackdrop] = useState(false);
 
     // Converts dates to human-readable format
     function formatDates(entry: TableDataEntry): TableDataEntry {
@@ -310,17 +305,17 @@ function Home() {
 
     // Reload data for Wallchart
     async function reloadWallChartData(): Promise<void> {
-        console.log("Reloading Wallchart")
+        let data;
         try {
-            let res = await API.wallchart(Auth.token)
-            console.log(res)
-            setWallChartData(res)
-            saveWallChartData(res)
+            data = await API.wallchart(Auth.token)
+            setWallChartData(data)
+            saveWallChartData(data)
         } catch (err) {
             if (err.message === "No Data") {
                 console.log("No Data!")
             } else {
-                // loadWallChartData().then((data: WallChartDataType) => setWallChartData(data))
+                data = await loadWallChartData()
+                setWallChartData(data)
             }
         }
     }
@@ -387,10 +382,7 @@ function Home() {
                 textAlign: 'center',
                 position: 'sticky'
             },
-            backdrop: {
-                zIndex: 1301, // To be in front of Dialog at 1300
-                color: '#fff',
-            },
+           
             speedDial: {
                 position: 'fixed',
                 bottom: theme.spacing(2),
@@ -577,9 +569,7 @@ function Home() {
                     />
                 ))}
             </SpeedDial>
-            <Backdrop className={classes.backdrop} open={openBackdrop}>
-                <CircularProgress disableShrink color="inherit" />
-            </Backdrop>
+            
         </Box >
     );
 }

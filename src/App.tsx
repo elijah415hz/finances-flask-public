@@ -7,17 +7,20 @@ import { testDatabase } from './utils/db'
 import './App.css';
 import CustomizedSnackbar from './components/SnackBar'
 import { AlertStateType, Auth, ContextState } from './interfaces/Interfaces'
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { green, blueGrey, red, purple } from '@material-ui/core/colors'
-
+import { ThemeProvider, createMuiTheme, Theme, makeStyles, createStyles } from '@material-ui/core/styles';
+import { green, blueGrey, purple } from '@material-ui/core/colors'
 import { MuiPickersOverrides } from '@material-ui/pickers/typings/overrides';
-import { CssBaseline, ThemeOptions } from '@material-ui/core'
+import {
+  CssBaseline,
+  ThemeOptions,
+  Backdrop,
+  CircularProgress,
+} from '@material-ui/core'
 
 // Types to allow for theme customization
 type overridesNameToClassKey = {
   [P in keyof MuiPickersOverrides]: keyof MuiPickersOverrides[P];
 };
-
 type CustomType = {
   MuiPickersBasePicker: {
     pickerView: {
@@ -25,7 +28,6 @@ type CustomType = {
     };
   };
 };
-
 declare module '@material-ui/core/styles/overrides' {
   interface ComponentNameToClassKey extends overridesNameToClassKey { }
   export interface ComponentNameToClassKey extends CustomType { }
@@ -42,7 +44,7 @@ function createMyTheme(options: ThemeOptions) {
         container: {
           backgroundColor: blueGrey[900],
           [defaultTheme.breakpoints.down("xs")]: {
-          marginLeft: '-10px',
+            marginLeft: '-10px',
           }
         },
       },
@@ -66,6 +68,7 @@ function createMyTheme(options: ThemeOptions) {
   })
 };
 
+// Adding global palette colors
 const theme = createMyTheme({
   palette: {
     type: 'dark',
@@ -90,14 +93,14 @@ const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
   setLoggedIn: Function,
   component: React.FunctionComponent<RouteComponentProps>,
 }): JSX.Element => (
-    <Route {...rest} render={props => (
-      loggedIn
-        ? <Component {...props} />
-        : <Redirect to='/login' />
-    )
-    } />
-
+  <Route {...rest} render={props => (
+    loggedIn
+      ? <Component {...props} />
+      : <Redirect to='/login' />
   )
+  } />
+
+)
 
 export const AuthContext = React.createContext<ContextState>({
   Auth: {
@@ -106,13 +109,23 @@ export const AuthContext = React.createContext<ContextState>({
     token: ""
   },
   setAuth: (): void => { },
-  setAlertState: (): void => { }
+  setAlertState: (): void => { },
+  setOpenBackdrop: (): void => { }
 })
-
-
 
 export default function App() {
 
+  const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+      backdrop: {
+        zIndex: 1301, // To be in front of Dialog at 1300
+        color: '#fff',
+      },
+    })
+  )
+
+  const classes = useStyles();
+  // Reducer state for Authentication values
   const reducer = (state: Auth, action: { type: string, payload?: { user: string, token: string } }): Auth => {
     if (action.type === 'LOGIN' && action.payload) {
       localStorage.setItem("user", action.payload.user);
@@ -142,12 +155,15 @@ export default function App() {
     token: ""
   })
 
+  // State for alert snackbars
   const [alertState, setAlertState] = useState<AlertStateType>({
     severity: undefined,
     message: "",
     open: false,
   })
 
+  // Loading Backdrop display state
+  const [openBackdrop, setOpenBackdrop] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -166,6 +182,7 @@ export default function App() {
   }, [])
 
 
+
   useEffect(() => {
     testDatabase()
   })
@@ -174,14 +191,12 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthContext.Provider
-        value={{ Auth, setAuth, setAlertState }}
+        value={{ Auth, setAuth, setAlertState, setOpenBackdrop }}
       >
-
         <Router>
           <ProtectedRoute path="/"
             loggedIn={Auth.loggedIn}
             setLoggedIn={setAuth}
-            // offline={offline}
             component={Home}
           />
           <Route exact path="/login">
@@ -192,6 +207,9 @@ export default function App() {
           state={alertState}
           setState={setAlertState}
         />
+        <Backdrop className={classes.backdrop} open={openBackdrop}>
+          <CircularProgress disableShrink color="inherit" />
+        </Backdrop>
       </AuthContext.Provider>
     </ThemeProvider>
   )

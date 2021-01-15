@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Login() {
-    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
+    const { Auth, setAuth, setAlertState, setOpenBackdrop } = React.useContext(AuthContext)
 
     const [loginFormState, setLoginFormState] = useState({
         username: "",
@@ -47,10 +47,10 @@ export default function Login() {
 
     const formSubmit = async (event: React.SyntheticEvent) => {
         event.preventDefault();
+        setOpenBackdrop(true)
         try {
-            await API.login(loginFormState).then(newToken => {
-                setAuth({ type: 'LOGIN', payload: { user: loginFormState.username, token: newToken.token } })
-            })
+            let newToken = await API.login(loginFormState)
+            setAuth({ type: 'LOGIN', payload: { user: loginFormState.username, token: newToken.token } })
         } catch (err) {
             console.error(err)
             setAlertState({
@@ -58,6 +58,8 @@ export default function Login() {
                 message: "Incorrect username or password",
                 open: true
             })
+        } finally {
+            setOpenBackdrop(false)
         }
     }
 
@@ -70,8 +72,6 @@ export default function Login() {
     if (Auth.loggedIn) {
         return <Redirect to='/' />
     }
-
-
 
     return (
         <>

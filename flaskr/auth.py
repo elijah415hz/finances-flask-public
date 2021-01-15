@@ -47,7 +47,6 @@ def login():
             user_info = con.execute(sql, [username]).fetchone()
             user_id = user_info[0]
             db_password = user_info[2]
-            print(user_info)
         except:
             print("invalid username!")
             return Response("Invalid Username", status=401)

@@ -10,7 +10,6 @@ bp = Blueprint('categories', __name__, url_prefix='/api/categories')
 @bp.route("/", methods=['GET'])
 def get_categories():
     valid_token = checkAuth(request)
-    print(valid_token)
     if not valid_token:
         return Response("Nice Try!", status=401)
     else:

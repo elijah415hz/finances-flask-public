@@ -25,12 +25,12 @@ import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import AddIcon from '@material-ui/icons/Add'
-import { 
-    emptyDatabase, 
-    saveCategories, 
-    loadCategories, 
-    saveWallChartData, 
-    loadWallChartData 
+import {
+    emptyDatabase,
+    saveCategories,
+    loadCategories,
+    saveWallChartData,
+    loadWallChartData
 } from '../utils/db';
 
 import PivotTable from '../components/PivotTable';
@@ -84,12 +84,53 @@ function Home() {
 
     )
 
-
     // State for datalists
     const [categoriesState, setCategoriesState] = useState<AllDataListsType>({
         persons: [],
         narrow_categories: [],
         broad_categories: [],
+    })
+
+    // State For WallChart
+    function reducer(state: ChartJSDataType, action: WallChartDataType): ChartJSDataType {
+        if (action.labels.length > 0) {
+            state = {
+                labels: action.labels,
+                datasets: [
+                    {
+                        label: "Income",
+                        data: action.income,
+                        fill: false,
+                        borderColor: theme.palette.primary.main
+                    },
+                    {
+                        label: "Expenses",
+                        data: action.expenses,
+                        fill: false,
+                        borderColor: theme.palette.secondary.main
+                    }
+                ]
+            }
+        }
+        return state
+    }
+
+    const [wallChartData, setWallChartData] = useReducer(reducer, {
+        labels: [],
+        datasets: [
+            {
+                label: "Income",
+                data: [],
+                fill: false,
+                borderColor: theme.palette.primary.main
+            },
+            {
+                label: "Expenses",
+                data: [],
+                fill: false,
+                borderColor: theme.palette.secondary.main
+            }
+        ]
     })
 
     // Converts dates to human-readable format
@@ -222,7 +263,7 @@ function Home() {
         }
     }
 
-    // Update an row altered by the user
+    // Update an expense row altered by the user
     async function updateExpensesRow(index: number): Promise<void> {
         try {
             await API.updateExpenses(Auth.token, expensesTableState.data[index])
@@ -242,7 +283,7 @@ function Home() {
         }
     }
 
-    // Update an row altered by the user
+    // Update an income row altered by the user
     async function updateIncomeRow(index: number): Promise<void> {
         try {
             await API.updateIncome(Auth.token, incomeTableState.data[index])
@@ -260,48 +301,6 @@ function Home() {
             })
         }
     }
-
-    // State For WallChart
-    function reducer(state: ChartJSDataType, action: WallChartDataType): ChartJSDataType {
-        if (action.labels.length > 0) {
-            state = {
-                labels: action.labels,
-                datasets: [
-                    {
-                        label: "Income",
-                        data: action.income,
-                        fill: false,
-                        borderColor: theme.palette.primary.main
-                    },
-                    {
-                        label: "Expenses",
-                        data: action.expenses,
-                        fill: false,
-                        borderColor: theme.palette.secondary.main
-                    }
-                ]
-            }
-        }
-        return state
-    }
-
-    const [wallChartData, setWallChartData] = useReducer(reducer, {
-        labels: [],
-        datasets: [
-            {
-                label: "Income",
-                data: [],
-                fill: false,
-                borderColor: theme.palette.primary.main
-            },
-            {
-                label: "Expenses",
-                data: [],
-                fill: false,
-                borderColor: theme.palette.secondary.main
-            }
-        ]
-    })
 
     // Reload data for Wallchart
     async function reloadWallChartData(): Promise<void> {
@@ -382,7 +381,7 @@ function Home() {
                 textAlign: 'center',
                 position: 'sticky'
             },
-           
+
             speedDial: {
                 position: 'fixed',
                 bottom: theme.spacing(2),
@@ -457,8 +456,7 @@ function Home() {
             setOffline(true)
         }
         reloadWallChartData()
-        }, [])
-
+    }, [])
 
     return (
         <Box component='div' className="Home">
@@ -472,7 +470,7 @@ function Home() {
                     variant="contained"
                     color="primary"
                     className={classes.editBtn}
-                    onClick={()=>setEditOpen(true)}
+                    onClick={() => setEditOpen(true)}
                 >Edit
                 </Button>
                 <Button
@@ -489,14 +487,14 @@ function Home() {
                 <Container className={classes.root}>
                     <h1 style={{ textAlign: 'center' }}>{Auth.user} Finances</h1>
                 </Container>
-                    <WallChart data={wallChartData}/>
+                <WallChart data={wallChartData} />
                 <Form
                     classes={classes}
                     handleFormSubmit={handleFormSubmit}
                     handleFormChange={handleFormChange}
                     formState={formState}
                 />
-            </Box >
+            </Box>
             <div className="body">
                 {formState.form === "income" && incomeTableState.data[0]?.id ? (
                     <ReportTable
@@ -523,36 +521,35 @@ function Home() {
                 ) : null}
             </div>
             <Dialog onClose={handleClose} open={editOpen} maxWidth='xl'>
-                <Edit 
-                    classes={classes} 
+                <Edit
+                    classes={classes}
                     handleClose={handleClose}
                     categories={categoriesState}
                     setCategories={setCategoriesState}
                     setOpenBackdrop={setOpenBackdrop}
-                    />
+                />
             </Dialog>
             <Dialog onClose={handleClose} open={addExpensesOpen} maxWidth='xl'>
-                <AddExpensesForm 
-                classes={classes} 
-                handleClose={handleClose}
-                categories={categoriesState}
-                setOpenBackdrop={setOpenBackdrop}
-                reloadWallChart={reloadWallChartData}
+                <AddExpensesForm
+                    classes={classes}
+                    handleClose={handleClose}
+                    categories={categoriesState}
+                    setOpenBackdrop={setOpenBackdrop}
+                    reloadWallChart={reloadWallChartData}
                 />
             </Dialog>
             <Dialog onClose={handleClose} open={addIncomeOpen} maxWidth='xl'>
-                <AddIncomeForm 
-                classes={classes} 
-                handleClose={handleClose}
-                categories={categoriesState}
-                setOpenBackdrop={setOpenBackdrop}
-                reloadWallChart={reloadWallChartData}
+                <AddIncomeForm
+                    classes={classes}
+                    handleClose={handleClose}
+                    categories={categoriesState}
+                    setOpenBackdrop={setOpenBackdrop}
+                    reloadWallChart={reloadWallChartData}
                 />
             </Dialog>
             <SpeedDial
-                ariaLabel="SpeedDial example"
+                ariaLabel="SpeedDial"
                 className={classes.speedDial}
-                // hidden={hidden}
                 icon={<SpeedDialIcon />}
                 onClose={handleSpeedDialClose}
                 onOpen={handleOpen}
@@ -569,7 +566,7 @@ function Home() {
                     />
                 ))}
             </SpeedDial>
-            
+
         </Box >
     );
 }

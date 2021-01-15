@@ -63,7 +63,6 @@ def post_income():
 def post_batch_income():
     json = request.get_json()
     valid_token = checkAuth(request)
-    print("JSON: ", json)
     if not valid_token:
         return Response("Nice Try!", status=401)
     else:
@@ -71,7 +70,6 @@ def post_batch_income():
             json['user_id'] = valid_token['id']
             insert_income(row)
         return Response('Records Inserted!', status=200)
-
 
 # Edit income
 @bp.route("/<int:id>", methods=['PUT'])

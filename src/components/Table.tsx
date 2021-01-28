@@ -59,7 +59,7 @@ export default function ReportTable(props:
     
         useEffect(() => {
             executeScroll()
-        }, [])
+        })
     return (
         <TableContainer component={Paper}>
             <Table className={classes.table} ref={myRef}>
@@ -69,7 +69,7 @@ export default function ReportTable(props:
                             .filter(column => !column.name.includes("id"))
                             .map(column => {
                                 return (
-                                    <StyledTableCell key={column.name}>
+                                    <StyledTableCell key={column.name} style={{textTransform: 'capitalize'}}>
                                         {column.name.replace("_", " ")}
                                     </StyledTableCell>
                                 )

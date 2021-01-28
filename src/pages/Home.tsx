@@ -459,11 +459,11 @@ function Home() {
             }
         }
         getCategories()
+        reloadWallChartData()
         if (!navigator.onLine) {
             setOffline(true)
         }
-        reloadWallChartData()
-    }, [])
+    }, [Auth.token])
 
     return (
         <Box component='div' className="Home">
@@ -492,7 +492,7 @@ function Home() {
                 >Logout
                 </Button>
                 <Container className={classes.root}>
-                    <h1 style={{ textAlign: 'center' }}>{Auth.user} Finances</h1>
+                    <h1 style={{ textAlign: 'center', textTransform: 'capitalize' }}>{Auth.user}'s Finances</h1>
                 </Container>
                 <WallChart data={wallChartData} />
                 <Form

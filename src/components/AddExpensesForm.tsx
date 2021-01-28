@@ -12,9 +12,10 @@ import {
     TextField,
     InputAdornment,
     Typography,
-    DialogContent
+    DialogContent,
+    IconButton
 } from '@material-ui/core';
-// import 'date-fns';
+import CloseIcon from '@material-ui/icons/Close'
 import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider,
@@ -23,7 +24,7 @@ import {
 
 
 export default function AddRecordsForm(props: {
-    classes: { root: string, formControl: string},
+    classes: { root: string, formControl: string, close: string },
     handleClose: Function,
     categories: AllDataListsType,
     setOpenBackdrop: Function,
@@ -117,9 +118,15 @@ export default function AddRecordsForm(props: {
             })
         }
     }
- 
+
     return (
-            <DialogContent>
+        <DialogContent>
+            <IconButton
+                className={props.classes.close}
+                onClick={() => {
+                    setFormState(initialFormState)
+                    props.handleClose()
+                }}><CloseIcon /></IconButton>
             <Typography variant="h5" component="h5" className={props.classes.root}>Log Expense</Typography>
             <form className={props.classes.root} onSubmit={handleFormSubmit}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -136,8 +143,8 @@ export default function AddRecordsForm(props: {
                         onChange={handleDateChange}
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
-                        }}                        
-                        />
+                        }}
+                    />
                 </MuiPickersUtilsProvider>
                 <TextField
                     onChange={handleFormChange}
@@ -146,7 +153,7 @@ export default function AddRecordsForm(props: {
                     name="vendor"
                     type="string"
                     InputLabelProps={{ shrink: true }}
-                    />
+                />
                 <TextField
                     onChange={handleFormChange}
                     value={formState.amount}
@@ -157,7 +164,7 @@ export default function AddRecordsForm(props: {
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
                     }}
                     inputProps={{ step: "0.01" }}
-                    />
+                />
                 <FormControl
                     className={props.classes.formControl}>
                     <InputLabel htmlFor="broad_category">Broad Category</InputLabel>
@@ -167,10 +174,10 @@ export default function AddRecordsForm(props: {
                         name="broad_category_id"
                         labelId="broad_category"
                         label="Broad Category"
-                        >
+                    >
                         {props.categories.broad_categories.map(i => (
                             <MenuItem value={i.id}>{i.name}</MenuItem>
-                            ))}
+                        ))}
                     </Select>
                 </FormControl>
                 {currentNarrowCategories.length > 0 ? (
@@ -182,7 +189,7 @@ export default function AddRecordsForm(props: {
                             name="narrow_category_id"
                             labelId="narrow_category"
                             label="Narrow Category"
-                            >
+                        >
                             {/* Get the list of narrow categories corresponding to the selected broad category */}
                             {currentNarrowCategories?.map(i => (
                                 <MenuItem value={i.id}>{i.name}</MenuItem>
@@ -191,7 +198,7 @@ export default function AddRecordsForm(props: {
                     </FormControl>
                 ) : null}
                 {currentBroadCategory.person ? (
-                    
+
                     <FormControl className={props.classes.formControl}>
                         <InputLabel htmlFor="person_id">Person</InputLabel>
                         <Select
@@ -200,10 +207,10 @@ export default function AddRecordsForm(props: {
                             name="person_id"
                             labelId="person_id"
                             label="Person"
-                            >
+                        >
                             {props.categories.persons.map(i => (
                                 <MenuItem value={i.id}>{i.name}</MenuItem>
-                                ))}
+                            ))}
                         </Select>
                     </FormControl>
                 ) : null}
@@ -214,23 +221,13 @@ export default function AddRecordsForm(props: {
                     name="notes"
                     type="string"
                     InputLabelProps={{ shrink: true }}
-                    />
+                />
                 <Button
                     type="submit"
                     variant="contained"
                     color="primary"
-                    >Submit</Button>
-                <Button
-                    type="button"
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {
-                        setFormState(initialFormState)
-                        props.handleClose()
-                    }
-                }
-                >Close</Button>
+                >Submit</Button>
             </form>
-                </DialogContent>
+        </DialogContent>
     )
 }

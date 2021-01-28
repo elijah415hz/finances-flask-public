@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import { Button, DialogContent, TextField, Container } from '@material-ui/core';
+import { Button, DialogContent, TextField, Typography } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -17,7 +16,11 @@ const useStyles = makeStyles((theme: Theme) =>
                     width: '100%',
                 },
             }
-        }
+        },
+        heading: {
+            textAlign: 'center',
+            fontFamily: 'Times New Roman, serif'
+        },
     })
 );
 
@@ -65,7 +68,7 @@ export default function Signup({handleClose}: {handleClose: Function}) {
     return (
         <DialogContent>
             <div style={{ textAlign: 'center' }}>
-                <h4>Signup</h4>
+            <Typography variant="h2" component="h4" className={classes.heading}>Sign Up</Typography>
                 <form className={classes.root} onSubmit={formSubmit}>
                     <TextField
                         onChange={handleChange}

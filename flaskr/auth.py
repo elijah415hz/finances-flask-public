@@ -52,7 +52,7 @@ def login():
             return Response("Invalid Username", status=401)
     if bcrypt.checkpw(password, db_password):
         token = jwt.encode({'username': username, 'id': user_id, 'exp' : datetime.utcnow() + timedelta(days=30)}, current_app.config['SECRET_KEY'], algorithm="HS256")  
-        return jsonify({'token': token.decode('UTF-8')}) 
+        return jsonify({'token': token}) 
     else:
         return Response("Wrong credentials!", status=401)
 

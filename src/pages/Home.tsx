@@ -381,7 +381,6 @@ function Home() {
                 textAlign: 'center',
                 position: 'sticky'
             },
-
             speedDial: {
                 position: 'fixed',
                 bottom: theme.spacing(2),
@@ -394,6 +393,14 @@ function Home() {
                 [theme.breakpoints.down('sm')]: {
                     marginLeft: '-10px'
                 },
+            },
+            card: {
+                margin: '1em 0'
+            },
+            close: {
+                position: 'absolute',
+                right: '0',
+                top: '0'
             }
         })
     );

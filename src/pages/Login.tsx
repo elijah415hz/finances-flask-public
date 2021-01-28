@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
 import { AuthContext } from '../App'
-import { Button, TextField, Dialog, Container, Typography } from '@material-ui/core';
-import Grid, { GridSpacing } from '@material-ui/core/Grid';
+import { Button, TextField, Dialog, Typography } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Signup from '../components/Signup'
 
@@ -126,10 +126,10 @@ export default function Login() {
                             </Grid>
                         <Grid item xs={12} className={classes.sidebar}>
 
-            <a href="#"
+            <Button
                 className={classes.link}
                 onClick={() => setSignupOpen(true)}
-            >Sign Up</a>
+            >Sign Up</Button>
             </Grid>
             </Grid>
             <Dialog onClose={handleClose} open={signupOpen} maxWidth='xl'>

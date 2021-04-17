@@ -21,8 +21,10 @@ function checkStatus<T>(res: Response, parseMethod: string): Promise<T> {
     }
     if (parseMethod === 'json'){
         return res.json() as Promise<T>
-    } else {
+    } else if (parseMethod === 'text'){
         return res.text() as unknown as Promise<T>
+    } else {
+        return res.blob() as unknown as Promise<T>
     }
 }
 
@@ -180,6 +182,22 @@ const API = {
                 "authorization": `Bearer ${token}`
             }
         }).then(res =>checkStatus<{username: string, token: string}>(res, 'json'))
+    },
+    downloadFile: function (token: string | null, filename: string, start: string, end: string): void {
+        fetch(`/api/expenses/file/${start}/${end}`, {
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        }).then(res => checkStatus<Blob>(res, 'blob'))
+            .then(blob => {
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();      
+            });
     }
 }
 

@@ -1,8 +1,9 @@
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, send_file
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 import numpy as np
+from io import BytesIO
 from .db import engine
 from .auth import checkAuth
 
@@ -123,6 +124,67 @@ def delete_expenses(id):
         sql = "DELETE FROM expenses WHERE id=%s;"
         engine.connect().execute(sql, [id])
         return Response(f'id: {id} Deleted', status=200)
+
+# Return Excel file
+@bp.route("/file/<start>/<end>") # Dates formatted '%Y-%m-%d'
+def expenses_file(start, end):
+    validToken = checkAuth(request)
+    if not validToken:
+        return Response("Nice Try!", status=401)
+    else:
+        user_id = validToken['id']
+        start_date = datetime.strptime(start, '%Y-%m-%d')
+        end_date = datetime.strptime(end, '%Y-%m-%d')
+        # Get Expenses
+        EXP_sql = "SELECT e.id, e.person_id, e.broad_category_id, e.narrow_category_id, e.vendor_id, e.date, v.name AS vendor, e.amount, b.name AS broad_category, n.name AS narrow_category, p.name AS person, notes FROM expenses e \
+                    LEFT JOIN vendors v ON v.id=e.vendor_id \
+                    LEFT JOIN broad_categories b ON b.id=e.broad_category_id \
+                    LEFT JOIN persons p ON p.id=e.person_id \
+                    LEFT JOIN narrow_categories n ON n.id=e.narrow_category_id \
+                    WHERE e.user_id=%s AND date > %s AND date < %s \
+                    ORDER BY date;"
+        EXP_report = pd.read_sql(EXP_sql, con=engine, params=[user_id, start_date, end_date], parse_dates=['date'])
+        EXP_report['date'] = EXP_report['date'].dt.strftime("%m/%d/%Y")
+        drop_columns = [c for c in EXP_report.columns if c[-2:] == 'id']
+        EXP_report.drop(columns=drop_columns, inplace=True)
+        EXP_report.columns = EXP_report.columns.str.title()
+        EXP_report.set_index('Date', inplace=True)
+        EXP_report.columns = EXP_report.columns.str.replace("_", " ")
+        # Get Income
+        INC_sql = "SELECT i.id, i.source_id, i.person_id as person_id, date, amount, s.name AS source, p.name AS person\
+                    FROM income i\
+                    LEFT JOIN sources s ON s.id=i.source_id\
+                    LEFT JOIN persons p ON p.id=i.person_id\
+                    WHERE i.user_id=%s AND date > %s AND date < %s\
+                    ORDER BY date;"
+        INC_report = pd.read_sql(INC_sql, con=engine, params=[user_id, start_date, end_date], parse_dates=['date'])
+        INC_report['date'] = INC_report['date'].dt.strftime("%m/%d/%Y")
+        drop_columns = [c for c in INC_report.columns if c[-2:] == 'id']
+        INC_report.drop(columns=drop_columns, inplace=True)
+        INC_report.columns = INC_report.columns.str.title()
+        INC_report.set_index('Date', inplace=True)
+        # Write to File
+        buffer = BytesIO()
+        writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
+        title_format = writer.book.add_format({'bold': True, 'font_size': 20})
+        num_format = writer.book.add_format({'num_format': "$#,##0.00"})
+        EXP_report.to_excel(writer, sheet_name='Expenses', startcol = 0, startrow = 2)
+        INC_report.to_excel(writer, sheet_name='Income', startcol = 0, startrow = 2)
+        # Styling Expenses
+        expenses = writer.sheets['Expenses']
+        expenses.set_column('A:G', 18)
+        expenses.set_row(0, 30)
+        expenses.set_column('C:C', None, num_format)
+        expenses.write_string(0, 0, 'Expenses', title_format)
+        # Styling Income
+        income = writer.sheets['Income']
+        income.set_column('A:G', 18)
+        income.set_row(0, 30)
+        income.set_column('B:B', None, num_format)
+        income.write_string(0, 0, 'Income', title_format)
+        writer.save()
+        buffer.seek(0)
+        return send_file(buffer, attachment_filename="reports.xlsx", cache_timeout=0)
 
 # Return Pivot Table
 # DEPRICATED

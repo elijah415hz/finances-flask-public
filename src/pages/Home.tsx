@@ -340,9 +340,17 @@ function Home() {
         }
     }
 
+    // Download Excel File
+    function downloadFile(): void {
+        API.downloadFile(Auth.token, `${Auth.user}_expenses.xlsx`, "2021-01-01", "2021-05-01")
+    }
+
     // Create classes to use for styling
     const useStyles = makeStyles((theme: Theme) =>
         createStyles({
+            home: {
+                padding: '0 1em 6em 1em'
+            },
             formControl: {
                 margin: theme.spacing(1),
                 minWidth: '10em'
@@ -466,7 +474,7 @@ function Home() {
     }, [Auth.token])
 
     return (
-        <Box component='div' className="Home">
+        <Box component='div' className={classes.home}>
             {offline ? (
                 <AppBar className={classes.offline} position='sticky'>
                     Offline
@@ -490,6 +498,13 @@ function Home() {
                         console.log(res)
                     }}
                 >Logout
+                </Button>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    className={classes.logoutBtn}
+                    onClick={downloadFile}
+                >Download
                 </Button>
                 <Container className={classes.root}>
                     <h1 style={{ textAlign: 'center', textTransform: 'capitalize' }}>{Auth.user}'s Finances</h1>

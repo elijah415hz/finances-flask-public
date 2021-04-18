@@ -44,6 +44,7 @@ export default function ReportTable(props:
         createStyles({
             table: {
                 minWidth: 650,
+                padding: '0 1em'
             },
         })
         );
@@ -61,7 +62,7 @@ export default function ReportTable(props:
             executeScroll()
         })
     return (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} >
             <Table className={classes.table} ref={myRef}>
                 <TableHead>
                     <TableRow>

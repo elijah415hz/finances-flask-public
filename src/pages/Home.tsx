@@ -15,7 +15,6 @@ import type {
     WallChartDataType
 } from '../interfaces/Interfaces'
 import {
-    AppBar,
     Button,
     Container,
     Dialog,
@@ -32,6 +31,7 @@ import {
     saveWallChartData,
     loadWallChartData
 } from '../utils/db';
+import AppBar from '../components/AppBar';
 
 import PivotTable from '../components/PivotTable';
 import Form from '../components/Form';
@@ -349,7 +349,7 @@ function Home() {
     const useStyles = makeStyles((theme: Theme) =>
         createStyles({
             home: {
-                padding: '0 1em 6em 1em'
+                padding: '0 0 6em 0'
             },
             formControl: {
                 margin: theme.spacing(1),
@@ -376,11 +376,21 @@ function Home() {
                 width: '100%'
             },
             logoutBtn: {
-                float: 'right',
+                position: 'fixed',
+                top: '0px',
+                right: '0px',
+                margin: '1em',
+            },
+            downloadBtn: {
+                position: 'fixed',
+                top: '0px',
+                right: '100px',
                 margin: '1em',
             },
             editBtn: {
-                float: 'left',
+                position: 'fixed',
+                top: '0px',
+                left: '0px',
                 margin: '1em',
             },
             offline: {
@@ -475,18 +485,23 @@ function Home() {
 
     return (
         <Box component='div' className={classes.home}>
-            {offline ? (
-                <AppBar className={classes.offline} position='sticky'>
-                    Offline
-                </AppBar>
-            ) : null}
-            <Box component='header' className="header">
+                <AppBar setEditOpen={setEditOpen}/>
+            <Box component='header' className="header" >
+                <h1 style={{ textAlign: 'center'}}>Wall Chart</h1>
+                    {/* <Container className={classes.root}>
                 <Button
                     variant="contained"
                     color="primary"
                     className={classes.editBtn}
                     onClick={() => setEditOpen(true)}
                 >Edit
+                </Button>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    className={classes.downloadBtn}
+                    onClick={downloadFile}
+                >Download
                 </Button>
                 <Button
                     variant="contained"
@@ -499,16 +514,7 @@ function Home() {
                     }}
                 >Logout
                 </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.logoutBtn}
-                    onClick={downloadFile}
-                >Download
-                </Button>
-                <Container className={classes.root}>
-                    <h1 style={{ textAlign: 'center', textTransform: 'capitalize' }}>{Auth.user}'s Finances</h1>
-                </Container>
+                </Container> */}
                 <WallChart data={wallChartData} />
                 <Form
                     classes={classes}

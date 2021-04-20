@@ -488,33 +488,7 @@ function Home() {
                 <AppBar setEditOpen={setEditOpen}/>
             <Box component='header' className="header" >
                 <h1 style={{ textAlign: 'center'}}>Wall Chart</h1>
-                    {/* <Container className={classes.root}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.editBtn}
-                    onClick={() => setEditOpen(true)}
-                >Edit
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.downloadBtn}
-                    onClick={downloadFile}
-                >Download
-                </Button>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.logoutBtn}
-                    onClick={async () => {
-                        setAuth({ type: 'LOGOUT' })
-                        let res = await emptyDatabase()
-                        console.log(res)
-                    }}
-                >Logout
-                </Button>
-                </Container> */}
+                    
                 <WallChart data={wallChartData} />
                 <Form
                     classes={classes}

@@ -3,6 +3,7 @@ import pandas as pd
 from .auth import checkAuth
 from .db import engine
 
+# Create Blueprint
 bp = Blueprint('categories', __name__, url_prefix='/api/categories')
 
 
@@ -30,11 +31,11 @@ def get_categories():
 # Post persons and categories to customize user categories
 @bp.route('/', methods=['POST'])
 def add_category():
-    json = request.get_json()
     valid_token = checkAuth(request)
     if not valid_token:
         return Response("Nice Try!", status=401)
     else:
+        json = request.get_json()
         if 'person' in json:
             with engine.connect() as con:
                 sql = "INSERT INTO persons(name, user_id) VALUES(%s, %s)"

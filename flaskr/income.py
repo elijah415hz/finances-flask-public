@@ -6,6 +6,7 @@ from .db import engine
 from .expenses import format_numbers
 from .auth import checkAuth
 
+# Create Blueprint and assign route prefix
 bp = Blueprint('income', __name__, url_prefix='/api/income')
 
 # Get Income by Month
@@ -30,7 +31,7 @@ def api_income(year, month):
         INC_report['amount'] = INC_report['amount'].apply(format_numbers)
         return INC_report.to_json(orient="table")
 
-# Used by post_income and post_batch_income
+# Helper function to insert record into database (Used by post_income and post_batch_income)
 def insert_income(json):
     date = datetime.strptime(json['date'], "%m/%d/%Y").strftime("%Y-%m-%d")
     amount = json['amount'] or None
@@ -58,7 +59,7 @@ def post_income():
         insert_income(json)
         return Response('Record Inserted!', status=200)
 
-# Load in batch of income records
+# Load in batch of income records (Used when records have been logged offline)
 @bp.route("/batch", methods=["POST"])
 def post_batch_income():
     json = request.get_json()
@@ -71,7 +72,7 @@ def post_batch_income():
             insert_income(row)
         return Response('Records Inserted!', status=200)
 
-# Edit income
+# Edit income record by id
 @bp.route("/<int:id>", methods=['PUT'])
 def update_income(id):  
     valid_token = checkAuth(request)
@@ -99,6 +100,7 @@ def update_income(id):
             con.execute(sql, [date, amount, person_id, source_id, id])
         return Response(f'id: {id} Updated', status=200)
 
+# Delete a record by id
 @bp.route("/<int:id>", methods=['DELETE'])
 def delete_income(id):
     valid_token = checkAuth(request)

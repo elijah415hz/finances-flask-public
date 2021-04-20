@@ -6,6 +6,7 @@ import bcrypt
 import jwt
 import sys
 
+# Create blueprint to register routes
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 # Helper function used by all routes to verify token
@@ -56,6 +57,7 @@ def login():
     else:
         return Response("Wrong credentials!", status=401)
 
+# Endpoint to check if user has a valid token
 @bp.route("/checkAuth", methods=['GET'])
 def callCheckAuth():
     validToken = checkAuth(request)

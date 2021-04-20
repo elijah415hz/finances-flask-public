@@ -7,7 +7,6 @@ import { ChartJSDataType } from "../interfaces/Interfaces";
 export default function WallChart({ data }: { data: ChartJSDataType }) {
     return (
         <Container>
-
             <Box maxHeight='50vh'>
                 <Line data={data} height={300} width={600} options={{
                     maintainAspectRatio: false,
@@ -25,7 +24,7 @@ export default function WallChart({ data }: { data: ChartJSDataType }) {
                         yAxes: [{
                             ticks: {
                                 fontColor: "#404B50",
-                                callback: function (value, index, values) {
+                                callback: function (value) {
                                     if (value >= 1000) {
                                         return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                     } else {

@@ -107,7 +107,7 @@ const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
 export default function App() {
 
   const {Auth, setAuth } = useAuth()
-  const {alertState, setAlertState, openBackdrop} = useStateContext()
+  const {alertState, setAlertState, loading} = useStateContext()
 
   const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -159,7 +159,7 @@ export default function App() {
           state={alertState}
           setState={setAlertState}
         />
-        <Backdrop className={classes.backdrop} open={openBackdrop}>
+        <Backdrop className={classes.backdrop} open={loading}>
           <CircularProgress disableShrink color="inherit" />
         </Backdrop>
     </ThemeProvider>

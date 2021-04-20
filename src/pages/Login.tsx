@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Login() {
     const {Auth, setAuth } = useAuth()
-    const {setAlertState, setOpenBackdrop} = useStateContext()
+    const {setAlertState, setLoading} = useStateContext()
     const [loginFormState, setLoginFormState] = useState({
         username: "",
         password: "",
@@ -70,7 +70,7 @@ export default function Login() {
 
     const formSubmit = async (event: React.SyntheticEvent) => {
         event.preventDefault();
-        setOpenBackdrop(true)
+        setLoading(true)
         try {
             let newToken = await API.login(loginFormState)
             setAuth({ type: 'LOGIN', payload: { user: loginFormState.username, token: newToken.token } })
@@ -82,7 +82,7 @@ export default function Login() {
                 open: true
             })
         } finally {
-            setOpenBackdrop(false)
+            setLoading(false)
         }
     }
 

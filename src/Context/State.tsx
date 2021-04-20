@@ -9,8 +9,8 @@ const StateContext = createContext<StateContextType>({
         open: false,
     },
     setAlertState: (): void =>{},
-    openBackdrop: false,
-    setOpenBackdrop: (): void =>{}
+    loading: false,
+    setLoading: (): void =>{}
 })
 
 export function useStateContext() {
@@ -26,13 +26,13 @@ export function StateProvider(props: { children: React.ReactNode }) {
     })
 
     // Loading Backdrop display state
-    const [openBackdrop, setOpenBackdrop] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const value = {
         alertState,
         setAlertState,
-        openBackdrop,
-        setOpenBackdrop
+        loading,
+        setLoading
     }
 
     return (

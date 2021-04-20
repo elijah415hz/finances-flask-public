@@ -26,7 +26,7 @@ export default function Edit(props: {
     classes: { root: string, formControl: string, card: string, close: string },
     categories: AllDataListsType,
     setCategories: Function,
-    setOpenBackdrop: Function
+    setLoading: Function
 }) {
     const {Auth, setAuth } = useAuth()
     const { setAlertState} = useStateContext()
@@ -54,7 +54,7 @@ export default function Edit(props: {
 
     async function handleFormSubmit(event: React.SyntheticEvent, form: 'person' | 'narrow_category' | 'broad_category'): Promise<any> {
         event.preventDefault()
-        props.setOpenBackdrop(true)
+        props.setLoading(true)
         let data
         try {
             switch (form) {
@@ -120,7 +120,7 @@ export default function Edit(props: {
                     })
             }
         } finally {
-            props.setOpenBackdrop(false)
+            props.setLoading(false)
             setFormState(initialFormState)
         }
     }

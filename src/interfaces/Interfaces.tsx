@@ -90,8 +90,8 @@ interface Auth {
   interface StateContextType {
     alertState: AlertStateType,
     setAlertState: React.Dispatch<React.SetStateAction<AlertStateType>>,
-    openBackdrop: boolean,
-    setOpenBackdrop: React.Dispatch<React.SetStateAction<boolean>>,
+    loading: boolean,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   }
 
 interface WallChartDataType {

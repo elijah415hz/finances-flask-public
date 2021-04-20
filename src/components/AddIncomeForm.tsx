@@ -28,7 +28,7 @@ export default function AddRecordsForm(props: {
     classes: { root: string, formControl: string, close: string },
     handleClose: Function,
     categories: AllDataListsType,
-    setOpenBackdrop: Function,
+    setLoading: Function,
     reloadWallChart: Function
 }) {
 
@@ -68,9 +68,9 @@ export default function AddRecordsForm(props: {
         let formStateConvertedDate: any = { ...formState }
         try {
             formStateConvertedDate.date = formStateConvertedDate.date?.toLocaleDateString("en-US")
-            props.setOpenBackdrop(true)
+            props.setLoading(true)
             await API.postIncome(Auth.token, formStateConvertedDate)
-            props.setOpenBackdrop(false)
+            props.setLoading(false)
             setAlertState({
                 severity: "success",
                 message: "Record Saved!",
@@ -78,7 +78,7 @@ export default function AddRecordsForm(props: {
             })
             props.reloadWallChart()
         } catch (err) {
-            props.setOpenBackdrop(false)
+            props.setLoading(false)
             if (err.message === "Error! 500") {
                 setAlertState({
                     severity: "error",

@@ -40,7 +40,7 @@ function Home() {
     const theme = useTheme();
 
     const {Auth, setAuth } = useAuth()
-    const {alertState, setAlertState, openBackdrop, setOpenBackdrop} = useStateContext()
+    const { setAlertState, setLoading} = useStateContext()
 
     // Form control state
     const [formState, setFormState] = useState<FormStateType>(
@@ -159,9 +159,9 @@ function Home() {
         try {
             event.preventDefault()
             let route = formState.form
-            setOpenBackdrop(true)
+            setLoading(true)
             let response = await API[route](Auth.token, formState)
-            setOpenBackdrop(false)
+            setLoading(false)
             // Formatting the dates the hard way because javascript doesn't support strftime...
             if (route !== 'pivot') {
                 response.data = response.data.map(formatDates)
@@ -181,7 +181,7 @@ function Home() {
             if (err.message === "Unauthorized") {
                 setAuth({ type: 'LOGOUT' })
             }
-            setOpenBackdrop(false)
+            setLoading(false)
             setAlertState({
                 severity: "error",
                 message: "Error Fetching Data",
@@ -258,6 +258,7 @@ function Home() {
             console.error(err)
         }
     }
+
 
     // Reload data for Wallchart
     async function reloadWallChartData(): Promise<void> {
@@ -511,7 +512,7 @@ function Home() {
                     handleClose={handleClose}
                     categories={categoriesState}
                     setCategories={setCategoriesState}
-                    setOpenBackdrop={setOpenBackdrop}
+                    setLoading={setLoading}
                 />
             </Dialog>
             <Dialog onClose={handleClose} open={addExpensesOpen} maxWidth='xl'>
@@ -519,7 +520,7 @@ function Home() {
                     classes={classes}
                     handleClose={handleClose}
                     categories={categoriesState}
-                    setOpenBackdrop={setOpenBackdrop}
+                    setLoading={setLoading}
                     reloadWallChart={reloadWallChartData}
                 />
             </Dialog>
@@ -528,7 +529,7 @@ function Home() {
                     classes={classes}
                     handleClose={handleClose}
                     categories={categoriesState}
-                    setOpenBackdrop={setOpenBackdrop}
+                    setLoading={setLoading}
                     reloadWallChart={reloadWallChartData}
                 />
             </Dialog>

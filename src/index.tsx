@@ -4,11 +4,17 @@ import './index.css';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
+import { AuthProvider } from './Context/Auth'
+import { StateProvider } from './Context/State'
 
 ReactDOM.render(
-  // <React.StrictMode>
-    <App />,
-  // </React.StrictMode>,
+  <React.StrictMode>
+    <AuthProvider>
+      <StateProvider>
+        <App />
+      </StateProvider>
+    </AuthProvider>,
+  </React.StrictMode>,
   document.getElementById('root')
 );
 

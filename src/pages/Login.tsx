@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import API from '../utils/API'
-import { AuthContext } from '../App'
+import { useAuth } from '../Context/Auth'
 import { Button, TextField, Dialog, Typography } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Signup from '../components/Signup'
+import { useStateContext } from '../Context/State';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -50,8 +51,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Login() {
-    const { Auth, setAuth, setAlertState, setOpenBackdrop } = React.useContext(AuthContext)
-
+    const {Auth, setAuth } = useAuth()
+    const {setAlertState, setOpenBackdrop} = useStateContext()
     const [loginFormState, setLoginFormState] = useState({
         username: "",
         password: "",

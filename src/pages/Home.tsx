@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import ReportTable from '../components/Table';
+import ReportTable from '../components/ReportTable';
 import AddExpensesForm from '../components/AddExpensesForm'
 import AddIncomeForm from '../components/AddIncomeForm'
 import API from '../utils/API'
 import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
-import { AuthContext } from '../App'
+import { useAuth } from '../Context/Auth'
 import type {
     TableDataEntry,
     DataListStateType,
@@ -15,8 +15,6 @@ import type {
     WallChartDataType
 } from '../interfaces/Interfaces'
 import {
-    Button,
-    Container,
     Dialog,
     Box
 } from '@material-ui/core';
@@ -25,7 +23,6 @@ import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import AddIcon from '@material-ui/icons/Add'
 import {
-    emptyDatabase,
     saveCategories,
     loadCategories,
     saveWallChartData,
@@ -35,13 +32,15 @@ import AppBar from '../components/AppBar';
 
 import PivotTable from '../components/PivotTable';
 import Form from '../components/Form';
-import WallChart from '../components/Chart'
+import WallChart from '../components/WallChart'
 import Edit from '../components/Edit';
+import { useStateContext } from '../Context/State';
 
 function Home() {
     const theme = useTheme();
 
-    const { Auth, setAuth, setAlertState, setOpenBackdrop } = React.useContext(AuthContext)
+    const {Auth, setAuth } = useAuth()
+    const {alertState, setAlertState, openBackdrop, setOpenBackdrop} = useStateContext()
 
     // Form control state
     const [formState, setFormState] = useState<FormStateType>(
@@ -238,9 +237,6 @@ function Home() {
 
         } catch (err) {
             console.error(err)
-            if (err.message === "Unauthorized") {
-                setAuth({ type: 'LOGOUT' })
-            }
         }
     }
 
@@ -261,6 +257,22 @@ function Home() {
         } catch (err) {
             console.error(err)
         }
+    }
+
+    // Reload data for Wallchart
+    async function reloadWallChartData(): Promise<void> {
+        let data = await loadWallChartData()
+        if (data) setWallChartData(data)
+        try {
+            data = await API.wallchart(Auth.token)
+            setWallChartData(data)
+            saveWallChartData(data)
+        } catch (err) {
+            if (err.message === "No Data") {
+                console.log("No Data!")
+            }
+        }
+
     }
 
     // Update an expense row altered by the user
@@ -302,22 +314,6 @@ function Home() {
         }
     }
 
-    // Reload data for Wallchart
-    async function reloadWallChartData(): Promise<void> {
-        let data;
-        try {
-            data = await API.wallchart(Auth.token)
-            setWallChartData(data)
-            saveWallChartData(data)
-        } catch (err) {
-            if (err.message === "No Data") {
-                console.log("No Data!")
-            } else {
-                data = await loadWallChartData()
-                setWallChartData(data)
-            }
-        }
-    }
 
     // Delete a row from the database
     async function deleteEntry(id: number | undefined) {
@@ -338,11 +334,6 @@ function Home() {
                 setAuth({ type: 'LOGOUT' })
             }
         }
-    }
-
-    // Download Excel File
-    function downloadFile(): void {
-        API.downloadFile(Auth.token, `${Auth.user}_expenses.xlsx`, "2021-01-01", "2021-05-01")
     }
 
     // Create classes to use for styling
@@ -428,8 +419,8 @@ function Home() {
     const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
 
     const actions = [
-        { icon: <AddIcon />, name: 'Expenses', action: handleExpensesOpen, operation: 'product' },
-        { icon: <AddIcon />, name: 'Income', action: handleIncomeOpen, operation: 'tag' }
+        { icon: <AddIcon />, name: 'Expenses', action: handleExpensesOpen, operation: 'expenses' },
+        { icon: <AddIcon />, name: 'Income', action: handleIncomeOpen, operation: 'income' }
     ]
 
     const handleSpeedDialClose = () => {
@@ -460,11 +451,6 @@ function Home() {
         setEditOpen(false)
     }
 
-    // Control display of Offline banner
-    const [offline, setOffline] = useState<boolean>(false)
-    window.addEventListener("offline", () => setOffline(true))
-    window.addEventListener("online", () => setOffline(false))
-
     useEffect(() => {
         async function getCategories(): Promise<void> {
             try {
@@ -478,17 +464,14 @@ function Home() {
         }
         getCategories()
         reloadWallChartData()
-        if (!navigator.onLine) {
-            setOffline(true)
-        }
     }, [Auth.token])
 
     return (
         <Box component='div' className={classes.home}>
-                <AppBar setEditOpen={setEditOpen}/>
+            <AppBar setEditOpen={setEditOpen} />
             <Box component='header' className="header" >
-                <h1 style={{ textAlign: 'center'}}>Wall Chart</h1>
-                    
+                <h1 style={{ textAlign: 'center' }}>Wall Chart</h1>
+
                 <WallChart data={wallChartData} />
                 <Form
                     classes={classes}

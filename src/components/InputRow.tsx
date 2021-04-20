@@ -6,17 +6,6 @@ import { IconButton, TableCell, TableRow, TextField, InputAdornment } from '@mat
 import { withStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { blueGrey } from '@material-ui/core/colors';
 
-
-const StyledTableCell = withStyles((theme: Theme) =>
-    createStyles({
-        body: {
-            fontSize: 14,
-            padding: 0,
-            maxWidth: '10ch',
-        },
-    }),
-)(TableCell);
-
 const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -42,11 +31,20 @@ export default function InputRow(props:
         dataLists?: AllDataListsType
         handleChange: Function,
         handleUpdate: Function,
-        deleteEntry: Function
+        deleteEntry: Function,
+        classes: string
     }) {
 
+    // State controls
     const [state, setState] = useState<TableDataEntry>({ amount: "" })
 
+    function handleInputRowChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        let { name, value } = event.target;
+        setState({ ...state, [name]: value })
+    }
+
+    // Helper function to create datalists for category and person fields
+    // This helps the user make a valid entry
     function makeDataList(propsState: DataListStateType[], id: string) {
         return (
             <datalist id={id}>
@@ -62,11 +60,7 @@ export default function InputRow(props:
         )
     }
 
-    function handleInputRowChange(event: React.ChangeEvent<HTMLInputElement>): void {
-        let { name, value } = event.target;
-        setState({ ...state, [name]: value })
-    }
-
+    // Set props to state on render
     useEffect(() => {
         setState(props.entry)
     }, [props.entry])
@@ -77,11 +71,10 @@ export default function InputRow(props:
                 .filter(column => !column.name.includes("id"))
                 .map(column => {
                     return (
-                        <StyledTableCell
-
-                        >
+                        <TableCell className={props.classes}>
                             <TextField
                                 name={column.name}
+                                // On blur, update state of entire table via handleChange dispatch in props
                                 onBlur={(e: React.FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => {
                                     props.handleChange(e, props.i)
                                 }}
@@ -108,18 +101,18 @@ export default function InputRow(props:
                             {column.name === 'broad_category' && props.dataLists?.broad_categories ? (
                                 makeDataList(props.dataLists?.broad_categories, column.name)
                             ) : null}
-                        </StyledTableCell>
+                        </TableCell>
                     )
                 })}
-            <StyledTableCell>
+            <TableCell className={props.classes}>
                 <IconButton
                     color="primary"
                     onClick={() => props.handleUpdate(props.i)}
                 >
                     <SaveIcon />
                 </IconButton>
-            </StyledTableCell>
-            <StyledTableCell>
+            </TableCell>
+            <TableCell className={props.classes}>
                 <IconButton
                     aria-label="delete"
                     color="secondary"
@@ -127,7 +120,7 @@ export default function InputRow(props:
                 >
                     <DeleteIcon />
                 </IconButton>
-            </StyledTableCell>
+            </TableCell>
         </StyledTableRow>
     )
 }

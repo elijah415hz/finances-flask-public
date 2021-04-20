@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import API from '../utils/API'
 import { saveRecord } from '../utils/db'
-import { AuthContext } from '../App'
+import { useAuth } from '../Context/Auth'
 import { ExpensesFormType, AllDataListsType, DataListStateType } from '../interfaces/Interfaces'
 import {
     Button,
@@ -21,6 +21,7 @@ import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import { useStateContext } from '../Context/State'
 
 
 export default function AddRecordsForm(props: {
@@ -30,8 +31,8 @@ export default function AddRecordsForm(props: {
     setOpenBackdrop: Function,
     reloadWallChart: Function
 }) {
-    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
-
+    const {Auth, setAuth } = useAuth()
+    const { setAlertState} = useStateContext()
     const initialFormState = {
         date: new Date(Date.now()),
         amount: NaN,

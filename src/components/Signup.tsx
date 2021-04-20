@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import API from '../utils/API'
-import { AuthContext } from '../App'
 import { Button, DialogContent, TextField, Typography } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import { useStateContext } from '../Context/State';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function Signup({handleClose}: {handleClose: Function}) {
-    const { setAlertState, setOpenBackdrop } = React.useContext(AuthContext)
+    const { setAlertState, setOpenBackdrop} = useStateContext()
 
     const [signupFormState, setSignupFormState] = useState({
         username: "",

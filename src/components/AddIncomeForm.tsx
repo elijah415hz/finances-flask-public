@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import API from '../utils/API'
-import { AuthContext } from '../App'
+import { useAuth } from '../Context/Auth'
 import type { IncomeFormType, AllDataListsType } from '../interfaces/Interfaces'
 import {
     Button,
@@ -21,6 +21,7 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { saveRecord } from '../utils/db';
+import { useStateContext } from '../Context/State';
 
 
 export default function AddRecordsForm(props: {
@@ -31,7 +32,8 @@ export default function AddRecordsForm(props: {
     reloadWallChart: Function
 }) {
 
-    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
+    const {Auth, setAuth } = useAuth()
+    const { setAlertState } = useStateContext()
 
     const initialFormState = {
         date: new Date(Date.now()),

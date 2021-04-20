@@ -8,7 +8,7 @@ import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import MoreIcon from '@material-ui/icons/MoreVert';
-import { AuthContext } from '../App'
+import { useAuth } from '../Context/Auth'
 import { emptyDatabase } from '../utils/db';
 import API from '../utils/API'
 
@@ -24,43 +24,6 @@ const useStyles = makeStyles((theme: Theme) =>
         title: {
             textAlign: 'center',
             textTransform: 'capitalize'
-        },
-        search: {
-            position: 'relative',
-            borderRadius: theme.shape.borderRadius,
-            backgroundColor: fade(theme.palette.common.white, 0.15),
-            '&:hover': {
-                backgroundColor: fade(theme.palette.common.white, 0.25),
-            },
-            marginRight: theme.spacing(1),
-            marginLeft: 0,
-            width: '100%',
-            [theme.breakpoints.up('sm')]: {
-                marginLeft: theme.spacing(3),
-                width: 'auto',
-            },
-        },
-        searchIcon: {
-            padding: theme.spacing(0, 2),
-            height: '100%',
-            position: 'absolute',
-            pointerEvents: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-        },
-        inputRoot: {
-            color: 'inherit',
-        },
-        inputInput: {
-            padding: theme.spacing(1, 1, 1, 0),
-            // vertical padding + font size from searchIcon
-            paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-            transition: theme.transitions.create('width'),
-            width: '100%',
-            [theme.breakpoints.up('md')]: {
-                width: '20ch',
-            },
         },
         sectionDesktop: {
             display: 'none',
@@ -82,7 +45,7 @@ export default function MyAppBar({ setEditOpen }: { setEditOpen: Function }) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const isMenuOpen = Boolean(anchorEl);
-    const { Auth, setAuth } = React.useContext(AuthContext)
+    const { Auth, setAuth } = useAuth()
 
     function edit(): void {
         setEditOpen(true)

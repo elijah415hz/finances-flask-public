@@ -82,12 +82,17 @@ interface Auth {
     token: string
   };
   
-  interface ContextState {
+  interface AuthContextType {
     Auth: Auth,
     setAuth: React.Dispatch<{ type: string; payload?: { user: string; token: string; } | undefined; }>,
-    setAlertState: React.Dispatch<React.SetStateAction<AlertStateType>>
-    setOpenBackdrop: React.Dispatch<React.SetStateAction<boolean>>
   };
+
+  interface StateContextType {
+    alertState: AlertStateType,
+    setAlertState: React.Dispatch<React.SetStateAction<AlertStateType>>,
+    openBackdrop: boolean,
+    setOpenBackdrop: React.Dispatch<React.SetStateAction<boolean>>,
+  }
 
 interface WallChartDataType {
     labels: string[], 
@@ -119,7 +124,8 @@ export type {
     CategoryType,
     AlertStateType,
     Auth,
-    ContextState,
+    AuthContextType,
+    StateContextType,
     EditFormType,
     WallChartDataType,
     ChartJSDataType

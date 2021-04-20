@@ -9,7 +9,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import { makeStyles, createStyles, withStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 export default function ReportTable(props:
     {
@@ -29,23 +29,25 @@ export default function ReportTable(props:
         form?: string
     }) {
 
-        const StyledTableCell = withStyles((theme: Theme) =>
-        createStyles({
-            head: {
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.common.white,
-                padding: 10,
-                fontSize: 16
-            },
-        }),
-        )(TableCell);
-
+        // Styling
         const useStyles = makeStyles((theme: Theme) =>
         createStyles({
             table: {
                 minWidth: 650,
                 padding: '0 1em'
             },
+                tableCellHead: {
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.common.white,
+                    padding: 10,
+                    fontSize: 16
+                },
+                tableCellBody: {
+                    fontSize: 14,
+                    padding: 0,
+                    maxWidth: '10ch',
+                },
+        
         })
         );
         const classes = useStyles();
@@ -57,10 +59,11 @@ export default function ReportTable(props:
                 myRef.current.scrollIntoView({behavior: 'smooth'})
             }
         }
-    
+        
         useEffect(() => {
             executeScroll()
         })
+        
     return (
         <TableContainer component={Paper} >
             <Table className={classes.table} ref={myRef}>
@@ -70,13 +73,13 @@ export default function ReportTable(props:
                             .filter(column => !column.name.includes("id"))
                             .map(column => {
                                 return (
-                                    <StyledTableCell key={column.name} style={{textTransform: 'capitalize'}}>
+                                    <TableCell className={classes.tableCellHead} key={column.name} style={{textTransform: 'capitalize'}}>
                                         {column.name.replace("_", " ")}
-                                    </StyledTableCell>
+                                    </TableCell>
                                 )
                             })}
-                        <StyledTableCell><span>Save</span></StyledTableCell>
-                        <StyledTableCell><span>Delete</span></StyledTableCell>
+                        <TableCell className={classes.tableCellHead}><span>Save</span></TableCell>
+                        <TableCell className={classes.tableCellHead}><span>Delete</span></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody className="tableBody">
@@ -90,6 +93,7 @@ export default function ReportTable(props:
                                 handleUpdate={props.handleUpdate}
                                 dataLists={props.dataLists}
                                 deleteEntry={props.deleteEntry}
+                                classes={classes.tableCellBody}
                             />
                     ))}
                 </TableBody>

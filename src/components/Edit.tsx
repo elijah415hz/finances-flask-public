@@ -17,7 +17,9 @@ import {
 import CloseIcon from '@material-ui/icons/Close'
 import { AllDataListsType, EditFormType } from '../interfaces/Interfaces'
 import API from '../utils/API'
-import { AuthContext } from '../App'
+import { useAuth } from '../Context/Auth'
+import { useStateContext } from '../Context/State'
+
 
 export default function Edit(props: {
     handleClose: Function,
@@ -26,7 +28,8 @@ export default function Edit(props: {
     setCategories: Function,
     setOpenBackdrop: Function
 }) {
-    const { Auth, setAuth, setAlertState } = React.useContext(AuthContext)
+    const {Auth, setAuth } = useAuth()
+    const { setAlertState} = useStateContext()
 
     const initialFormState = {
         person: "",

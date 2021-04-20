@@ -6,7 +6,6 @@ import API from './utils/API'
 import { testDatabase } from './utils/db'
 import './App.css';
 import CustomizedSnackbar from './components/SnackBar'
-import { AlertStateType, Auth, ContextState } from './interfaces/Interfaces'
 import { ThemeProvider, createMuiTheme, Theme, makeStyles, createStyles } from '@material-ui/core/styles';
 import { green, blueGrey, purple } from '@material-ui/core/colors'
 import { MuiPickersOverrides } from '@material-ui/pickers/typings/overrides';
@@ -16,6 +15,8 @@ import {
   Backdrop,
   CircularProgress,
 } from '@material-ui/core'
+import {useAuth} from './Context/Auth';
+import { useStateContext } from './Context/State'
 
 // Types to allow for theme customization
 type overridesNameToClassKey = {
@@ -102,18 +103,11 @@ const ProtectedRoute = ({ component: Component, loggedIn, ...rest }: {
 
 )
 
-export const AuthContext = React.createContext<ContextState>({
-  Auth: {
-    loggedIn: false,
-    user: "",
-    token: ""
-  },
-  setAuth: (): void => { },
-  setAlertState: (): void => { },
-  setOpenBackdrop: (): void => { }
-})
 
 export default function App() {
+
+  const {Auth, setAuth } = useAuth()
+  const {alertState, setAlertState, openBackdrop} = useStateContext()
 
   const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -125,46 +119,7 @@ export default function App() {
   )
 
   const classes = useStyles();
-  // Reducer state for Authentication values
-  const reducer = (state: Auth, action: { type: string, payload?: { user: string, token: string } }): Auth => {
-    if (action.type === 'LOGIN' && action.payload) {
-      localStorage.setItem("user", action.payload.user);
-      localStorage.setItem("token", action.payload.token);
-      return {
-        ...state,
-        loggedIn: true,
-        user: action.payload.user,
-        token: action.payload.token
-      };
-    } else if (action.type === 'LOGOUT') {
-      localStorage.clear();
-      return {
-        ...state,
-        loggedIn: false,
-        user: "",
-        token: "",
-      };
-    } else {
-      return state;
-    }
-  };
-
-  const [Auth, setAuth] = useReducer(reducer, {
-    loggedIn: false,
-    user: "",
-    token: ""
-  })
-
-  // State for alert snackbars
-  const [alertState, setAlertState] = useState<AlertStateType>({
-    severity: undefined,
-    message: "",
-    open: false,
-  })
-
-  // Loading Backdrop display state
-  const [openBackdrop, setOpenBackdrop] = useState<boolean>(false);
-
+  
   useEffect(() => {
     const token = localStorage.getItem("token")
     const user = localStorage.getItem("user")
@@ -190,9 +145,6 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthContext.Provider
-        value={{ Auth, setAuth, setAlertState, setOpenBackdrop }}
-      >
         <Router>
           <ProtectedRoute path="/"
             loggedIn={Auth.loggedIn}
@@ -210,7 +162,6 @@ export default function App() {
         <Backdrop className={classes.backdrop} open={openBackdrop}>
           <CircularProgress disableShrink color="inherit" />
         </Backdrop>
-      </AuthContext.Provider>
     </ThemeProvider>
   )
 }

@@ -4,8 +4,6 @@ import { withStyles, createStyles, Theme } from '@material-ui/core/styles'
 import { TableDataEntry } from '../interfaces/Interfaces';
 import { blueGrey } from '@material-ui/core/colors';
 
-// import StaticRow from './StaticRow';
-
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
         head: {
@@ -58,14 +56,16 @@ export default function PivotTable(props: {
     },
 }) {
 
+    // Controls which rows are expanded to view subcategories
     const [show, setShow] = useState<boolean[]>([false])
-
     function toggleShowRow(i: number) {
         let newShow = [...show]
         newShow[i] = !newShow[i]
         setShow(newShow)
     }
 
+    // Calling reduce on our props data to create our pivot table data
+    // Yes, this will re-run on every render, but until I have the time to get the TS errors worked out with the useEffect route, we'll do it this way
     const pivotState = props.state.data.reduce((a, b) => {
         if (b.broad_category) {
             if (a[b.broad_category]) {
@@ -98,12 +98,12 @@ export default function PivotTable(props: {
         return a
     }, {} as any)
 
-    console.log(pivotState)
-
+    // Set every broad category to be collapsed
     useEffect(() => {
         let showState = Object.keys(pivotState).map((i: any) => false)
         setShow(showState)
     }, [props])
+
     return (
         <TableContainer component={Paper}>
             <Table>
@@ -116,10 +116,10 @@ export default function PivotTable(props: {
                             Narrow Category
                         </StyledTableCell>
                         <StyledTableCell>
-                            person
+                            Person
                         </StyledTableCell>
                         <StyledTableCell>
-                            amount
+                            Amount
                         </StyledTableCell>
                     </TableRow>
                 </TableHead>

@@ -81,9 +81,9 @@ export async function saveRecord(table: 'income' | 'expenses', record: ExpensesF
 }
 
 export async function saveCategories(categories: AllDataListsType) {
-  (Object.keys(categories) as Array<keyof AllDataListsType>).map((category: keyof AllDataListsType) => {
+  (Object.keys(categories) as Array<keyof AllDataListsType>).forEach((category: keyof AllDataListsType) => {
     db.clear(category)
-    categories[category as keyof AllDataListsType]?.map(c => {
+    categories[category as keyof AllDataListsType]?.forEach(c => {
       db.put(category, c)
     })
   })

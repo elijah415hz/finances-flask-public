@@ -68,7 +68,7 @@ def post_batch_income():
         return Response("Nice Try!", status=401)
     else:
         for row in json:
-            json['user_id'] = valid_token['id']
+            row['user_id'] = valid_token['id']
             insert_income(row)
         return Response('Records Inserted!', status=200)
 

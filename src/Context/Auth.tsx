@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState, useReducer} from 'react'
+import React, {createContext, useContext, useReducer} from 'react'
 import { Auth, AuthContextType } from '../interfaces/Interfaces'
 
 

@@ -26,7 +26,8 @@ import {
     saveCategories,
     loadCategories,
     saveWallChartData,
-    loadWallChartData
+    loadWallChartData,
+    checkDatabase
 } from '../utils/db';
 import AppBar from '../components/AppBar';
 
@@ -39,8 +40,8 @@ import { useStateContext } from '../Context/State';
 function Home() {
     const theme = useTheme();
 
-    const {Auth, setAuth } = useAuth()
-    const { setAlertState, setLoading} = useStateContext()
+    const { Auth, setAuth } = useAuth()
+    const { setAlertState, setLoading } = useStateContext()
 
     // Form control state
     const [formState, setFormState] = useState<FormStateType>(
@@ -466,6 +467,16 @@ function Home() {
         getCategories()
         reloadWallChartData()
     }, [Auth.token])
+
+    useEffect(() => {
+        async function checkAndDisplaySuccess() {
+            let result = await checkDatabase()
+            setAlertState(result)
+        }
+        // listen for app coming back online
+        window.addEventListener("online", checkAndDisplaySuccess);
+        return () => window.removeEventListener("online", checkAndDisplaySuccess)
+    }, [])
 
     return (
         <Box component='div' className={classes.home}>

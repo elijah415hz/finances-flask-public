@@ -2,7 +2,6 @@ click
 gunicorn
 itsdangerous
 markupsafe
-matplotlib
 numpy
 pandas
 python-dateutil

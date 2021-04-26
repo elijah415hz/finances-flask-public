@@ -9,7 +9,6 @@ verify_ssl = true
 click = "*"
 gunicorn = "*"
 itsdangerous = "*"
-matplotlib = "*"
 numpy = "*"
 pandas = "*"
 python-dateutil = "*"

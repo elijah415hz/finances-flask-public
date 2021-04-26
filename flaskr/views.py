@@ -1,6 +1,5 @@
 from flask import Blueprint, send_file, current_app, Response, request, jsonify, send_from_directory
 import pandas as pd
-from matplotlib.figure import Figure
 import base64
 import os
 from io import BytesIO

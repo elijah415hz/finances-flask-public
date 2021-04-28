@@ -2,6 +2,7 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 ![Contents](https://img.shields.io/github/languages/top/elijah415hz/finances-flask-public)
 ![Last-Commit](https://img.shields.io/github/last-commit/elijah415hz/finances-flask-public)
+![Screenshot](screenshot.jpg)
 
 ## Description
 Flask of Finances is a finances tracking app inspired by "Your Money or your Life." I found after years of trying to get a clear picture of my budget that the fancy apps that connected to all of my bank accounts and credit cards weren't working for me. The automagicness of it all meant that I just forgot to check up on it. I needed something a bit more hands on so that I'd be connecting with it on a more regular basis. I also wanted more control over the categories of my spending so that I could get a really granular understanding of my finances. Enter Flask of Finances, a fully customizable expense and income tracking progressive web app built with React and Flask.

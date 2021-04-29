@@ -7,7 +7,7 @@ import { testDatabase } from './utils/db'
 import './App.css';
 import CustomizedSnackbar from './components/SnackBar'
 import { ThemeProvider, createMuiTheme, Theme, makeStyles, createStyles } from '@material-ui/core/styles';
-import { green, blueGrey, purple } from '@material-ui/core/colors'
+import { green, blueGrey, deepPurple } from '@material-ui/core/colors'
 import { MuiPickersOverrides } from '@material-ui/pickers/typings/overrides';
 import {
   CssBaseline,
@@ -80,7 +80,7 @@ const theme = createMyTheme({
       main: green[900]
     },
     secondary: {
-      main: purple[800]
+      main: deepPurple[800]
     }
   },
 });

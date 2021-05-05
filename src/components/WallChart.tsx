@@ -29,7 +29,7 @@ export default function WallChart({ data }: { data: ChartJSDataType }) {
               yAxes: [
                 {
                   ticks: {
-                    fontColor: "#404B50",
+                    fontColor: "#fff",
                     callback: function (value) {
                       if (value >= 1000) {
                         return (

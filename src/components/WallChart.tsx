@@ -13,11 +13,11 @@ export default function WallChart({ data }: { data: ChartJSDataType }) {
                     scales: {
                         xAxes: [{
                             ticks: {
-                                fontColor: "#404B50"
+                                fontColor: "#fff"
                             },
                             gridLines: {
-                                color: "#404B50",
-                                zeroLineColor: "#404B50",
+                                color: "#fff",
+                                zeroLineColor: "#fff",
                                 drawOnChartArea: false
                             }
                         }],
@@ -33,8 +33,8 @@ export default function WallChart({ data }: { data: ChartJSDataType }) {
                                 }
                             },
                             gridLines: {
-                                color: "#404B50",
-                                zeroLineColor: "#404B50",
+                                color: "#fff",
+                                zeroLineColor: "#fff",
                                 drawOnChartArea: false
                             }
                         }]

@@ -49,6 +49,18 @@ export default function WallChart({ data }: { data: ChartJSDataType }) {
                 },
               ],
             },
+            tooltips: {
+              callbacks: {
+                label: function (tooltipItem, data) {
+                  return (
+                    "$" +
+                    Number(tooltipItem.yLabel)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  );
+                },
+              },
+            },
           }}
         />
       </Box>
